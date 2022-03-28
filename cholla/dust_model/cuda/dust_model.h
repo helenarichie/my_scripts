@@ -4,9 +4,9 @@
 #ifndef DUST_CUDA_H
 #define DUST_CUDA_H
 
-#include"/Users/helenraichie/GitHub/cholla/src/global/gpu.hpp"
+#include"/ihome/hrichie/her45/GitHub/cholla/src/global/gpu.hpp"
 #include<math.h>
-#include"/Users/helenraichie/GitHub/cholla/src/global/global.h"
+#include"/ihome/hrichie/her45/GitHub/cholla/src/global/global.h"
 
 
 #endif // DUST_CUDA_H
