@@ -1,6 +1,3 @@
-#ifdef CUDA
-#ifdef DUST_GPU
-
 #include"dust_cuda.h"
 #include<math.h>
 #include<vector.h>
@@ -16,7 +13,3 @@ int main() {
     cuda_hello<<<1, 1>>>();
     return 0;
 }
-
-
-#endif // DUST_GPU
-#endif // CUDA
