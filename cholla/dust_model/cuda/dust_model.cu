@@ -13,7 +13,7 @@ int main() {
     return 0;
 }
 
-__global__ void cuda_hello()) {
+__global__ void cuda_hello() {
     printf("Hello World from GPU!\n");
 }
 
