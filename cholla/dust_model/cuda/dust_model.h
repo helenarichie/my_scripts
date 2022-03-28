@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #ifdef CUDA
 #ifdef DUST_GPU
 
@@ -12,3 +13,8 @@
 #endif // DUST_CUDA_H
 #endif // DUST_GPU
 #endif // CUDA
+=======
+#include"/Users/helenraichie/GitHub/cholla/src/global/gpu.hpp"
+#include<math.h>
+#include"/Users/helenraichie/GitHub/cholla/src/global/global.h"
+>>>>>>> 03218ff89d357ecfba355f295a38142f6362d651
