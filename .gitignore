@@ -18,3 +18,7 @@ dist
 # Testing and cache files
 .pytest_cache/
 *.prof
+
+# Output files
+*.h5
+*.mp4
