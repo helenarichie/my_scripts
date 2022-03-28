@@ -134,7 +134,6 @@ double Dust::calc_dd_dt() {
     return -d_dust / (tau_sp/3);
 }
 
-// forward-Euler methods:
 void Get_Indices(int n_ghost, int nx, int ny, int nz, int &is, int &ie, int &js, int &je, int &ks, int &ke) {
     is = n_ghost;
     ie = nx - n_ghost;

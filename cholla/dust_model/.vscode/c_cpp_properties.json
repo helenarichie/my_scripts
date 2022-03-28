@@ -1,0 +1,109 @@
+{
+    "configurations": [
+        {
+            "name": "Spock",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${OLCF_GOOGLETEST_ROOT}/**",
+                "${OLCF_HDF5_ROOT}/**",
+                "${CRAY_MPICH_BASEDIR}/**"
+            ],
+            "defines": [
+                "PRECISION=2",
+                "MPI_CHOLLA",
+                "CUDA",
+                "HLLD",
+                "PARTICLES",
+                "OUTPUT",
+                "HDF5",
+                "HYDRO_GPU",
+                "CUDA",
+                "MPI_CHOLLA",
+                "BLOCK",
+                "PRECISION=2",
+                "PPMP",
+                "HLLD",
+                "MHD",
+                "DENSITY_FLOOR",
+                "TEMPERATURE_FLOOR",
+                "CPU_TIME",
+                "PARALLEL_OMP"
+            ],
+            "compilerPath": "/opt/cray/pe/cce/12.0.1/cce-clang/x86_64/bin/clang",
+            "intelliSenseMode": "linux-clang-x64",
+            "cppStandard": "c++11",
+            "cStandard": "c11"
+        },
+        {
+            "name": "H2P-Power9-Node",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/ihome/crc/install/power9/googletest/1.11.0/**",
+                "/ihome/crc/install/power9/hdf5/1.12.0/build-gcc-10.1.0/**",
+                "/ihome/crc/install/power9/openmpi/4.0.5/build-gcc-10.1.0/**",
+                "/ihome/crc/install/power9/cuda/11.1.0/include/**"
+            ],
+            "defines": [
+                "PRECISION=2",
+                "MPI_CHOLLA",
+                "CUDA",
+                "HLLD",
+                "PARTICLES",
+                "OUTPUT",
+                "HDF5",
+                "HYDRO_GPU",
+                "CUDA",
+                "MPI_CHOLLA",
+                "BLOCK",
+                "PRECISION=2",
+                "PPMP",
+                "HLLD",
+                "MHD",
+                "DENSITY_FLOOR",
+                "TEMPERATURE_FLOOR",
+                "CPU_TIME",
+                "PARALLEL_OMP"
+            ],
+            "compilerPath": "${GCC_ROOT}/bin/g++",
+            "intelliSenseMode": "linux-gcc-x64",
+            "cppStandard": "c++11",
+            "cStandard": "c11"
+        },
+        {
+            "name": "c-3po",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/local/include/**",
+                "/usr/lib/x86_64-linux-gnu/openmpi/include/",
+                "/usr/local/cuda-11.4/include",
+                "/usr/lib/x86_64-linux-gnu/hdf5/serial/include/"
+            ],
+            "defines": [
+                "PRECISION=2",
+                "MPI_CHOLLA",
+                "CUDA",
+                "HLLD",
+                "PARTICLES",
+                "OUTPUT",
+                "HDF5",
+                "HYDRO_GPU",
+                "CUDA",
+                "MPI_CHOLLA",
+                "BLOCK",
+                "PRECISION=2",
+                "PPMP",
+                "HLLD",
+                "MHD",
+                "DENSITY_FLOOR",
+                "TEMPERATURE_FLOOR",
+                "CPU_TIME",
+                "PARALLEL_OMP"
+            ],
+            "compilerPath": "/usr/bin/g++",
+            "intelliSenseMode": "linux-gcc-x64",
+            "cppStandard": "c++11",
+            "cStandard": "c11"
+        }
+    ],
+    "version": 4
+}
