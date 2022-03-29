@@ -1,3 +1,5 @@
+#define CUDA
+
 #include "dust_model.h"
 
 #include <cstdio>
@@ -10,18 +12,17 @@
 #include "/ihome/hrichie/her45/GitHub/cholla/src/utils/cuda_utilities.h"
 
 int main() {
-    cuda_hello<<<1, 1>>>();
-    return 0;
+    Dust_Update(C.device, H.nx, H.ny, H.nz, H.n_ghost, H.n_fields, H.dt, gama, dev_dti_array);
 }
 
- void dust_update(Real *dev_conserved, int nx, int ny, int nz, int n_ghost, int n_fields, Real dt, Real gamma, Real *dt_array) {
+ void Dust_Update(Real *dev_conserved, int nx, int ny, int nz, int n_ghost, int n_fields, Real dt, Real gamma, Real *dt_array) {
     dim3 dim1dGrid(ngrid, 1, 1);
     dim3 dim1dBlock(TPB, 1, 1);
-    hipLaunchKernelGGL(dust_kernel, dim1dGrid, dim1dBlock, 0, 0, dev_conserved, nx, ny, nz, n_ghost, n_fields, dt, gamma, dt_array);
+    hipLaunchKernelGGL(Dust_Kernel, dim1dGrid, dim1dBlock, 0, 0, dev_conserved, nx, ny, nz, n_ghost, n_fields, dt, gamma, dt_array);
     CudaCheckError();  
 }
 
-__global__ void dust_kernel(Real *dev_conserved, int nx, int ny, int nz, int n_ghost, int n_fields, Real dt, Real gamma, Real *dt_array) {
+__global__ void Dust_Kernel(Real *dev_conserved, int nx, int ny, int nz, int n_ghost, int n_fields, Real dt, Real gamma, Real *dt_array) {
     __shared__ Real min_dt[TPB];
 
     // get grid indices
