@@ -10,9 +10,43 @@
 #include "/ihome/hrichie/her45/GitHub/cholla/src/utils/gpu.hpp"
 #include "/ihome/hrichie/her45/GitHub/cholla/src/utils/hydro_utilities.h"
 #include "/ihome/hrichie/her45/GitHub/cholla/src/utils/cuda_utilities.h"
+#include "/ihome/hrichie/her45/GitHub/cholla/src/grid/grid3D.h"
+#include "/ihome/hrichie/her45/GitHub/cholla/src/grid/grid3D.cpp"
 
 int main() {
-    Dust_Update(C.device, H.nx, H.ny, H.nz, H.n_ghost, H.n_fields, H.dt, gama, dev_dti_array);
+    struct parameters Params;
+    Params.nx = 1;
+    Params.ny = 1;
+    Params.nz = 1;
+    Params.tout = 0.2;
+    Params.outstep = 0.2;
+    Params.gamma = 1.6666666666666667;
+    Params.xmin = 0.0;
+    Params.ymin = 0.0;
+    Params.zmin = 0.0;
+    Params.xlen = 1.0;
+    Params.ylen = 1.0;
+    Params.zlen = 1.0;
+    Params.xl_bcnd = 3;
+    Params.xu_bcnd = 3;
+    Params.yl_bcnd = 0;
+    Params.yu_bcnd = 0;
+    Params.zl_bcnd = 0;
+    Params.zu_bcnd = 0;
+    Params.outdir = "./";
+
+    Grid3D G;
+    G.Initialize(&Params);
+    G.Set_Initial_Conditions(Params);
+    G.Set_Boundary_Conditions_Grid(Params);
+
+    chprintf("Dimensions of each cell: dx = %f dy = %f dz = %f\n", G.H.dx, G.H.dy, G.H.dz);
+    chprintf("Ratio of specific heats gamma = %f\n", gama);
+    chprintf("Nstep = %d  Timestep = %f  Simulation time = %f\n", G.H.n_step, G.H.dt, G.H.t);
+
+
+    
+    Dust_Update(C.device, H.nx, H.ny, H.nz, H.n_ghost, H.n_fields, H.dt, gamma, dev_dti_array);
 }
 
  void Dust_Update(Real *dev_conserved, int nx, int ny, int nz, int n_ghost, int n_fields, Real dt, Real gamma, Real *dt_array) {
