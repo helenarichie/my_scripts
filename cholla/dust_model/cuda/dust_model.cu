@@ -6,6 +6,7 @@
 #include "dust_model.h"
 
 #include <cstdio>
+#include<stdio.h>
 
 #include "/ihome/hrichie/her45/GitHub/cholla/src/global/global.h"
 #include "/ihome/hrichie/her45/GitHub/cholla/src/global/global_cuda.h"
@@ -14,53 +15,64 @@
 #include "/ihome/hrichie/her45/GitHub/cholla/src/utils/cuda_utilities.h"
 #include "/ihome/hrichie/her45/GitHub/cholla/src/grid/grid3D.h"
 
-
 int n_fields = 6;
 int n_cells = 1;
 int nx = 1;
 int ny = 1;
 int nz = 1;
-int n_ghost = 2;
+int n_ghost = 0;
 int ngrid = (n_cells + TPB - 1) / TPB;
 
 int main() {
   Real gamma = 1.6666666666666667;
 
   Real rho = 1.67260e-26;
-  Real vx = 0.0;
-  Real vy = 0.0;
-  Real vz = 0.0;
+  Real vx = 3.0;
+  Real vy = 2.0;
+  Real vz = 1.0;
   Real P = 3.10657e-13;
   Real rho_d = 1.67260e-26/3;
 
   Real dt = 1e2;
 
-  Real host_conserved[n_fields] = {rho, vx, vy, vz, P, rho_d};
-  Real dev_conserved[n_fields];
+  Real *host_conserved;
+  Real *dev_conserved;
 
-  Real host_dti_array[TPB] = {dt};
-  Real dev_dti_array[TPB];
+  Real *host_dti_array;
+  Real *dev_dti_array;
 
-  // Memory allocation for host array
-  CudaSafeCall( cudaHostAlloc((void**)&host_conserved, n_fields*n_cells*sizeof(Real), cudaHostAllocDefault) );
-  // Memory allocation for device array
-  CudaSafeCall( cudaMalloc((void**)&dev_conserved, n_fields*n_cells*sizeof(Real)) );
+  // Memory allocation for host arrays
+  CudaSafeCall(cudaHostAlloc(&host_conserved, n_fields*n_cells*sizeof(Real), cudaHostAllocDefault));
+  CudaSafeCall(cudaHostAlloc(&host_dti_array, TPB*sizeof(Real), cudaHostAllocDefault));
+  // Memory allocation for device arrays
+  CudaSafeCall(cudaMalloc(&dev_conserved, n_fields*n_cells*sizeof(Real)));
+  CudaSafeCall(cudaMalloc(&dev_dti_array, TPB*sizeof(Real)));
+
+  for (int i = 0; i < TPB; i++ ) {
+    host_dti_array[i] = dt;
+    std::cout << i << "\n";
+  }
 
   // Initialize host array
   Conserved_Init(host_conserved, rho, vx, vy, vz, P, rho_d, gamma, n_cells, nx, ny, nz, n_ghost, n_fields);
-
   // Copy host to device
-  CudaSafeCall(cudaMemcpy(dev_dti_array, host_dti_array, ngrid*sizeof(Real), cudaMemcpyHostToDevice));
+  CudaSafeCall(cudaMemcpy(dev_dti_array, host_dti_array, TPB*sizeof(Real), cudaMemcpyHostToDevice));
   CudaSafeCall(cudaMemcpy(dev_conserved, host_conserved, ngrid*sizeof(Real), cudaMemcpyHostToDevice));
+
+  std::cout << "host_i: " << host_conserved[5*n_cells] << "\n";
+  //std::cout << "dev_i: " << dev_conserved[5*n_cells] << "\n";
 
   Dust_Update(dev_conserved, nx, ny, nz, n_ghost, n_fields, dt, gamma, dev_dti_array);
 
   // Copy device to host
-  CudaSafeCall( cudaMemcpy(host_conserved, dev_conserved, ngrid*sizeof(Real), cudaMemcpyDeviceToHost) );
+  CudaSafeCall(cudaMemcpy(host_conserved, dev_conserved, ngrid*sizeof(Real), cudaMemcpyDeviceToHost));
 
   // free host and device memory
-  CudaSafeCall( cudaFreeHost(host_conserved) );
-  CudaSafeCall( cudaFree(dev_conserved) );
+  CudaSafeCall(cudaFreeHost(host_conserved));
+  CudaSafeCall(cudaFree(dev_conserved));
+
+  std::cout << "host_f: " << host_conserved[5*n_cells] << "\n";
+  //std::cout << "dev_f: " << dev_conserved[5*n_cells] << "\n";
 
 }
 
@@ -73,19 +85,17 @@ int main() {
 
 __global__ void Dust_Kernel(Real *dev_conserved, int nx, int ny, int nz, int n_ghost, int n_fields, Real dt, Real gamma, Real *dt_array) {
     __shared__ Real min_dt[TPB];
-
     // get grid indices
     int n_cells = nx * ny * nz;
     int is, ie, js, je, ks, ke;
     cuda_utilities::Get_Real_Indices(n_ghost, nx, ny, nz, is, ie, js, je, ks, ke);
-
     // get a global thread ID
     int blockId = blockIdx.x + blockIdx.y * gridDim.x;
     int id = threadIdx.x + blockId * blockDim.x;
     int zid = id / (nx * ny);
     int yid = (id - zid * nx * ny) / nx;
     int xid = id - zid * nx * ny - yid * nx;
-    // add a thread id within the block
+    // add a thread id within the block 
     int tid = threadIdx.x;
 
     // set min dt to a high number
@@ -106,12 +116,12 @@ __global__ void Dust_Kernel(Real *dev_conserved, int nx, int ny, int nz, int n_g
     Real dd; // change in dust density at current time-step
     Real dd_max = 0.01; // allowable percentage of dust density increase
     Real dt_sub; //refined timestep
-
     if (xid >= is && xid < ie && yid >= js && yid < je && zid >= ks && zid < ke) {
         // get quantities from dev_conserved
         d_gas = dev_conserved[id];
         d_dust = dev_conserved[5*n_cells + id];
         E = dev_conserved[4*n_cells + id];
+        printf("kernel: %f\n", d_dust);
         // make sure thread hasn't crashed
         if (E < 0.0 || E != E) return;
         
