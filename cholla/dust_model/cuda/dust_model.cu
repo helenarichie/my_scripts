@@ -35,56 +35,49 @@ int main() {
 
   Real dt = 1e2;
 
-  Real *host_conserved;
-  Real *dev_conserved;
-
-  Real *host_dti_array;
-  Real *dev_dti_array;
+  double *host_conserved;
+  double *dev_conserved;
 
   // Memory allocation for host arrays
-  CudaSafeCall(cudaHostAlloc(&host_conserved, n_fields*n_cells*sizeof(Real), cudaHostAllocDefault));
-  CudaSafeCall(cudaHostAlloc(&host_dti_array, TPB*sizeof(Real), cudaHostAllocDefault));
+  cudaHostAlloc(&host_conserved, n_fields*n_cells*sizeof(double), cudaHostAllocDefault);
+  
   // Memory allocation for device arrays
-  CudaSafeCall(cudaMalloc(&dev_conserved, n_fields*n_cells*sizeof(Real)));
-  CudaSafeCall(cudaMalloc(&dev_dti_array, TPB*sizeof(Real)));
-
-  for (int i = 0; i < TPB; i++ ) {
-    host_dti_array[i] = dt;
-    std::cout << i << "\n";
-  }
+  cudaMalloc(&dev_conserved, n_fields*n_cells*sizeof(double));
 
   // Initialize host array
   Conserved_Init(host_conserved, rho, vx, vy, vz, P, rho_d, gamma, n_cells, nx, ny, nz, n_ghost, n_fields);
+
   // Copy host to device
-  CudaSafeCall(cudaMemcpy(dev_dti_array, host_dti_array, TPB*sizeof(Real), cudaMemcpyHostToDevice));
-  CudaSafeCall(cudaMemcpy(dev_conserved, host_conserved, ngrid*sizeof(Real), cudaMemcpyHostToDevice));
+  CudaSafeCall(cudaMemcpy(dev_conserved, host_conserved, n_fields*n_cells*sizeof(double), cudaMemcpyHostToDevice));
 
-  std::cout << "host_i: " << host_conserved[5*n_cells] << "\n";
-  //std::cout << "dev_i: " << dev_conserved[5*n_cells] << "\n";
+  //std::cout << "host_i: " << host_conserved[5*n_cells] << "\n";
 
-  Dust_Update(dev_conserved, nx, ny, nz, n_ghost, n_fields, dt, gamma, dev_dti_array);
+  dim3 dim1dGrid(ngrid, 1, 1);
+  dim3 dim1dBlock(TPB, 1, 1);
+  Dust_Kernel<<<dim1dGrid, dim1dBlock>>>(dev_conserved, nx, ny, nz, n_ghost, n_fields, dt, gamma);
+  //hipLaunchKernelGGL(Dust_Kernel, dim1dGrid, dim1dBlock, 0, 0, dev_conserved, nx, ny, nz, n_ghost, n_fields, dt, gamma);
+  CudaCheckError();  
 
   // Copy device to host
-  CudaSafeCall(cudaMemcpy(host_conserved, dev_conserved, ngrid*sizeof(Real), cudaMemcpyDeviceToHost));
+  cudaMemcpy(host_conserved, dev_conserved, n_fields*n_cells*sizeof(double), cudaMemcpyDeviceToHost);
+
+  //std::cout << "host_f: " << host_conserved[5*n_cells] << "\n";
 
   // free host and device memory
-  CudaSafeCall(cudaFreeHost(host_conserved));
-  CudaSafeCall(cudaFree(dev_conserved));
-
-  std::cout << "host_f: " << host_conserved[5*n_cells] << "\n";
-  //std::cout << "dev_f: " << dev_conserved[5*n_cells] << "\n";
+  cudaFreeHost(host_conserved);
+  cudaFree(dev_conserved);
 
 }
 
- void Dust_Update(Real *dev_conserved, int nx, int ny, int nz, int n_ghost, int n_fields, Real dt, Real gamma, Real *dt_array) {
+ void Dust_Update(double *dev_conserved, int nx, int ny, int nz, int n_ghost, int n_fields, Real dt, Real gamma) {
     dim3 dim1dGrid(ngrid, 1, 1);
     dim3 dim1dBlock(TPB, 1, 1);
-    hipLaunchKernelGGL(Dust_Kernel, dim1dGrid, dim1dBlock, 0, 0, dev_conserved, nx, ny, nz, n_ghost, n_fields, dt, gamma, dt_array);
+    hipLaunchKernelGGL(Dust_Kernel, dim1dGrid, dim1dBlock, 0, 0, dev_conserved, nx, ny, nz, n_ghost, n_fields, dt, gamma);
     CudaCheckError();  
 }
 
-__global__ void Dust_Kernel(Real *dev_conserved, int nx, int ny, int nz, int n_ghost, int n_fields, Real dt, Real gamma, Real *dt_array) {
-    __shared__ Real min_dt[TPB];
+__global__ void Dust_Kernel(double *dev_conserved, int nx, int ny, int nz, int n_ghost, int n_fields, Real dt, Real gamma) {
+    //__shared__ Real min_dt[TPB];
     // get grid indices
     int n_cells = nx * ny * nz;
     int is, ie, js, je, ks, ke;
@@ -96,11 +89,13 @@ __global__ void Dust_Kernel(Real *dev_conserved, int nx, int ny, int nz, int n_g
     int yid = (id - zid * nx * ny) / nx;
     int xid = id - zid * nx * ny - yid * nx;
     // add a thread id within the block 
-    int tid = threadIdx.x;
 
     // set min dt to a high number
-    min_dt[tid] = 1e10;
-    __syncthreads();
+    //min_dt[tid] = 1e10;
+
+    if (id == 0) {printf("dt: %f\n", dt);}
+    if (id == 0) {printf("nx: %d\n", nx);}
+    if (id == 0) {printf("gamma: %f\n", gamma);}
 
     // define physics variables
     Real d_gas, d_dust; // fluid mass densities
@@ -171,8 +166,8 @@ __global__ void Dust_Kernel(Real *dev_conserved, int nx, int ny, int nz, int n_g
         dev_conserved[(n_fields-1)*n_cells + id] = d*ge;
         #endif
     }
-    __syncthreads();
 
+    /*
     // do the reduction in shared memory (find the min timestep in the block)
     for (unsigned int s=1; s<blockDim.x; s*=2) {
         if (tid % (2*s) == 0) {
@@ -180,9 +175,9 @@ __global__ void Dust_Kernel(Real *dev_conserved, int nx, int ny, int nz, int n_g
         }
         __syncthreads();
     }
-
     // write the result for this block to global memory
      if (tid == 0) dt_array[blockIdx.x] = min_dt[0];
+    */
 }
 
 __device__ void Dust::set_tau_sp() {
