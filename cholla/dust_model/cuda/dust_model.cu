@@ -27,6 +27,7 @@ const int k_n_ghost = 0;
 const int k_ngrid = (k_n_cells + TPB - 1) / TPB;
 
 int main() {
+
   Real gamma = 1.6666666666666667;
 
   Real rho = 1.67260e-26;
@@ -36,88 +37,84 @@ int main() {
   Real P = 3.10657e-2;
   Real rho_d = 1.67260e-26/3;
 
-  Real dt = 1e4;
+  Real dt = 1e3;
 
   Real *host_conserved;
   Real *dev_conserved;
+  Real *params_host;
+  Real *params_dev;
 
-  int n_dt = 1e6;
-  Real t_arr[n_dt] = {0};
+  int n_params = 6;
+
+  int n_dt = 1e5;
   Real host_out[n_dt] = {0};
+  Real t_arr[n_dt] = {0};
+  Real tmax = n_dt*dt;
 
-  std::vector<double> vec_1 = linspace(1, 10, 3);
-  print_vector(vec_1);
-
-  // initialize time array
-  Real dt_i = dt;
-  for(int i=0; i<n_dt; i++) {
-    t_arr[i] = dt_i;
-    dt_i += dt;
+  int i = 0;
+  for (Real t_i = 0; t_i < tmax; t_i += dt) {
+        t_arr[i] = t_i;
+        i += 1;
   }
 
   for(int i=0; i<n_dt; i++) {
     // Memory allocation for host arrays
     CudaSafeCall(cudaHostAlloc(&host_conserved, k_n_fields*k_n_cells*sizeof(Real), cudaHostAllocDefault));
-    //host_conserved = (Real*)malloc(k_n_fields*k_n_cells*sizeof(Real));
+    CudaSafeCall(cudaHostAlloc(&params_host, n_params*sizeof(Real), cudaHostAllocDefault));
+
     // Memory allocation for device arrays
     CudaSafeCall(cudaMalloc(&dev_conserved, k_n_fields*k_n_cells*sizeof(Real)));
+    CudaSafeCall(cudaMalloc(&params_dev, n_params*sizeof(Real)));
 
     // Initialize host array
     Conserved_Init(host_conserved, rho, vx, vy, vz, P, rho_d, gamma, k_n_cells, k_nx, k_ny, k_nz, k_n_ghost, k_n_fields);
 
     // Copy host to device
     CudaSafeCall(cudaMemcpy(dev_conserved, host_conserved, k_n_fields*k_n_cells*sizeof(Real), cudaMemcpyHostToDevice));
+    CudaSafeCall(cudaMemcpy(params_dev, params_host, n_params*sizeof(Real), cudaMemcpyHostToDevice));
 
     // std::cout << "host_i: " << host_conserved[5*k_n_cells] << "\n";
 
-    Dust_Update(dev_conserved, k_nx, k_ny, k_nz, k_n_ghost, k_n_fields, dt, gamma);
+    Dust_Update(dev_conserved, k_nx, k_ny, k_nz, k_n_ghost, k_n_fields, dt, gamma, params_dev);
 
     // Copy device to host
     CudaSafeCall(cudaMemcpy(host_conserved, dev_conserved, k_n_fields*k_n_cells*sizeof(Real), cudaMemcpyDeviceToHost));
+    CudaSafeCall(cudaMemcpy(params_host, params_dev, n_params*sizeof(Real), cudaMemcpyDeviceToHost));
 
     // std::cout << "host_f: " << host_conserved[5*k_n_cells] << "\n";
     host_out[i] = host_conserved[5*k_n_cells];
 
     // free host and device memory
     CudaSafeCall(cudaFreeHost(host_conserved));
-    CudaSafeCall(cudaFree(dev_conserved)); 
+    CudaSafeCall(cudaFree(dev_conserved));
   }
 
   std::ofstream myfile ("output.txt");
   if (myfile.is_open())
   {
     for(int i=0; i<n_dt; i++) {
-      // std::cout << t_arr[i] << "\n";
       myfile << t_arr[i] << "," ;
       myfile << host_out[i] << "\n" ;
     }
     myfile.close();
   }
-  else std::cout << "Unable to open file";
-  return 0;
 
-  for(int i=0; i<n_dt; i++) {
-    // std::cout << t_arr[i] << "\n";
-    continue;
+  for(int i=0; i<6; i++) {
+   std::cout << params_host[i] << "\n";
   }
-
-  for(int i=0; i<n_dt; i++) {
-    // std::cout << host_out[i] << "\n";
-    continue;
-  }
-
 }
 
- void Dust_Update(Real *dev_conserved, int nx, int ny, int nz, int n_ghost, int n_fields, Real dt, Real gamma) {
+ void Dust_Update(Real *dev_conserved, int nx, int ny, int nz, int n_ghost, int n_fields, Real dt, Real gamma, Real *params_dev) {
     dim3 dim1dGrid(k_ngrid, 1, 1);
     dim3 dim1dBlock(TPB, 1, 1);
-    hipLaunchKernelGGL(Dust_Kernel, dim1dGrid, dim1dBlock, 0, 0, dev_conserved, nx, ny, nz, n_ghost, n_fields, dt, gamma);
+    hipLaunchKernelGGL(Dust_Kernel, dim1dGrid, dim1dBlock, 0, 0, dev_conserved, nx, ny, nz, n_ghost, n_fields, dt, gamma, params_dev);
     CudaCheckError();  
 }
 
-__global__ void Dust_Kernel(Real *dev_conserved, int nx, int ny, int nz, int n_ghost, int n_fields, Real dt, Real gamma) {
+__global__ void Dust_Kernel(Real *dev_conserved, int nx, int ny, int nz, int n_ghost, int n_fields, Real dt, Real gamma, Real *params_dev) {
     //__shared__ Real min_dt[TPB];
     // get grid indices
+    Real const K = 1e30;
     int n_cells = nx * ny * nz;
     int is, ie, js, je, ks, ke;
     cuda_utilities::Get_Real_Indices(n_ghost, nx, ny, nz, is, ie, js, je, ks, ke);
@@ -145,6 +142,7 @@ __global__ void Dust_Kernel(Real *dev_conserved, int nx, int ny, int nz, int n_g
     Real dd; // change in dust density at current time-step
     Real dd_max = 0.01; // allowable percentage of dust density increase
     Real dt_sub; //refined timestep
+
     if (xid >= is && xid < ie && yid >= js && yid < je && zid >= ks && zid < ke) {
         // get quantities from dev_conserved
         d_gas = dev_conserved[id];
@@ -153,6 +151,11 @@ __global__ void Dust_Kernel(Real *dev_conserved, int nx, int ny, int nz, int n_g
         E = dev_conserved[4*n_cells + id];
         //printf("kernel: %7.4e\n", d_dust);
         // make sure thread hasn't crashed
+
+        // multiply small values by arbitrary constant to preserve precision
+        d_gas *= K;
+        d_dust *= K;
+
         if (E < 0.0 || E != E) return;
         
         vx = dev_conserved[1*n_cells + id] / d_gas;
@@ -185,6 +188,12 @@ __global__ void Dust_Kernel(Real *dev_conserved, int nx, int ny, int nz, int n_g
         dd_dt = dust_obj.calc_dd_dt();
         dd = dd_dt * dt;
 
+
+        params_dev[0] = dust_obj.tau_sp_/3.154e7;
+        params_dev[1] = T;
+        params_dev[2] = n;
+        params_dev[3] = dd_dt;
+        params_dev[4] = dd; 
         // printf("tau_sp: %e\n", dust_obj.tau_sp_);
 
         // printf("T: %e\n", T);
@@ -201,13 +210,17 @@ __global__ void Dust_Kernel(Real *dev_conserved, int nx, int ny, int nz, int n_g
             dd = dt * dd_dt;
         }
 
-        dust_obj.d_dust_ += dd;
+        params_dev[5] = dust_obj.d_dust_; 
 
-        // printf("dd_dt: %e\n", dd_dt);
-        // printf("dd: %e\n", dd);
-        // printf("after calculation: %7.4e\n", dust_obj.d_dust_);
+        printf("dd_dt: %7.6e\n", dd_dt);
+        printf("dd: %7.6e\n", dd);
+        printf("d_dust: %7.6e\n", dust_obj.d_dust_);
 
         // update dust and gas densities
+        d_dust = dust_obj.d_dust_ + dd;
+
+        d_gas /= K;
+        d_dust /= K;
         dev_conserved[5*n_cells + id] = dust_obj.d_dust_;
         
         #ifdef DE
@@ -284,32 +297,4 @@ void Conserved_Init(Real *host_conserved, Real rho, Real vx, Real vy, Real vz, R
       }
     }
   }
-}
-
-template<typename T>
-std::vector<double> linspace(T start_in, T end_in, int num_in)
-{
-
-  std::vector<double> linspaced;
-
-  double start = static_cast<double>(start_in);
-  double end = static_cast<double>(end_in);
-  double num = static_cast<double>(num_in);
-
-  if (num == 0) { return linspaced; }
-  if (num == 1) 
-    {
-      linspaced.push_back(start);
-      return linspaced;
-    }
-
-  double delta = (end - start) / (num - 1);
-
-  for(int i=0; i < num-1; ++i)
-    {
-      linspaced.push_back(start + delta * i);
-    }
-  linspaced.push_back(end); // I want to ensure that start and end
-                            // are exactly the same as the input
-  return linspaced;
 }
