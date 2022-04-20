@@ -9,6 +9,8 @@
 #include<stdio.h>
 #include <fstream>
 
+#include <vector>
+
 #include "../../../../cholla/src/global/global.h"
 #include "../../../../cholla/src/global/global_cuda.h"
 #include "../../../../cholla/src/utils/gpu.hpp"
@@ -39,9 +41,12 @@ int main() {
   Real *host_conserved;
   Real *dev_conserved;
 
-  int n_dt = 1e4;
+  int n_dt = 1e6;
   Real t_arr[n_dt] = {0};
   Real host_out[n_dt] = {0};
+
+  std::vector<double> vec_1 = linspace(1, 10, 3);
+  print_vector(vec_1);
 
   // initialize time array
   Real dt_i = dt;
@@ -81,8 +86,6 @@ int main() {
   std::ofstream myfile ("output.txt");
   if (myfile.is_open())
   {
-    myfile << "This is a line.\n";
-    myfile << "This is another line.\n";
     for(int i=0; i<n_dt; i++) {
       // std::cout << t_arr[i] << "\n";
       myfile << t_arr[i] << "," ;
@@ -281,4 +284,32 @@ void Conserved_Init(Real *host_conserved, Real rho, Real vx, Real vy, Real vz, R
       }
     }
   }
+}
+
+template<typename T>
+std::vector<double> linspace(T start_in, T end_in, int num_in)
+{
+
+  std::vector<double> linspaced;
+
+  double start = static_cast<double>(start_in);
+  double end = static_cast<double>(end_in);
+  double num = static_cast<double>(num_in);
+
+  if (num == 0) { return linspaced; }
+  if (num == 1) 
+    {
+      linspaced.push_back(start);
+      return linspaced;
+    }
+
+  double delta = (end - start) / (num - 1);
+
+  for(int i=0; i < num-1; ++i)
+    {
+      linspaced.push_back(start + delta * i);
+    }
+  linspaced.push_back(end); // I want to ensure that start and end
+                            // are exactly the same as the input
+  return linspaced;
 }
