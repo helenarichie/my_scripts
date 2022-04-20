@@ -39,7 +39,7 @@ int main() {
   Real *host_conserved;
   Real *dev_conserved;
 
-  int n_dt = 1e5;
+  int n_dt = 1e4;
   Real t_arr[n_dt] = {0};
   Real host_out[n_dt] = {0};
 
@@ -78,7 +78,7 @@ int main() {
     CudaSafeCall(cudaFree(dev_conserved)); 
   }
 
-  std::ofstream myfile ("example.txt");
+  std::ofstream myfile ("output.txt");
   if (myfile.is_open())
   {
     myfile << "This is a line.\n";
