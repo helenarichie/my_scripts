@@ -27,7 +27,7 @@ class Dust {
     __device__ Real calc_dd_dt();
 
   private:
-    Real YR_IN_S_ = 3.154*pow(10,7); // one year in s
+    Real YR_IN_S_ = 3.154e7; // one year in s
 
 };
 
