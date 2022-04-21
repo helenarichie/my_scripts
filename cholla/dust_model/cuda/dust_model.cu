@@ -30,50 +30,49 @@ int main() {
 
   Real gamma = 1.6666666666666667;
 
-  Real rho = 1.67260e-26;
-  Real vx = 3.0;
+  // set values for conserved variable array
+  Real rho = 1.67260e-26; // gas density
+  Real vx = 3.0; // x, y, z velocity
   Real vy = 2.0;
   Real vz = 1.0;
-  Real P = 3.10657e-2;
-  Real rho_d = 1.67260e-26/3;
+  Real P = 3.10657e-2; // pressure
+  Real rho_d = 1.67260e-26/3; // dust density
 
-  Real dt = 1e3;
+  Real dt = 1e3; // integration time-step
 
+  // conserved variable arrays for host and device
   Real *host_conserved;
   Real *dev_conserved;
+
+  // arrays to save values of other physical parameters for host and device
   Real *params_host;
   Real *params_dev;
+  int n_params = 6;// number of params in array
 
-  int n_params = 6;
+  int n_dt = 1e5; // number of time-steps for kernel
+  Real tmax = n_dt*dt; // total integration time
 
-  int n_dt = 1e5;
-  Real host_out[n_dt] = {0};
-  Real t_arr[n_dt] = {0};
-  Real tmax = n_dt*dt;
+  // arrays to save dust density output
+  int n_cols = 8;
+  Real host_out[n_dt*n_cols] = {0};
 
-  int i = 0;
-  for (Real t_i = 0; t_i < tmax; t_i += dt) {
-        t_arr[i] = t_i;
-        i += 1;
-  }
+  // Memory allocation for host arrays
+  CudaSafeCall(cudaHostAlloc(&host_conserved, k_n_fields*k_n_cells*sizeof(Real), cudaHostAllocDefault));
+  CudaSafeCall(cudaHostAlloc(&params_host, n_params*sizeof(Real), cudaHostAllocDefault));
 
+  // Memory allocation for device arrays
+  CudaSafeCall(cudaMalloc(&dev_conserved, k_n_fields*k_n_cells*sizeof(Real)));
+  CudaSafeCall(cudaMalloc(&params_dev, n_params*sizeof(Real)));
+
+  // Initialize host array
+  Conserved_Init(host_conserved, rho, vx, vy, vz, P, rho_d, gamma, k_n_cells, k_nx, k_ny, k_nz, k_n_ghost, k_n_fields);
+
+  Real t_i = 0;
   for(int i=0; i<n_dt; i++) {
-    // Memory allocation for host arrays
-    CudaSafeCall(cudaHostAlloc(&host_conserved, k_n_fields*k_n_cells*sizeof(Real), cudaHostAllocDefault));
-    CudaSafeCall(cudaHostAlloc(&params_host, n_params*sizeof(Real), cudaHostAllocDefault));
-
-    // Memory allocation for device arrays
-    CudaSafeCall(cudaMalloc(&dev_conserved, k_n_fields*k_n_cells*sizeof(Real)));
-    CudaSafeCall(cudaMalloc(&params_dev, n_params*sizeof(Real)));
-
-    // Initialize host array
-    Conserved_Init(host_conserved, rho, vx, vy, vz, P, rho_d, gamma, k_n_cells, k_nx, k_ny, k_nz, k_n_ghost, k_n_fields);
 
     // Copy host to device
     CudaSafeCall(cudaMemcpy(dev_conserved, host_conserved, k_n_fields*k_n_cells*sizeof(Real), cudaMemcpyHostToDevice));
     CudaSafeCall(cudaMemcpy(params_dev, params_host, n_params*sizeof(Real), cudaMemcpyHostToDevice));
-
-    // std::cout << "host_i: " << host_conserved[5*k_n_cells] << "\n";
 
     Dust_Update(dev_conserved, k_nx, k_ny, k_nz, k_n_ghost, k_n_fields, dt, gamma, params_dev);
 
@@ -81,30 +80,36 @@ int main() {
     CudaSafeCall(cudaMemcpy(host_conserved, dev_conserved, k_n_fields*k_n_cells*sizeof(Real), cudaMemcpyDeviceToHost));
     CudaSafeCall(cudaMemcpy(params_host, params_dev, n_params*sizeof(Real), cudaMemcpyDeviceToHost));
 
-    // std::cout << "host_f: " << host_conserved[5*k_n_cells] << "\n";
-    host_out[i] = host_conserved[5*k_n_cells];
+    host_out[i] = t_i; // time
+    host_out[1*n_cols+i] = host_conserved[5*k_n_cells]; // dust density
+    host_out[2*n_cols+i] = params_host[0]; // temp
+    host_out[3*n_cols+i] = params_host[1]; // number density
+    host_out[4*n_cols+i] = params_host[2]; // sputtering timescale
+    host_out[5*n_cols+i] = params_host[3]; // dd_dt
+    host_out[6*n_cols+i] = params_host[4]; // dd
+    host_out[7*n_cols+i] = params_host[5]; // time_refine
 
-    // free host and device memory
-    CudaSafeCall(cudaFreeHost(host_conserved));
-    CudaSafeCall(cudaFree(dev_conserved));
+    t_i += dt;
   }
+  
+  // free host and device memory
+  CudaSafeCall(cudaFreeHost(host_conserved));
+  CudaSafeCall(cudaFree(dev_conserved));
 
   std::ofstream myfile ("output.txt");
   if (myfile.is_open())
   {
     for(int i=0; i<n_dt; i++) {
-      myfile << t_arr[i] << "," ;
-      myfile << host_out[i] << "\n" ;
+      for(int j=0; j<n_cols; j++) {
+        myfile << host_out[j*n_cols+i] << ",";
+      }
+      myfile << "\n";
     }
     myfile.close();
   }
-
-  for(int i=0; i<6; i++) {
-   std::cout << params_host[i] << "\n";
-  }
 }
 
- void Dust_Update(Real *dev_conserved, int nx, int ny, int nz, int n_ghost, int n_fields, Real dt, Real gamma, Real *params_dev) {
+void Dust_Update(Real *dev_conserved, int nx, int ny, int nz, int n_ghost, int n_fields, Real dt, Real gamma, Real *params_dev) {
     dim3 dim1dGrid(k_ngrid, 1, 1);
     dim3 dim1dBlock(TPB, 1, 1);
     hipLaunchKernelGGL(Dust_Kernel, dim1dGrid, dim1dBlock, 0, 0, dev_conserved, nx, ny, nz, n_ghost, n_fields, dt, gamma, params_dev);
@@ -189,19 +194,16 @@ __global__ void Dust_Kernel(Real *dev_conserved, int nx, int ny, int nz, int n_g
         dd = dd_dt * dt;
 
 
-        params_dev[0] = dust_obj.tau_sp_/3.154e7;
-        params_dev[1] = T;
-        params_dev[2] = n;
+        params_dev[0] = T;
+        params_dev[1] = n;
+        params_dev[2] = dust_obj.tau_sp_/3.154e7;
         params_dev[3] = dd_dt;
         params_dev[4] = dd; 
-        // printf("tau_sp: %e\n", dust_obj.tau_sp_);
-
-        // printf("T: %e\n", T);
-        // printf("n: %e\n", n);
-        // printf("dt: %e\n", dt);
 
         // ensure that dust density is not changing too rapidly
+        bool time_refine = false;
         while (d_dust/dd > dd_max) {
+            time_refine = true;
             dt_sub = dd_max * d_dust / dd_dt;
             dust_obj.d_dust_ += dt_sub * dd_dt;
             dust_obj.dt_ -= dt_sub;
@@ -210,18 +212,15 @@ __global__ void Dust_Kernel(Real *dev_conserved, int nx, int ny, int nz, int n_g
             dd = dt * dd_dt;
         }
 
-        params_dev[5] = dust_obj.d_dust_; 
+        params_dev[5] = time_refine;
 
-        printf("dd_dt: %7.6e\n", dd_dt);
-        printf("dd: %7.6e\n", dd);
-        printf("d_dust: %7.6e\n", dust_obj.d_dust_);
-
-        // update dust and gas densities
+        // update dust density
         d_dust = dust_obj.d_dust_ + dd;
 
+        // remove scaling constant
         d_gas /= K;
         d_dust /= K;
-        dev_conserved[5*n_cells + id] = dust_obj.d_dust_;
+        dev_conserved[5*n_cells + id] = d_dust;
         
         #ifdef DE
         dev_conserved[(n_fields-1)*n_cells + id] = d*ge;
