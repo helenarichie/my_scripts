@@ -54,7 +54,7 @@ int main() {
 
   // arrays to save dust density output
   int n_cols = 8;
-  Real host_out[n_dt*n_cols] = {0};
+  Real host_out[n_cols][n_dt] = {0};
 
   // Memory allocation for host arrays
   CudaSafeCall(cudaHostAlloc(&host_conserved, k_n_fields*k_n_cells*sizeof(Real), cudaHostAllocDefault));
@@ -80,14 +80,14 @@ int main() {
     CudaSafeCall(cudaMemcpy(host_conserved, dev_conserved, k_n_fields*k_n_cells*sizeof(Real), cudaMemcpyDeviceToHost));
     CudaSafeCall(cudaMemcpy(params_host, params_dev, n_params*sizeof(Real), cudaMemcpyDeviceToHost));
 
-    host_out[i] = t_i; // time
-    host_out[1*n_cols+i] = host_conserved[5*k_n_cells]; // dust density
-    host_out[2*n_cols+i] = params_host[0]; // temp
-    host_out[3*n_cols+i] = params_host[1]; // number density
-    host_out[4*n_cols+i] = params_host[2]; // sputtering timescale
-    host_out[5*n_cols+i] = params_host[3]; // dd_dt
-    host_out[6*n_cols+i] = params_host[4]; // dd
-    host_out[7*n_cols+i] = params_host[5]; // time_refine
+    host_out[0][i] = t_i; // time
+    host_out[1][i] = host_conserved[5*k_n_cells]; // dust density
+    host_out[2][i] = params_host[0]; // temp
+    host_out[3][i] = params_host[1]; // number density
+    host_out[4][i] = params_host[2]; // sputtering timescale
+    host_out[5][i] = params_host[3]; // dd_dt
+    host_out[6][i] = params_host[4]; // dd
+    host_out[7][i] = params_host[5]; // time_refine
 
     t_i += dt;
   }
@@ -101,7 +101,7 @@ int main() {
   {
     for(int i=0; i<n_dt; i++) {
       for(int j=0; j<n_cols; j++) {
-        myfile << host_out[j*n_cols+i] << ",";
+        myfile << host_out[j][i] << ",";
       }
       myfile << "\n";
     }
@@ -192,7 +192,6 @@ __global__ void Dust_Kernel(Real *dev_conserved, int nx, int ny, int nz, int n_g
 
         dd_dt = dust_obj.calc_dd_dt();
         dd = dd_dt * dt;
-
 
         params_dev[0] = T;
         params_dev[1] = n;
