@@ -31,12 +31,12 @@ int main() {
   Real gamma = 1.6666666666666667;
 
   // set values for conserved variable array
-  Real rho = 1.67260e-26; // gas density
+  Real rho = 1.67260E-24; // gas density
   Real vx = 3.0; // x, y, z velocity
   Real vy = 2.0;
   Real vz = 1.0;
-  Real P = 3.10657e-2; // pressure
-  Real rho_d = 1.67260e-26/3; // dust density
+  Real P = 21.3348; // pressure
+  Real rho_d = rho/100; // dust density
 
   Real dt = 1e3; // integration time-step
 
@@ -96,7 +96,7 @@ int main() {
   CudaSafeCall(cudaFreeHost(host_conserved));
   CudaSafeCall(cudaFree(dev_conserved));
 
-  std::ofstream myfile ("output.txt");
+  std::ofstream myfile ("output8.txt");
   if (myfile.is_open())
   {
     for(int i=0; i<n_dt; i++) {

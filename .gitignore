@@ -25,3 +25,5 @@ dist
 *.png
 *.o
 *.exe
+*.txt
+dust
