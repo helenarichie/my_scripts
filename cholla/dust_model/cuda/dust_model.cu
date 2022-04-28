@@ -192,14 +192,14 @@ __global__ void Dust_Kernel(Real *dev_conserved, int nx, int ny, int nz, int n_g
         params_dev[0] = T;
         params_dev[1] = n;
         params_dev[2] = tau_sp/3.154e7;
-        params_dev[3] = dd_dt;
-        params_dev[4] = dd; 
+        params_dev[3] = dd_dt/K;
+        params_dev[4] = dd/K; 
 
         // ensure that dust density is not changing too rapidly
         bool time_refine = false;
-        while (dd/d_dust > dd_max) {
+        while (abs(dd)/d_dust > dd_max) {
             time_refine = true;
-            dt_sub = dd_max * d_dust / dd_dt;
+            dt_sub = dd_max * d_dust / abs(dd_dt);
             d_dust += dt_sub * dd_dt;
             dt -= dt_sub;
             dd_dt = calc_dd_dt(d_dust, tau_sp);
