@@ -35,7 +35,7 @@ int main() {
   Real vx = 3.0; // x, y, z velocity
   Real vy = 2.0;
   Real vz = 1.0;
-  Real P = 21.3348; // pressure
+  Real P = 0.00213348; // pressure
   Real rho_d = rho/100; // dust density
 
   Real dt = 1e3; // integration time-step
@@ -96,7 +96,7 @@ int main() {
   CudaSafeCall(cudaFreeHost(host_conserved));
   CudaSafeCall(cudaFree(dev_conserved));
 
-  std::ofstream myfile ("output8.txt");
+  std::ofstream myfile ("output4.txt");
   if (myfile.is_open())
   {
     for(int i=0; i<n_dt; i++) {
@@ -178,43 +178,38 @@ __global__ void Dust_Kernel(Real *dev_conserved, int nx, int ny, int nz, int n_g
         Real T_init;
         T_init = hydro_utilities::Calc_Temp(P, n);
 
-        //printf("P: %e\n", P);
-
         #ifdef DE
         T_init = hydro_utilities::Calc_Temp_DE(d_gas, ge, gamma, n);
         #endif // DE
 
         T = T_init;
 
-        // calculate change in dust density
-        Dust dust_obj(T, n, dt, d_gas, d_dust);
-        dust_obj.set_tau_sp();
+        Real tau_sp = calc_tau_sp(n, T);
 
-        dd_dt = dust_obj.calc_dd_dt();
+        dd_dt = calc_dd_dt(d_dust, tau_sp);
         dd = dd_dt * dt;
 
         params_dev[0] = T;
         params_dev[1] = n;
-        params_dev[2] = dust_obj.tau_sp_/3.154e7;
-        params_dev[3] = dd_dt;
-        params_dev[4] = dd; 
+        params_dev[2] = tau_sp/3.154e7;
+        params_dev[3] = dd_dt/K;
+        params_dev[4] = dd/K; 
 
         // ensure that dust density is not changing too rapidly
         bool time_refine = false;
-        while (d_dust/dd > dd_max) {
+        while (abs(dd)/d_dust > dd_max) {
             time_refine = true;
-            dt_sub = dd_max * d_dust / dd_dt;
-            dust_obj.d_dust_ += dt_sub * dd_dt;
-            dust_obj.dt_ -= dt_sub;
-            dt = dust_obj.dt_;
-            dd_dt = dust_obj.calc_dd_dt();
+            dt_sub = dd_max * d_dust / abs(dd_dt);
+            d_dust += dt_sub * dd_dt;
+            dt -= dt_sub;
+            dd_dt = calc_dd_dt(d_dust, tau_sp);
             dd = dt * dd_dt;
         }
 
         params_dev[5] = time_refine;
 
         // update dust density
-        d_dust = dust_obj.d_dust_ + dd;
+        d_dust += dd;
 
         // remove scaling constant
         d_gas /= K;
@@ -227,20 +222,19 @@ __global__ void Dust_Kernel(Real *dev_conserved, int nx, int ny, int nz, int n_g
     }
 }
 
-__device__ void Dust::set_tau_sp() {
+__device__ Real calc_tau_sp(Real n, Real T) {
+  Real YR_IN_S = 3.154e7;
   Real a1 = 1; // dust grain size in units of 0.1 micrometers
-  Real d0 = n_ / (6e-4); // gas density in units of 10^-27 g/cm^3
+  Real d0 = n / (6e-4); // gas density in units of 10^-27 g/cm^3
   Real T_0 = 2e6; // K
   Real omega = 2.5;
-  Real A = 0.17e9 * YR_IN_S_; // 0.17 Gyr in s
+  Real A = 0.17e9 * YR_IN_S; // 0.17 Gyr in s
 
-  tau_sp_ = A * (a1/d0) * (pow(T_0/T_, omega) + 1); // s
-
-  // printf("tau_sp (yr): %e\n", tau_sp_/YR_IN_S_);
+  return A * (a1/d0) * (pow(T_0/T, omega) + 1); // s
 }
 
-__device__ Real Dust::calc_dd_dt() {
-    return -d_dust_ / (tau_sp_/3);
+__device__ Real calc_dd_dt(Real d_dust, Real tau_sp) {
+    return -d_dust / (tau_sp/3);
 }
 
 // function to initialize conserved variable array, similar to Grid3D::Constant in grid/initial_conditions.cpp 
