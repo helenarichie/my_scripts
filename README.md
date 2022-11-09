@@ -1,2 +1,2 @@
-# research
-A repo where I upload code scratchwork that I might find useful later
+# my_scripts
+A place to put my plotting scripts that are specific to my research
