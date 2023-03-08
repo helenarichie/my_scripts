@@ -2,14 +2,14 @@ from hconfig import *
 
 
 # date = input("\nDate: ")
-date = "2023-03-07"
+date = "2023-03-08"
 
 # directory with slices
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-datadir = os.path.join(basedir, "hdf5/slice/")
+datadir = os.path.join(basedir, "hdf5/")
 pngdir = os.path.join(basedir, "png/slice/")
 
-data = ReadHDF5(datadir, nscalar=1, slice="xy")
+data = ReadHDF5(datadir, nscalar=1, slice="xy", cat="True")
 head = data.head
 conserved = data.conserved
 
