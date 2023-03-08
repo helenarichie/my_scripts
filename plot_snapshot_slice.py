@@ -2,10 +2,9 @@ from hconfig import *
 
 date = input("\nDate: ")
 nfile = input("\nFile number: ")
-
 # directory with slices
-datadir = f"/ix/eschneider/helena/data/{date}/hdf5/"
-outdir = f"/ix/eschneider/helena/data/{date}/"
+datadir = f"/ix/eschneider/helena/data/cloud_wind/{date}/hdf5/"
+outdir = datadir
 
 data = ReadHDF5(datadir, nscalar=1, slice="xy", fnum=nfile)
 head = data.head
@@ -37,7 +36,8 @@ for i, d in enumerate(d_gas):
     fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(25,9))
     
     # xy gas density projection
-    im = axs[0][0].imshow(np.log10(d_gas[i].T), origin="lower", vmin=-28, vmax=-23, extent=[0, nx*dx, 0, nz*dx])
+    #im = axs[0][0].imshow(np.log10(d_gas[i].T), origin="lower", vmin=-28, vmax=-23, extent=[0, nx*dx, 0, nz*dx])
+    im = axs[0][0].imshow(np.log10(d_gas[i].T), origin="lower", extent=[0, nx*dx, 0, nz*dx])
     ylabel = r'$\mathrm{log}_{10}(\rho)$ [$\mathrm{g}\mathrm{cm}^{-3}$]'
     divider = make_axes_locatable(axs[0][0])
     cax = divider.append_axes("right", size="5%", pad=0.05)
@@ -53,7 +53,7 @@ for i, d in enumerate(d_gas):
     
 
     # xy density-weighted temperature projection
-    im = axs[1][0].imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=-28, vmax=-22, extent=[0, nx*dx, 0, nz*dx])
+    im = axs[1][0].imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=-28, vmax=-24, extent=[0, nx*dx, 0, nz*dx])
     ylabel = r'$\mathrm{log}_{10}(\rho)$ [$\mathrm{g}\mathrm{cm}^{-3}$]'
     divider = make_axes_locatable(axs[1][0])
     cax = divider.append_axes("right", size="5%", pad=0.05)
@@ -69,7 +69,8 @@ for i, d in enumerate(d_gas):
     axs[1][0].legend()
     
 
-    im = axs[0][1].imshow(np.log10(T[i].T), origin="lower", cmap="inferno", vmin=2, vmax=vlims_T[1], extent=[0, nx*dx, 0, nz*dx])
+    #im = axs[0][1].imshow(np.log10(T[i].T), origin="lower", cmap="inferno", vmin=0, vmax=vlims_T[1], extent=[0, nx*dx, 0, nz*dx])
+    im = axs[0][1].imshow(np.log10(T[i].T), origin="lower", cmap="inferno", extent=[0, nx*dx, 0, nz*dx])
     
     if np.isnan(np.log10(T[i].T).any()):
         print("there's a nan")
@@ -90,7 +91,8 @@ for i, d in enumerate(d_gas):
 
     # xz velocity slice
     # im = axs[1][1].imshow(vx[i].T, origin="lower", vmin=-1e-3, vmax=0.011, extent=[0, nx*dx, 0, nz*dx])
-    im = axs[1][1].imshow(vx[i].T*1e-5, origin="lower", extent=[0, nx*dx, 0, nz*dx], vmin=0, vmax=200)
+    # im = axs[1][1].imshow(vx[i].T*1e-5, origin="lower", extent=[0, nx*dx, 0, nz*dx], vmin=0, vmax=200)
+    im = axs[1][1].imshow(vx[i].T*1e-5, origin="lower", extent=[0, nx*dx, 0, nz*dx])
     ylabel = r'x-velocity [km/s]'
 
     divider = make_axes_locatable(axs[1][1])

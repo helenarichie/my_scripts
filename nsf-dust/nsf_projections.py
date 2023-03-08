@@ -1,15 +1,18 @@
+import sys
+sys.path.insert(0, "/ix/eschneider/helena/code/github/my_scripts/")
 from hconfig import *
 
 # date = input("\nDate: ")
 date = "2022-11-05"
 
 # directory with slices
-datadir = f"/ix/eschneider/helena/data/{date}/hdf5/"
-outdir = f"/ix/eschneider/helena/data/{date}/png/nsf/"
+datadir = f"/ix/eschneider/helena/data/cloud_wind/{date}/hdf5/proj/"
+outdir = f"/ix/eschneider/helena/figs/astrosnacks/"
 
-fnum = 34
+# fnum = 34
 
-data = ReadHDF5(datadir, proj="xy", fnum=fnum)
+# data = ReadHDF5(datadir, proj="xy", fnum=fnum)
+data = ReadHDF5(datadir, proj="xy")
 head = data.head
 conserved = data.conserved
 
@@ -23,10 +26,13 @@ gamma = head["gamma"]
 t_arr = data.t_cgs() / yr_in_s
 ######################################################
 
+# np.savetxt(os.path.join(outdir, "t_arr.csv"), t_arr, delimiter=",")
 
-datadir = f"/ix/eschneider/helena/data/{date}/hdf5/"
-outdir = f"/ix/eschneider/helena/data/{date}/png/nsf/"
-data = ReadHDF5(datadir, nscalar=1, fnum=fnum)
+
+datadir = f"/ix/eschneider/helena/data/cloud_wind/{date}/hdf5/full-vol/"
+outdir = f"/ix/eschneider/helena/figs/astrosnacks/"
+data = ReadHDF5(datadir, nscalar=1)
+# data = ReadHDF5(datadir, nscalar=1, fnum=fnum)
 head = data.head
 conserved = data.conserved
 
@@ -38,6 +44,7 @@ vlims_du = [np.log10(np.amin(d_dust.flatten())), np.log10(np.amax(d_dust.flatten
 
 d_dust = np.sum(d_dust*dx, axis=3)
 
+vlims_gas = [-4.75, -3.0]
 
 for i, d in enumerate(d_gas):
 
@@ -46,7 +53,7 @@ for i, d in enumerate(d_gas):
     # xy gas density projection
     # im = axs[0].imshow(np.log10(d_gas[i].T), origin="lower", vmin=-28, vmax=-23, extent=[0, nx*dx, 0, nz*dx])
     #im = axs.imshow(np.log10(d_gas[i].T), origin="lower", vmin=-26.25, vmax=-24.25)
-    im = axs.imshow(np.log10(d_gas[i].T), origin="lower")
+    im = axs.imshow(np.log10(d_gas[i].T), origin="lower", vmin=vlims_gas[0], vmax=vlims_gas[1])
     ylabel = r'$\mathrm{log}_{10}(\Sigma_{gas})$ [$\mathrm{g}\,\mathrm{cm}^{-2}$]'
     divider = make_axes_locatable(axs)
     cax = divider.append_axes("right", size="5%", pad=0.05)
@@ -57,6 +64,7 @@ for i, d in enumerate(d_gas):
     axs.tick_params(axis='both', which='both', direction='in', color='white', labelleft=0, labelbottom=0, top=1, right=1, length=7)
     axs.hlines(0.12*ny, 50, (50+51.2), color='white')
     axs.text(105, 0.1*ny, '150 pc', color='white')
+    axs.text(50, 0.8*ny, f'{int(round(t_arr[i]/1e6, 0))} Myr', color='white')
     #axs[0].set_title(r"Gas Density Projection")
     #axs[0].plot([], [], " ", label="${:.1e}~yr$".format(t_arr[i]))
     #axs[0].legend()
@@ -65,10 +73,10 @@ for i, d in enumerate(d_gas):
         # plot and save
     save = True
     if save:
-        plt.savefig(outdir + f"{fnum}_gas_proj.png", dpi=300)
-        plt.savefig(f"{fnum}_gas_proj.png", dpi=300)
+        plt.savefig(outdir + f"{i}_gas_proj.png", dpi=300)
+        #plt.savefig(f"{fnum}_gas_proj.png", dpi=300)
     plt.close()
-    
+
     fig, axs = plt.subplots(nrows=1, ncols=1, figsize=(13,5))
     # im = axs[1].imshow(np.log10(T[i].T), origin="lower", cmap="inferno", vmin=2, vmax=vlims_T[1], extent=[0, nx*dx, 0, nz*dx])
     #im = axs.imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=-28.75, vmax=-26.75)
@@ -87,16 +95,18 @@ for i, d in enumerate(d_gas):
     axs.tick_params(axis='both', which='both', direction='in', color='white', labelleft=0, labelbottom=0, top=1, right=1, length=7)
     axs.hlines(0.12*ny, 50, (50+51.2), color='white')
     axs.text(105, 0.1*ny, '150 pc', color='white')
+    axs.text(50, 0.8*ny, f'{int(round(t_arr[i]/1e6, 0))} Myr', color='white')
     #axs[1].set_title(r"Dust Density Projection")
     #axs[1].set_xlabel(r"$x~$[kpc]")
     #axs[1].set_ylabel(r"$z~$[kpc]")
     fig.tight_layout()
     
+    
     # plot and save
     save = True
     if save:
-        plt.savefig(outdir + f"{fnum}_dust_proj.png", dpi=300)
-        plt.savefig(f"{fnum}_dust_proj.png", dpi=300)
+        plt.savefig(outdir + f"{i}_dust_proj.png", dpi=300)
+        #plt.savefig(f"{fnum}_dust_proj.png", dpi=300)
     plt.close()
 
     print(f"Saving figure {i+1} of {len(d_gas)}.\n")

@@ -1,11 +1,11 @@
 from hconfig import *
 
 # date = input("\nDate: ")
-date = "2022-11-05"
+date = "2022-11-16"
 
 # directory with slices
-datadir = f"/ix/eschneider/helena/data/{date}/hdf5/proj/"
-outdir = f"/ix/eschneider/helena/data/{date}/png/proj/"
+datadir = f"/ix/eschneider/helena/data/cloud_wind/{date}/chi-1e3/hdf5/proj/"
+outdir = f"/ix/eschneider/helena/data/cloud_wind/{date}/chi-1e3/png/proj/"
 
 data = ReadHDF5(datadir, proj="xy")
 head = data.head
