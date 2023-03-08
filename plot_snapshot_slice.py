@@ -2,9 +2,9 @@ from hconfig import *
 
 date = input("\nDate: ")
 nfile = input("\nFile number: ")
-# directory with slices
-datadir = f"/ix/eschneider/helena/data/cloud_wind/{date}/hdf5/"
-outdir = datadir
+
+basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
+datadir = os.path.join(basedir, "hdf5")
 
 data = ReadHDF5(datadir, nscalar=1, slice="xy", fnum=nfile)
 head = data.head
@@ -113,7 +113,7 @@ for i, d in enumerate(d_gas):
     # plot and save
     save = True
     if save:
-        plt.savefig(outdir + "snapshot.png", dpi=300)
+        plt.savefig(basedir + "snapshot.png", dpi=300)
     plt.close()
 
     print(f"Saving figure {i+1} of {len(d_dust)}.\n")

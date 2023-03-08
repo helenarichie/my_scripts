@@ -2,10 +2,9 @@ from hconfig import *
 
 
 ################# hard-coded, fill these in! ###################
-date = "2023-03-07/sim1"
+date = "2023-03-07"
 write_csv = False  # do you need to read data from HDF5 files?
 rho_cl_i = 1e-24  # n = 1, needed to index cloud material
-nx = 128 
 ################################################################
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
@@ -110,11 +109,13 @@ print("\nPlotting...")
 fig, ax = plt.subplots(2, 1, figsize=(15,22))
 
 ax[0].semilogx(t_arr, rho_cl_tot/rho_cl_tot_i, linewidth=7, color="red")
+ax[0].set_xlim(1, 1.2e6)
 ax[0].set_ylabel(r'$\rho_{cl}/\rho_{cl,init}$')
 ax[0].set_xlabel(r'Time [yr]')
 ax[0].set_title(r"Cloud")
 
 ax[1].semilogx(t_arr, rho_d_tot/rho_d_tot_i, linewidth=7, color="blue")
+ax[1].set_xlim(1, 1.2e6)
 ax[1].set_ylabel(r'$\rho_{d}/\rho_{d,init}$')
 ax[1].set_xlabel(r'Time [yr]')
 ax[1].set_title(r"Dust")
