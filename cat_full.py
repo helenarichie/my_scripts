@@ -12,6 +12,8 @@ iend = 1*n_proc
 dnamein = './hdf5/raw/'
 dnameout = './hdf5/'
 
+scalar = True # set to True if scalar was used
+
 # loop over outputs
 for n in range(ns, ne+1):
 
@@ -32,6 +34,7 @@ for n in range(ns, ne+1):
       ny = head['dims'][1]
       nz = head['dims'][2]
       fileout.attrs['dims'] = [nx, ny, nz]
+      fileout.attrs['dx'] = [head['dx'][0]]
       fileout.attrs['gamma'] = [head['gamma'][0]]
       fileout.attrs['t'] = [head['t'][0]]
       fileout.attrs['dt'] = [head['dt'][0]]
@@ -46,6 +49,8 @@ for n in range(ns, ne+1):
       my = fileout.create_dataset("momentum_y", (nx, ny, nz), chunks=True, dtype=filein['momentum_y'].dtype)
       mz = fileout.create_dataset("momentum_z", (nx, ny, nz), chunks=True, dtype=filein['momentum_z'].dtype)
       E  = fileout.create_dataset("Energy", (nx, ny, nz), chunks=True, dtype=filein['Energy'].dtype)
+      if scalar:
+        scalar0 = fileout.create_dataset('scalar0', (nx, ny, nz), chunks=True, dtype=filein['scalar0'].dtype)
       try:
         GE = fileout.create_dataset("GasEnergy", (nx, ny, nz), chunks=True, dtype=filein['GasEnergy'].dtype)
       except KeyError:
@@ -71,6 +76,8 @@ for n in range(ns, ne+1):
     fileout['momentum_y'][xs:xs+nxl,ys:ys+nyl,zs:zs+nzl] = filein['momentum_y']
     fileout['momentum_z'][xs:xs+nxl,ys:ys+nyl,zs:zs+nzl] = filein['momentum_z']
     fileout['Energy'][xs:xs+nxl,ys:ys+nyl,zs:zs+nzl]  = filein['Energy']
+    if scalar:
+      fileout['scalar0'][xs:xs+nxl,ys:ys+nyl,zs:zs+nzl] = filein['scalar0']
     try:
       fileout['GasEnergy'][xs:xs+nxl,ys:ys+nyl,zs:zs+nzl] = filein['GasEnergy']
     except KeyError:

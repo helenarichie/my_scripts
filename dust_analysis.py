@@ -2,13 +2,13 @@ from hconfig import *
 
 
 ################# hard-coded, fill these in! ###################
-date = "2023-03-07"
-write_csv = False  # do you need to read data from HDF5 files?
+date = "2023-03-08"
+write_csv = True  # do you need to read data from HDF5 files?
 rho_cl_i = 1e-24  # n = 1, needed to index cloud material
 ################################################################
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-datadir = os.path.join(basedir, "hdf5/full")
+datadir = os.path.join(basedir, "hdf5",)
 csvdir = os.path.join(basedir, "csv")
 pngdir = os.path.join(basedir, "png")
 
@@ -21,7 +21,7 @@ wind_init = []
 # read data in from HDF5 files and write it out to csv files
 if write_csv:
     # read in full-volume data from HDF5 files with one scalar field
-    data = ReadHDF5(datadir, nscalar=1)
+    data = ReadHDF5(datadir, nscalar=1, cat=True)
     head = data.head
     conserved = data.conserved
 
