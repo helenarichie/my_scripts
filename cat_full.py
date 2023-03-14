@@ -5,12 +5,12 @@ import h5py
 import numpy as np
 
 ns = 0
-ne = 200
+ne = 128
 n_proc = 2 # number of processors that did the calculations
 istart = 0*n_proc
 iend = 1*n_proc
-dnamein = './hdf5/raw/'
-dnameout = './hdf5/'
+dnamein = '/ix/eschneider/helena/data/hdf5/'
+dnameout = './hdf5/full/'
 
 scalar = True # set to True if scalar was used
 

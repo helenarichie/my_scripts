@@ -6,7 +6,7 @@ nfile = input("\nFile number: ")
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
 datadir = os.path.join(basedir, "hdf5")
 
-data = ReadHDF5(datadir, nscalar=1, slice="xy", fnum=nfile)
+data = ReadHDF5(datadir, nscalar=1, slice="xy", fnum=nfile, cat=True)
 head = data.head
 conserved = data.conserved
 

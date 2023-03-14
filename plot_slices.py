@@ -1,19 +1,19 @@
 from hconfig import *
 
-
-# date = input("\nDate: ")
-date = "2023-03-08"
+#################################
+date = "2023-03-10"
+cat = True
+#################################
 
 # directory with slices
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-datadir = os.path.join(basedir, "hdf5/")
+datadir = os.path.join(basedir, "hdf5/slice/")
 pngdir = os.path.join(basedir, "png/slice/")
 
-data = ReadHDF5(datadir, nscalar=1, slice="xy", cat="True")
+data = ReadHDF5(datadir, nscalar=1, slice="xy", cat=cat)
 head = data.head
 conserved = data.conserved
 
-######################################################
 nx = head["dims"][0]
 nz = head["dims"][-1]
 dx = head["dx"][0]
@@ -23,7 +23,6 @@ vx = data.vx_cgs()
 gamma = head["gamma"]
 t_arr = data.t_cgs() / yr_in_s
 T = data.T()
-######################################################
 
 wh_zero = np.where(d_dust<=0)
 d_dust[wh_zero] = 1e-40
@@ -51,8 +50,8 @@ for i, d in enumerate(d_gas):
     axs[0][0].tick_params(axis='both', which='both', direction='in', color='white', top=1, right=1)
     axs[0][0].set_title(r"Gas Density Slice")
     axs[0][0].set_xlabel(r"$x~$[kpc]")
-    axs[0][0].plot([], [], " ", label="${:.1e}~yr$".format(t_arr[i]))
-    axs[0][0].legend()
+    #axs[0][0].plot([], [], " ", label="${:.1e}~yr$".format(t_arr[i]))
+    #axs[0][0].legend()
     
 
     # xy density-weighted temperature projection
@@ -68,8 +67,8 @@ for i, d in enumerate(d_gas):
     axs[1][0].set_title(r"Dust Density Slice")
     axs[1][0].set_xlabel(r"$x~$[kpc]")
     axs[1][0].set_ylabel(r"$z~$[kpc]")
-    axs[1][0].plot([], [], " ", label="${:.1e}~yr$".format(t_arr[i]))
-    axs[1][0].legend()
+    #axs[1][0].plot([], [], " ", label="${:.1e}~yr$".format(t_arr[i]))
+    #axs[1][0].legend()
     
 
     #im = axs[0][1].imshow(np.log10(T[i].T), origin="lower", cmap="inferno", vmin=2, vmax=vlims_T[1], extent=[0, nx*dx, 0, nz*dx])
@@ -89,8 +88,8 @@ for i, d in enumerate(d_gas):
     axs[0][1].set_title(r"Temperature Slice")
     axs[0][1].set_xlabel(r"$x~$[kpc]")
     axs[0][1].set_ylabel(r"$z~$[kpc]")
-    axs[0][1].plot([], [], " ", label="${:.1e}~yr$".format(t_arr[i]))
-    axs[0][1].legend()
+    #axs[0][1].plot([], [], " ", label="${:.1e}~yr$".format(t_arr[i]))
+    #axs[0][1].legend()
 
     # xz velocity slice
     # im = axs[1][1].imshow(vx[i].T, origin="lower", vmin=-1e-3, vmax=0.011, extent=[0, nx*dx, 0, nz*dx])

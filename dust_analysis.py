@@ -1,14 +1,13 @@
 from hconfig import *
 
-
 ################# hard-coded, fill these in! ###################
-date = "2023-03-08"
+date = "2023-03-09"
 write_csv = True  # do you need to read data from HDF5 files?
 rho_cl_i = 1e-24  # n = 1, needed to index cloud material
 ################################################################
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-datadir = os.path.join(basedir, "hdf5",)
+datadir = os.path.join(basedir, "hdf5/full",)
 csvdir = os.path.join(basedir, "csv")
 pngdir = os.path.join(basedir, "png")
 
@@ -16,12 +15,11 @@ rho_d_tot = []  # total dust density in sim volume for each time
 rho_cl_tot = []  # total cloud density in sim volume for each time
 T_cl_avg = []  # average T for each time
 t_arr = []
-wind_init = []
 
 # read data in from HDF5 files and write it out to csv files
 if write_csv:
     # read in full-volume data from HDF5 files with one scalar field
-    data = ReadHDF5(datadir, nscalar=1, cat=True)
+    data = ReadHDF5(datadir, nscalar=1, cat=False)
     head = data.head
     conserved = data.conserved
 
@@ -36,18 +34,12 @@ if write_csv:
     print(f"Finished --- {round(time.time() - start, 3)} s")
 
     start = time.time()
-    print("\nLoading velocities...")
-    vx = data.vx_cgs()
-    print(f"Finished --- {round(time.time() - start, 3)} s")
-
-    start = time.time()
     print("\nLoading temperatures...")
     T = data.T()
     print(f"Finished --- {round(time.time() - start, 3)} s")
 
     gamma = head["gamma"]
     t_arr = data.t_cgs() / yr_in_s
-    T_hot = T[0][0][0][0] # initial wind temperature
 
     start = time.time()
     print("\nGetting cloud and dust densities...")
@@ -61,7 +53,6 @@ if write_csv:
     np.savetxt(os.path.join(csvdir, "rho_cl_tot.csv"), rho_cl_tot, delimiter=",")
     np.savetxt(os.path.join(csvdir, "T_cl_avg.csv"), T_cl_avg, delimiter=",")
     np.savetxt(os.path.join(csvdir, "t_arr.csv"), t_arr, delimiter=",")
-    np.savetxt(os.path.join(csvdir, "wind_init.csv"), [d_gas[0][0][0][0], vx[0][0][0][0], T_hot], delimiter=",")
 
 # if the csv files were already saved
 else: 
@@ -85,11 +76,6 @@ else:
             line = line.split(",")
             t_arr.append(float(line[0]))
 
-    with open(os.path.join(csvdir, "wind_init.csv")) as f:
-        for line in f:
-            line = line.split(",")
-            wind_init.append(float(line[0]))
-
 rho_d_tot = np.array(rho_d_tot) # why was I multiplying this by 256?
 rho_cl_tot = np.array(rho_cl_tot)
 T_cl_avg = np.array(T_cl_avg)
@@ -97,12 +83,6 @@ t_arr = np.array(t_arr)
 
 rho_cl_tot_i = rho_cl_tot[0]
 rho_d_tot_i = rho_d_tot[0]
-
-rho_wind_i = None
-if write_csv:
-    rho_wind_i = d_gas[0][0][0][0]
-else:
-    rho_wind_i = wind_init[0]
 
 print("\nPlotting...")
 
