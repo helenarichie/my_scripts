@@ -3,7 +3,7 @@ from hconfig import *
 from csv import writer
 
 ######### hard-coded values! #########
-date = "2023-03-10"
+date = "2023-03-14"
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
 datadir = os.path.join(basedir, "hdf5/full/")
 pngdir = os.path.join(basedir, "png/")
@@ -22,7 +22,6 @@ areas = [ny*nz*dx**2, nx*nz*dx**2, nx*ny*dx**2]
 indices = ["0", "-1"]
 fluids = ["gas", "dust"]
 
-
 def calc_mass_loss_rate(rho, v, area):
         return np.sum(rho * v) * area
 
@@ -30,6 +29,15 @@ if cat:
     files = glob.glob(os.path.join(datadir, "*.h5"))
 else:
     files = glob.glob(os.path.join(datadir, "*.h5.0"))
+
+f = open(os.path.join(csvdir, "outflow_cloud.csv"), "w")
+f.close()
+f = open(os.path.join(csvdir, "flux_cloud.csv"), "w")
+f.close()
+f = open(os.path.join(csvdir, "outflow_dust.csv"), "w")
+f.close()
+f = open(os.path.join(csvdir, "flux_dust.csv"), "w")
+f.close()
 
 for i in range(0, len(files)):
     data = ReadHDF5(datadir, fnum=i, nscalar=1, cat=cat)
@@ -70,12 +78,12 @@ for i in range(0, len(files)):
 
     outflow_rates, fluxes = get_rates(data.d_cgs()[0], cutoff)
 
-    with open(os.path.join(csvdir, "outflow_gas.csv"), "a") as f:
+    with open(os.path.join(csvdir, "outflow_cloud.csv"), "a") as f:
         writer_obj = writer(f)
         writer_obj.writerow(outflow_rates)
         f.close()
 
-    with open(os.path.join(csvdir, "flux_gas.csv"), "a") as f:
+    with open(os.path.join(csvdir, "flux_cloud.csv"), "a") as f:
         writer_obj = writer(f)
         writer_obj.writerow(fluxes)
         f.close()
@@ -87,7 +95,7 @@ for i in range(0, len(files)):
         writer_obj.writerow(outflow_rates)
         f.close()
 
-    with open(os.path.join(csvdir, "flux_gas.csv"), "a") as f:
+    with open(os.path.join(csvdir, "flux_dust.csv"), "a") as f:
         writer_obj = writer(f)
         writer_obj.writerow(fluxes)
         f.close()

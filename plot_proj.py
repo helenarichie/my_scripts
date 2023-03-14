@@ -2,8 +2,8 @@ from hconfig import *
 
 # date = input("\nDate: ")
 #################################
-date = "2023-03-09"
-cat = False
+date = "2023-03-14"
+cat = True
 vlims_gas = (-4.75, -3.0)
 vlims_dust = (-8, -7.25)
 save = True
@@ -13,8 +13,8 @@ dust = True
 
 # directory with slices
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-proj_data = os.path.join(basedir, "hdf5/raw/proj/")
-full_data = os.path.join(basedir, "hdf5/raw/full/")
+proj_data = os.path.join(basedir, "hdf5/proj/")
+full_data = os.path.join(basedir, "hdf5/full/")
 pngdir = os.path.join(basedir, "png/proj/")
 
 
@@ -49,7 +49,7 @@ if gas:
         axs.set_xlabel(r"$x~$[kpc]")
         axs.set_ylabel(r"$z~$[kpc]")
         axs.tick_params(axis='both', which='both', direction='in', color='white', top=1, right=1, length=7)
-        axs.text(0.05*dx*nx, 0.1*dx*nz, f'{int(round(t_arr[i]/1e6, 2))} Myr', color='white', fontsize=20)    
+        axs.text(0.05*dx*nx, 0.1*dx*nz, f'{round(t_arr[i]/1e6, 2)} Myr', color='white', fontsize=20)    
         axs.set_title(r"Gas Density Projection")
 
         # plot and save

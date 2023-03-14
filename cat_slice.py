@@ -5,10 +5,10 @@ import h5py
 import numpy as np
 
 ns = 0
-ne = 127
+ne = 105
 n_procs = 2 # number of processors that did the cholla calculation
-dnamein = '/ix/eschneider/helena/data/cloud_wind/2023-03-10/hdf5/'
-dnameout = '/ix/eschneider/helena/data/cloud_wind/2023-03-10/hdf5/'
+dnamein = '/ix/eschneider/helena/data/cloud_wind/2023-03-14/hdf5/'
+dnameout = '/ix/eschneider/helena/data/cloud_wind/2023-03-14/hdf5/'
 
 DE = False # set to True if Dual Energy flag was used
 SCALAR = True # set to True if Scalar was used
