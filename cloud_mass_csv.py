@@ -9,12 +9,20 @@ cat = False
 ################################################################
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-datadir = os.path.join(basedir, "hdf5/raw/full/",)
+datadir = os.path.join(basedir, "hdf5/full/")
 csvdir = os.path.join(basedir, "csv")
-pngdir = os.path.join(basedir, "png")
 
 t_arr = []
 wind_init = []
+
+f = open(os.path.join(csvdir, "rho_d_tot.csv"), "w")
+f.close()
+f = open(os.path.join(csvdir, "rho_cl_tot.csv"), "w")
+f.close()
+f = open(os.path.join(csvdir, "T_cl_avg.csv"), "w")
+f.close()
+f = open(os.path.join(csvdir, "t_arr.csv"), "w")
+f.close()
 
 def write_csv(path, fnum=None, nscalar=0, cat=True):
     data = ReadHDF5(path, fnum=fnum, nscalar=nscalar, cat=cat)

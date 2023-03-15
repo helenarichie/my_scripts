@@ -3,7 +3,7 @@ from hconfig import *
 # date = input("\nDate: ")
 #################################
 date = "2023-03-14"
-cat = True
+cat = False
 vlims_gas = (-4.75, -3.0)
 vlims_dust = (-8, -7.25)
 save = True
@@ -13,8 +13,8 @@ dust = True
 
 # directory with slices
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-proj_data = os.path.join(basedir, "hdf5/proj/")
-full_data = os.path.join(basedir, "hdf5/full/")
+proj_data = os.path.join(basedir, "hdf5/")
+full_data = os.path.join(basedir, "hdf5/")
 pngdir = os.path.join(basedir, "png/proj/")
 
 

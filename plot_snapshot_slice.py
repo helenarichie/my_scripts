@@ -2,11 +2,17 @@ from hconfig import *
 
 date = input("\nDate: ")
 nfile = input("\nFile number: ")
+cat_in = input("\ncat?: ")
+cat = None
+if cat_in.lower() == "true":
+    cat = True
+else:
+    cat = False
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
 datadir = os.path.join(basedir, "hdf5")
 
-data = ReadHDF5(datadir, nscalar=1, slice="xy", fnum=nfile, cat=True)
+data = ReadHDF5(datadir, nscalar=1, slice="xy", fnum=nfile, cat=cat)
 head = data.head
 conserved = data.conserved
 

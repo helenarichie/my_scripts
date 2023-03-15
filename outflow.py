@@ -8,8 +8,8 @@ basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
 datadir = os.path.join(basedir, "hdf5/full/")
 pngdir = os.path.join(basedir, "png/")
 csvdir = os.path.join(basedir, "csv/")
-cat = True
-cutoff = 0
+cat = False
+cutoff = 1/3*1e-24
 ######################################
 
 data = ReadHDF5(datadir, fnum=0, nscalar=1, cat=cat)
@@ -39,6 +39,32 @@ f.close()
 f = open(os.path.join(csvdir, "flux_dust.csv"), "w")
 f.close()
 
+def get_rates(d, cutoff):
+    rates, fluxes = np.zeros(6), np.zeros(6)
+    for i, area in enumerate(areas):
+        for index in indices:
+            if (index == "0") and (i == 0):
+                rates[0] = calc_mass_loss_rate(d[0, :, :], data.vx_cgs()[0][0, :, :], area)
+                fluxes[0] = np.sum(d[0, :, :][d[0, :, :]>=cutoff])
+            if (index == "0") and (i == 1):
+                rates[1] = calc_mass_loss_rate(d[:, 0, :], data.vy_cgs()[0][:, 0, :], area)
+                fluxes[1] = np.sum(d[:, 0, :][d[:, 0, :]>=cutoff])
+            if (index == "0") and (i == 2):
+                rates[2] = calc_mass_loss_rate(d[:, :, 0], data.vz_cgs()[0][:, :, 0], area)
+                fluxes[2] = np.sum(d[:, :, 0][d[:, :, 0]>=cutoff])
+            if (index == "-1") and (i == 0):
+                rates[3] = calc_mass_loss_rate(d[-1, :, :], data.vx_cgs()[0][-1, :, :], area)
+                fluxes[3] = np.sum(d[-1, :, :][d[-1, :, :]>=cutoff])
+            if (index == "-1") and (i == 1):
+                rates[4] = calc_mass_loss_rate(d[:, -1, :], data.vy_cgs()[0][:, -1, :], area)
+                fluxes[4] = np.sum(d[:, -1, :][d[:, -1, :]>=cutoff])
+            if (index == "-1") and (i == 2):
+                rates[5] = calc_mass_loss_rate(d[:, :, -1], data.vz_cgs()[0][:, :, -1], area)
+                fluxes[5] = np.sum(d[:, :, -1][d[:, :, -1]>=cutoff])
+    
+    return rates, fluxes
+
+
 for i in range(0, len(files)):
     data = ReadHDF5(datadir, fnum=i, nscalar=1, cat=cat)
     head = data.head
@@ -46,35 +72,6 @@ for i in range(0, len(files)):
     nx, ny, nz = head["dims"]
     gamma = head["gamma"]
     dx = data.dx_cgs()[0]
-    
-    def get_rates(d, cutoff):
-        outflow_rates, fluxes = [], []
-        density, velocity, flux = None, None, None
-        for i, area in enumerate(areas):
-            for index in indices:
-                if (index == "0") and (i == 0):
-                    density, velocity = d[0, :, :], data.vx_cgs()[0][0, :, :]
-                    flux = np.sum(d[0, :, :][d[0, :, :]>=cutoff])
-                if (index == "0") and (i == 1):
-                    density, velocity = d[:, 0, :], data.vy_cgs()[0][:, 0, :]
-                    flux = np.sum(d[:, 0, :][d[:, 0, :]>=cutoff])
-                if (index == "0") and (i == 2):
-                    density, velocity = d[:, :, 0], data.vz_cgs()[0][:, :, 0]
-                    flux = np.sum(d[:, :, 0][d[:, :, 0]>=cutoff])
-                if (index == "-1") and (i == 0):
-                    density, velocity = d[-1, :, :], data.vx_cgs()[0][-1, :, :]
-                    flux = np.sum(d[-1, :, :][d[-1, :, :]>=cutoff])
-                if (index == "-1") and (i == 1):
-                    density, velocity = d[:, -1, :], data.vy_cgs()[0][:, -1, :]
-                    flux = np.sum(d[:, -1, :][d[:, -1, :]>=cutoff])
-                if (index == "-1") and (i == 2):
-                    density, velocity = d[:, :, -1], data.vz_cgs()[0][:, :, -1]
-                    flux = np.sum(d[:, :, -1][d[:, :, -1]>=cutoff])
-                                  
-                outflow_rates.append(calc_mass_loss_rate(density, velocity, area))
-                fluxes.append(flux)
-        
-        return outflow_rates, fluxes
 
     outflow_rates, fluxes = get_rates(data.d_cgs()[0], cutoff)
 
@@ -88,7 +85,7 @@ for i in range(0, len(files)):
         writer_obj.writerow(fluxes)
         f.close()
 
-    outflow_rates, fluxes = get_rates(conserved["scalar0"][0] * head["density_unit"], cutoff)
+    outflow_rates, fluxes = get_rates(conserved["scalar0"][0] * head["density_unit"], 1e-2*cutoff)
 
     with open(os.path.join(csvdir, "outflow_dust.csv"), "a") as f:
         writer_obj = writer(f)

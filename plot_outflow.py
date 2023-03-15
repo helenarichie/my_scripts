@@ -1,12 +1,12 @@
 from hconfig import *
 
 ######### hard-coded values! #########
-date = "2023-03-10"
+date = "2023-03-14"
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
 datadir = os.path.join(basedir, "hdf5/full/")
-pngdir = os.path.join(basedir, "png/")
+pngdir = os.path.join(basedir, "png/outflow/")
 csvdir = os.path.join(basedir, "csv/")
-cat = True
+cat = False
 cutoff = 0
 ######################################
 
@@ -40,9 +40,11 @@ with open(os.path.join(csvdir, "outflow_cloud.csv")) as f:
 
 flux_cloud = np.zeros((n_steps, 6))
 with open(os.path.join(csvdir, "flux_cloud.csv")) as f:
+    cumulative_flux = np.zeros(6)
     for i, line in enumerate(f):
-        line = line.split(",")
-        flux_cloud[i] = np.array(line, dtype=float)
+        line = np.array(line.split(","), dtype=float)
+        cumulative_flux += line
+        flux_cloud[i] = cumulative_flux
 
 rate_dust = np.zeros((n_steps, 6))
 with open(os.path.join(csvdir, "outflow_dust.csv")) as f:
@@ -52,34 +54,42 @@ with open(os.path.join(csvdir, "outflow_dust.csv")) as f:
 
 flux_dust = np.zeros((n_steps, 6))
 with open(os.path.join(csvdir, "flux_dust.csv")) as f:
+    cumulative_flux = np.zeros(6)
     for i, line in enumerate(f):
-        line = line.split(",")
-        flux_dust[i] = np.array(line, dtype=float)
+        line = np.array(line.split(","), dtype=float)
+        cumulative_flux += line
+        flux_dust[i] = cumulative_flux
 
 faces = [["-x", "-y", "-z"],
          ["+x", "+y", "+z"]]
 
 def plot_outflow(rate, faces, fig_name):
-    fig, axs = plt.subplots(3, 2, figsize=(30,30))
+    fig, axs = plt.subplots(2, 3, figsize=(40,20))
+    count = 0
     for i, sign in enumerate(faces):
         for j, face in enumerate(sign):
-            print(j, i)
-            axs[j][i].plot(t_arr/1e6, rate[:, i+j], linewidth="5")
-            axs[j][i].set_xlabel(r"Time$~[Myr]$")
-            axs[j][i].set_ylabel(r'Outflow Rate $[g\,s^-1]$')
-            axs[j][i].set_title(face)
+            axs[i][j].plot(t_arr/1e6, rate[:, count], linewidth="5")
+            axs[i][j].set_xlabel(r"Time$~[Myr]$")
+            axs[i][j].set_ylabel(r'Outflow Rate $[g\,s^-1]$')
+            axs[i][j].set_title(face)
+            count += 1
+    #plt.tight_layout()
     plt.suptitle(fig_name)
     plt.savefig(pngdir + fig_name)
 
 
 def plot_flux(flux, faces, fig_name):
-    fig, axs = plt.subplots(3, 2, figsize=(30,30))
+    fig, axs = plt.subplots(2, 3, figsize=(40,20))
+    count = 0
     for i, sign in enumerate(faces):
         for j, face in enumerate(sign):
-            axs[j][i].plot(t_arr/1e6, flux[:, i+j], linewidth="5", color="orange")
-            axs[j][i].set_xlabel(r"Time$~[Myr]$")
-            axs[j][i].set_ylabel(r'Mass At Boundary $[g]$')
-            axs[j][i].set_title(face)
+            axs[i][j].plot(t_arr/1e6, flux[:, count], linewidth="5", color="orange")
+            axs[i][j].set_xlabel(r"Time$~[Myr]$")
+            axs[i][j].set_ylabel(r'Mass At Boundary $[g]$')
+            axs[i][j].set_title(face)
+            count += 1
+    #plt.tight_layout()
+    plt.subplots_adjust(wspace=0.3)
     plt.suptitle(fig_name)
     plt.savefig(pngdir + fig_name)
 
