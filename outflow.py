@@ -45,22 +45,28 @@ def get_rates(d, cutoff):
         for index in indices:
             if (index == "0") and (i == 0):
                 rates[0] = calc_mass_loss_rate(d[0, :, :], data.vx_cgs()[0][0, :, :], area)
-                fluxes[0] = np.sum(d[0, :, :][d[0, :, :]>=cutoff])
+                flux = d[0, :, :][d[0, :, :]>=cutoff]
+                fluxes[0] = np.sum(flux) * flux.size * dx**2
             if (index == "0") and (i == 1):
                 rates[1] = calc_mass_loss_rate(d[:, 0, :], data.vy_cgs()[0][:, 0, :], area)
-                fluxes[1] = np.sum(d[:, 0, :][d[:, 0, :]>=cutoff])
+                flux = d[:, 0, :][d[:, 0, :]>=cutoff]
+                fluxes[1] = np.sum(flux) * flux.size * dx**2
             if (index == "0") and (i == 2):
                 rates[2] = calc_mass_loss_rate(d[:, :, 0], data.vz_cgs()[0][:, :, 0], area)
-                fluxes[2] = np.sum(d[:, :, 0][d[:, :, 0]>=cutoff])
+                flux = d[:, :, 0][d[:, :, 0]>=cutoff]
+                fluxes[2] = np.sum(flux) * flux.size * dx**2
             if (index == "-1") and (i == 0):
                 rates[3] = calc_mass_loss_rate(d[-1, :, :], data.vx_cgs()[0][-1, :, :], area)
-                fluxes[3] = np.sum(d[-1, :, :][d[-1, :, :]>=cutoff])
+                flux = d[-1, :, :][d[-1, :, :]>=cutoff]
+                fluxes[3] = np.sum(flux) * flux.size * dx**2
             if (index == "-1") and (i == 1):
                 rates[4] = calc_mass_loss_rate(d[:, -1, :], data.vy_cgs()[0][:, -1, :], area)
-                fluxes[4] = np.sum(d[:, -1, :][d[:, -1, :]>=cutoff])
+                flux = d[:, -1, :][d[:, -1, :]>=cutoff]
+                fluxes[4] = np.sum(flux) * flux.size * dx**2
             if (index == "-1") and (i == 2):
                 rates[5] = calc_mass_loss_rate(d[:, :, -1], data.vz_cgs()[0][:, :, -1], area)
-                fluxes[5] = np.sum(d[:, :, -1][d[:, :, -1]>=cutoff])
+                flux = d[:, :, -1][d[:, :, -1]>=cutoff]
+                fluxes[5] = np.sum(flux) * flux.size * dx**2
     
     return rates, fluxes
 
