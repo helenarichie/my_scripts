@@ -5,11 +5,11 @@ import h5py
 import numpy as np
 
 ns = 0
-ne = 105
-n_proc = 2 # number of processors that did the calculations
+ne = 130
+n_proc = 4 # number of processors that did the calculations
 istart = 0*n_proc
 iend = 1*n_proc
-dnamein = '/ix/eschneider/helena/data/cloud_wind/2023-03-14/hdf5/'
+dnamein = '/ix/eschneider/helena/data/cloud_wind/2023-03-20/hdf5/'
 dnameout = dnamein
 
 scalar = True # set to True if scalar was used

@@ -3,12 +3,12 @@ from hconfig import *
 from csv import writer
 
 ######### hard-coded values! #########
-date = "2023-03-14"
+date = "2023-03-20"
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
 datadir = os.path.join(basedir, "hdf5/full/")
 pngdir = os.path.join(basedir, "png/")
 csvdir = os.path.join(basedir, "csv/")
-cat = False
+cat = True
 cutoff = 1/3*1e-24
 ######################################
 
@@ -69,7 +69,6 @@ def get_rates(d, cutoff):
                 fluxes[5] = np.sum(flux) * flux.size * dx**2
     
     return rates, fluxes
-
 
 for i in range(0, len(files)):
     data = ReadHDF5(datadir, fnum=i, nscalar=1, cat=cat)

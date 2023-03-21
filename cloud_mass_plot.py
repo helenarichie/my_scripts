@@ -1,11 +1,11 @@
 from hconfig import *
 
 ################# hard-coded, fill these in! ###################
-date1 = ""
+date1 = "2023-03-20"
 date2 = ""
 title = "$n=10^{-2}$ Wind"
-xlim = (0, 1)
-comp = True
+xlim = (0, 1.3)
+comp = False
 ################################################################
 
 date = date1

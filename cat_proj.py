@@ -5,10 +5,10 @@ import h5py
 import numpy as np
 
 ns = 0
-ne = 105
-n_procs = 2 # number of processors that did the cholla calculation
-dnamein = '/ix/eschneider/helena/data/cloud_wind/2023-03-14/hdf5/'
-dnameout = '/ix/eschneider/helena/data/cloud_wind/2023-03-14/hdf5/'
+ne = 130
+n_procs = 4 # number of processors that did the cholla calculation
+dnamein = '/ix/eschneider/helena/data/cloud_wind/2023-03-20/hdf5/'
+dnameout = dnamein
 
 # loop over the output times
 for n in range(ns, ne+1):
@@ -21,6 +21,7 @@ for n in range(ns, ne+1):
 
     # open the input file for reading
     filein = h5py.File(dnamein+str(n)+'_proj.h5.'+str(i), 'r')
+    print(filein)
     # read in the header data from the input file
     head = filein.attrs
 
@@ -72,7 +73,7 @@ for n in range(ns, ne+1):
     d_xy[xs:xs+nxl,ys:ys+nyl] += filein['d_xy']
     d_xz[xs:xs+nxl,zs:zs+nzl] += filein['d_xz']
     T_xy[xs:xs+nxl,ys:ys+nyl] += filein['T_xy']
-    T_xz[xs:xs+nxl,zs:zs+nzl] += filein['T_xz']
+    # T_xz[xs:xs+nxl,zs:zs+nzl] += filein['T_xz'] this wasn't working for some reason?
 
     filein.close()
 

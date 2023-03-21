@@ -1,12 +1,12 @@
 from hconfig import *
 
 ######### hard-coded values! #########
-date = "2023-03-14"
+date = "2023-03-20"
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
 datadir = os.path.join(basedir, "hdf5/full/")
 pngdir = os.path.join(basedir, "png/outflow/")
 csvdir = os.path.join(basedir, "csv/")
-cat = False
+cat = True
 cgs = True
 rho_cl_init = 1e-24 # g cm^-3
 r_cl_init = 5 * 3.086e+18 # cm
@@ -34,7 +34,8 @@ t_arr = []
 with open(os.path.join(csvdir, "t_arr.csv")) as f:
     for line in f:
         line = line.split(",")
-        t_arr.append(float(line[0]))
+        t = line[0].strip("\n").strip("[").strip("]")
+        t_arr.append(float(t))
 t_arr = np.array(t_arr)
 
 n_steps = len(t_arr)
@@ -92,8 +93,12 @@ def plot_outflow(rate, faces, fig_name, cgs):
             axs[i][j].set_xlabel(r"Time$~[Myr]$")
             axs[i][j].set_ylabel(r'Outflow Rate $[g\,s^-1]$')
             axs[i][j].set_title(face)
+            ax2 = axs[i][j].twinx()
+            ax2.set_ylim(np.amin(rate[:, count]*M_sun/yr_in_s), np.amax(rate[:, count]*M_sun/yr_in_s))
+            ax2.set_ylabel(r"Outflow Rate $[M_\odot\,yr^{-1}]$", rotation=270, labelpad=55)
             count += 1
     #plt.tight_layout()
+    plt.subplots_adjust(wspace=0.5)
     plt.suptitle(fig_name)
     plt.savefig(pngdir + fig_name)
 
@@ -116,7 +121,7 @@ def plot_flux(flux, faces, fig_name, cgs, ax2_lims):
             axs[i][j].set_title(face)
             count += 1
     #plt.tight_layout()
-    plt.subplots_adjust(wspace=0.6)
+    plt.subplots_adjust(wspace=0.5)
     plt.suptitle(fig_name)
     plt.savefig(pngdir + fig_name)
 
