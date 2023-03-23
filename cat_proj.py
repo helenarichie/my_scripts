@@ -5,9 +5,9 @@ import h5py
 import numpy as np
 
 ns = 0
-ne = 130
+ne = 150
 n_procs = 4 # number of processors that did the cholla calculation
-dnamein = '/ix/eschneider/helena/data/cloud_wind/2023-03-20/hdf5/'
+dnamein = '/ix/eschneider/helena/data/cloud_wind/2023-03-22/hdf5/'
 dnameout = dnamein
 
 # loop over the output times
@@ -21,7 +21,6 @@ for n in range(ns, ne+1):
 
     # open the input file for reading
     filein = h5py.File(dnamein+str(n)+'_proj.h5.'+str(i), 'r')
-    print(filein)
     # read in the header data from the input file
     head = filein.attrs
 

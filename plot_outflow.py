@@ -78,6 +78,7 @@ for i in range(0, 6):
     dust_flux_min[i] = np.amin(flux_dust[:, i])
     dust_flux_max[i] = np.amax(flux_dust[:, i])
 
+print(m_cl_init)
 ax2_lims_cloud = np.column_stack((cloud_flux_min/m_cl_tot_init, cloud_flux_max/m_cl_tot_init))
 ax2_lims_dust = np.column_stack((dust_flux_min/m_dust_tot_init, dust_flux_max/m_dust_tot_init))
 

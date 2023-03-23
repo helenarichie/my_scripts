@@ -4,10 +4,10 @@
 import h5py
 import numpy as np
 
-ns = 0
-ne = 205
+ns = 160
+ne = 160
 n_procs = 4 # number of processors that did the cholla calculation
-dnamein = '/ix/eschneider/helena/data/cloud_wind/2023-03-20/hdf5/'
+dnamein = '/ix/eschneider/helena/data/cloud_wind/2023-03-22/hdf5/'
 dnameout = dnamein
 
 DE = False # set to True if Dual Energy flag was used
