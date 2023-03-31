@@ -2,10 +2,10 @@ from hconfig import *
 
 # date = input("\nDate: ")
 #################################
-date = "2023-03-22"
-cat = True
+date = "2023-03-14"
+cat = False
 vlims_gas = (-4.75, -3.0)
-vlims_dust = (-8, -7.25)
+vlims_dust = (-8.5, -7.25)
 save = True
 gas = True
 dust = True
@@ -16,7 +16,6 @@ basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
 proj_data = os.path.join(basedir, "hdf5/proj")
 full_data = os.path.join(basedir, "hdf5/full")
 pngdir = os.path.join(basedir, "png/proj/")
-
 
 if gas:
 
