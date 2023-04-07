@@ -1,19 +1,34 @@
 from hconfig import *
 import seaborn as sns
+import matplotlib as mpl
 from matplotlib import colors
+from labellines import labelLines
+# pip install matplotlib-label-lines
 
-date = "2023-04-03"
+date = "2023-03-07"
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
 dnamein = os.path.join(basedir, "hdf5/full/")
 dnameout = os.path.join(basedir, "png/phase/")
-cat = True
+cat = False
+gas = True
+dust = False
+
 T_min, T_max = 5e2, 1e8
-n_min, n_max = 1e-5, 1.5e1
+d_min, d_max = None, None
+if gas:
+    d_min, d_max = 1e-29, 1.5e-23
+if dust:
+    d_min, d_max = 1e-31, 1.5e-25
 
 r_cl = 5 * 3.086e+18 # pc to cm
-chi = 100
+chi = 1000
 v_wind_i = 1000e3 # cm/s
 tau_cc = (np.sqrt(chi)*r_cl/v_wind_i)/yr_in_s # cloud crushing time
+
+if cat:
+    files = glob.glob(os.path.join(dnamein, "*.h5"))
+else:
+    files = glob.glob(os.path.join(dnamein, "*.h5.0"))
 
 def tau_sp_n(T, tau_sp):
     YR_IN_S = 3.154e7;
@@ -26,50 +41,64 @@ def tau_sp_n(T, tau_sp):
 
     return A * 6e-4 * (a1/tau_sp) * ((T_0/T)**omega + 1)
 
-tau_sp = np.linspace(2, 22, 20)
-tau_sp = 10**tau_sp
-T_sput = np.linspace(T_min, T_max, 100)
+a = np.arange(0, 20, 2)
+tau_sp = 10**a
+T_sput_i = np.linspace(T_min, T_max, 100)
+T_sput = []
 n_sput = []
+tau_sps = []
 for tau in tau_sp:
-    n_sput.append(tau_sp_n(T_sput, tau))
-
-if cat:
-    files = glob.glob(os.path.join(dnamein, "*.h5"))
-else:
-    files = glob.glob(os.path.join(dnamein, "*.h5.0"))
+    tau_sps.append(np.linspace(tau, tau, 100))
+    T_sput.append(T_sput_i)
+    n_sput.append(tau_sp_n(T_sput_i, tau))
+tau_sps = np.array(tau_sps)
+n_sput = np.array(n_sput)
 
 for i in range(0, len(files)):
     data = ReadHDF5(dnamein, fnum=i, nscalar=1, cat=cat)
     head = data.head
     conserved = data.conserved
+    dx = data.dx_cgs()[0]
 
-    d_gas = data.d_cgs()
+    d = None
+    if gas:
+        d = data.d_cgs()
+    if dust:
+        d = conserved["scalar0"] * head["density_unit"]
+        wh_zero = np.where(d<=0)
+        d[wh_zero] = 1e-40
+
     T = data.T()
-    t_arr = data.t_cgs() / yr_in_s
+    t = data.t_cgs() / yr_in_s
 
-    n_gas = d_gas / (MP * 0.6)
+    d_sput = n_sput * (MP * 0.6)
+    weights = d.flatten() * dx**3 * 5.02785e-34 # solar masses
 
-    log_n = np.log10(n_gas.flatten())
+    log_d = np.log10(d.flatten())
     log_T = np.log10(T.flatten())
-    extent = np.log10([[n_min, n_max], [T_min, T_max]])
-
-    hist_cmap = sns.cubehelix_palette(light=1, as_cmap=True, reverse=True)
+    extent = np.log10([[d_min, d_max], [T_min, T_max]])
 
     fig, ax = plt.subplots(figsize=(25,20))
-    hist = plt.hist2d(log_n, log_T, 
-                    bins=150, norm=colors.LogNorm(), 
-                    cmap=hist_cmap,
-                    range=extent)
+    hist = plt.hist2d(log_d, log_T, weights=weights,
+                      bins=150, norm=colors.LogNorm(),
+                      range=extent)
+    
+    for j, tau in enumerate(tau_sp):
+        plt.plot(np.log10(d_sput[j]), np.log10(T_sput[j]), linestyle="--", 
+                 linewidth=3, color="grey", label=r'$10^{{{:d}}}$ yr'.format(a[j]))
 
-    for j, n in enumerate(n_sput):
-        plt.plot(np.log10(n), np.log10(T_sput), 
-                c="k", linestyle="--", 
-                linewidth=3, zorder=0, 
-                alpha=0.1)
+    labelLines(plt.gca().get_lines(), zorder=2.5)
 
-    plt.xlabel("$\log (n~[cm^{-3}])$")
+    if gas:
+        plt.xlabel(r"$\log (\rho_{gas}~[g\,cm^{-3}])$")
+    if dust:
+        plt.xlabel(r"$\log (\rho_{dust}~[g\,cm^{-3}])$")
     plt.ylabel("$\log (T~[K])$")
-    plt.title(f"Time={round(t_arr[0]/1e6, 3)} Myr, " + r"$t/t_{cc}$=" + f"{round(t_arr[0]/tau_cc, 3)}")
-    plt.colorbar(label="Number of Cells")
+    plt.title(f"Time={round(t[0]/1e6, 3)} Myr, " + r"$t/t_{cc}$=" + f"{round(t[0]/tau_cc, 3)}")
+    cbar = plt.colorbar()
+    cbar.set_label("$M_\odot$", rotation=270, labelpad=30)
 
-    plt.savefig(dnameout + f"{i}_nT.png", dpi=300)
+    if gas:
+        plt.savefig(dnameout + f"{i}_gas_rhoT.png", dpi=300)
+    if dust:
+        plt.savefig(dnameout + f"{i}_dust_rhoT.png", dpi=300)
