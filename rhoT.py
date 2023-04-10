@@ -3,23 +3,23 @@ from matplotlib import colors
 from labellines import labelLines
 # pip install matplotlib-label-lines
 
-date = "2023-03-07"
+date = "2023-03-22"
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
 dnamein = os.path.join(basedir, "hdf5/full/")
 dnameout = os.path.join(basedir, "png/phase/")
-cat = False
-gas = True
-dust = False
+cat = True
+gas = False
+dust = True
 
 T_min, T_max = 5e2, 5e7
 d_min, d_max = None, None
 if gas:
-    d_min, d_max = 3e-29, 1.5e-23
+    d_min, d_max = 7e-29, 1e-22
 if dust:
-    d_min, d_max = 5e-31, 1.5e-25
+    d_min, d_max = 1e-34, 1.5e-24
 
 r_cl = 5 * 3.086e+18 # pc to cm
-chi = 1000
+chi = 100
 v_wind_i = 1000e3 # cm/s
 tau_cc = (np.sqrt(chi)*r_cl/v_wind_i)/yr_in_s # cloud crushing time
 
@@ -40,6 +40,7 @@ def tau_sp_n(T, tau_sp):
     return A * 6e-4 * (a1/tau_sp) * ((T_0/T)**omega + 1)
 
 a = np.arange(0, 20, 2)
+a = np.array([0, 2, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18])
 tau_sp = 10**a
 T_sput_i = np.linspace(T_min, T_max, 100)
 T_sput = []
@@ -103,3 +104,5 @@ for i in range(0, len(files)):
         plt.savefig(dnameout + f"{i}_gas_rhoT.png", dpi=300)
     if dust:
         plt.savefig(dnameout + f"{i}_dust_rhoT.png", dpi=300)
+    
+    plt.close()
