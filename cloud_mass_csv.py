@@ -2,10 +2,11 @@ from hconfig import *
 from csv import writer
 
 ################# hard-coded, fill these in! ###################
-date = "2023-03-15"
+date = "2023-03-07"
 write_csv = True  # do you need to read data from HDF5 files?
 rho_cl_i = 1e-24  # n = 1, needed to index cloud material
-cat = True
+cat = False
+nfiles = 314
 ################################################################
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
@@ -62,5 +63,5 @@ def write_csv(path, fnum=None, nscalar=0, cat=True):
         writer_obj.writerow([t[0]])
         f.close()
 
-for i in range(0, 201):
+for i in range(0, nfiles):
     write_csv(datadir, fnum=i, nscalar=1, cat=cat)

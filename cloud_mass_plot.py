@@ -1,10 +1,10 @@
 from hconfig import *
 
 ################# hard-coded, fill these in! ###################
-date1 = "2023-03-20"
+date1 = "2023-03-07"
 date2 = ""
 title = "$n=10^{-2}$ Wind"
-xlim = (0, 1.3)
+xlim = (0, 3.14)
 comp = False
 ################################################################
 
@@ -97,7 +97,7 @@ if comp:
 #ax[0].semilogx(t_arr_16, rho_cl_tot_16/rho_cl_tot_i_16, linewidth=7, color="red", linestyle="--", label="16")
 #ax[0].semilogx(t_arr_32, rho_cl_tot_32/rho_cl_tot_i_32, linewidth=7, color="red", label="32")
 ax[0].set_xlim(xlim)
-ax[0].set_ylabel(r'$\rho_{cl}/\rho_{cl,init}$')
+ax[0].set_ylabel(r'$m_{cl}/m_{cl,init}$')
 ax[0].set_xlabel(r'Time [Myr]')
 ax[0].set_title(r"Cloud")
 ax[0].legend()
@@ -108,7 +108,7 @@ if comp:
 #ax[1].semilogx(t_arr_16, rho_d_tot_16/rho_d_tot_i_16, linewidth=7, color="blue", linestyle="--", label="16")
 #ax[1].semilogx(t_arr_32, rho_d_tot_32/rho_d_tot_i_32, linewidth=7, color="blue", label="32")
 ax[1].set_xlim(xlim)
-ax[1].set_ylabel(r'$\rho_{d}/\rho_{d,init}$')
+ax[1].set_ylabel(r'$m_{d}/m_{d,init}$')
 ax[1].set_xlabel(r'Time [Myr]')
 ax[1].set_title(r"Dust")
 ax[1].legend()

@@ -2,10 +2,10 @@ from hconfig import *
 
 # date = input("\nDate: ")
 #################################
-date = "2023-03-14"
-cat = False
+date = "2023-04-06"
+cat = True
 vlims_gas = (-4.75, -3.0)
-vlims_dust = (-8.5, -7.25)
+vlims_dust = (-8.75, -7.25)
 save = True
 gas = True
 dust = True
@@ -109,4 +109,4 @@ if dust:
             plt.savefig(pngdir + f"{i}_dust_proj.png", dpi=300)
         plt.close()
 
-        print(f"Saving figure {i} of {len(os.listdir(full_data))}.\n")
+        print(f"Saving figure {i} of {len(os.listdir(full_data))-1}.\n")

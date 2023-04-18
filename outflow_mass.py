@@ -3,12 +3,12 @@ from hconfig import *
 from csv import writer
 
 ######### hard-coded values! #########
-date = "2023-03-22"
+date = "2023-03-07"
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
 datadir = os.path.join(basedir, "hdf5/full/")
 pngdir = os.path.join(basedir, "png/")
 csvdir = os.path.join(basedir, "csv/")
-cat = True
+cat = False
 cutoff = 0.05*1e-24  # 5% of initial density
 ######################################
 

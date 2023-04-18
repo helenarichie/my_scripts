@@ -3,14 +3,18 @@
 
 import h5py
 import numpy as np
+import os
 
 ns = 0
-ne = 159
+ne = 40
 n_proc = 4 # number of processors that did the calculations
 istart = 0*n_proc
 iend = 1*n_proc
-dnamein = '/ix/eschneider/helena/data/cloud_wind/2023-03-22/hdf5/'
-dnameout = dnamein
+
+date = "2023-04-06"
+basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
+dnamein = os.path.join(basedir, "hdf5/raw/full/")
+dnameout = os.path.join(basedir, "hdf5/full/")
 
 scalar = True # set to True if scalar was used
 

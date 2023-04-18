@@ -1,17 +1,18 @@
 from hconfig import *
 
 ######### hard-coded values! ###########
-date = "2023-03-22"
+date = "2023-03-07"
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
 datadir = os.path.join(basedir, "hdf5/full/")
 pngdir = os.path.join(basedir, "png/outflow/")
 csvdir = os.path.join(basedir, "csv/")
-cat = True
+cat = False
 cgs = True
 rho_cl_init = 1e-24  # g cm^-3
 r_cl_init = 5 * 3.086e+18  # cm, initial cloud radius
 chi = 1e2  # background-wind density contrast
 v_b = 1e3 * 1e5  # km/s * (cm/s / km/s), background wind speed
+#xlims = (0, 1)
 ########################################
 
 # Constants
@@ -108,6 +109,7 @@ def plot_outflow(rate, rate_dense, faces, fig_name, cgs):
         for j, face in enumerate(sign):
             #axs[i][j].plot(t_arr/1e6, rate[:, count], linewidth="5", label="tot")
             axs[i][j].plot(t_arr/1e6, rate_dense[:, count], linewidth="5", label="dense")
+            #axs[i][j].set_xlim(xlims)
             axs[i][j].set_xlabel(r"Time$~[Myr]$")
             axs[i][j].set_ylabel(r'Outflow Rate $[g\,s^-1]$')
             axs[i][j].set_title(face, fontsize=40, y=1.1)
@@ -140,6 +142,7 @@ def plot_m_out(mass, faces, fig_name, cgs, ax2_lims):
                 axs[i][j].set_ylabel(r'Mass At Boundary $[M_\odot]$')
             axs[i][j].set_xlabel(r"Time$~[Myr]$")
             axs[i][j].set_title(face, fontsize=40, y=1.1)
+            #axs[i][j].set_xlim(xlims)
             #x2 = axs[i][j].twiny()
             #t_cc_range = np.arange(np.amin(t_arr/(tau_cc/yr_in_s)), np.amax(t_arr/(tau_cc/yr_in_s)), step=4)
             #x2.set_xlim(np.amin(t_cc_range), np.amax(t_cc_range))

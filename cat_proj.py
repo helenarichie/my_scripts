@@ -3,12 +3,16 @@
 
 import h5py
 import numpy as np
+import os
 
+date = "2023-04-06"
 ns = 0
-ne = 150
+ne = 40
 n_procs = 4 # number of processors that did the cholla calculation
-dnamein = '/ix/eschneider/helena/data/cloud_wind/2023-03-22/hdf5/'
-dnameout = dnamein
+
+basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
+dnamein = os.path.join(basedir, "hdf5/raw/proj/")
+dnameout = os.path.join(basedir, "hdf5/proj/")
 
 # loop over the output times
 for n in range(ns, ne+1):
