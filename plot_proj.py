@@ -5,7 +5,7 @@ from hconfig import *
 date = "2023-04-06"
 cat = True
 vlims_gas = (-4.75, -3.0)
-vlims_dust = (-8.75, -7.25)
+vlims_dust = (-10, -7.25)
 save = True
 gas = True
 dust = True
