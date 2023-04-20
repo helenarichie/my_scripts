@@ -28,6 +28,7 @@ if cat:
 else:
     files = glob.glob(os.path.join(datadir, "*.h5.0"))
 
+"""
 # create files to write quantities for cloud (dense gas only), total gas, and dust
 f = open(os.path.join(csvdir, "rate_cl.csv"), "w")
 f.close()
@@ -39,6 +40,9 @@ f = open(os.path.join(csvdir, "mass_gas.csv"), "w")
 f.close()
 f = open(os.path.join(csvdir, "mass_dust.csv"), "w")
 f.close()
+"""
+f = open(os.path.join(csvdir, "rate_dust.csv"), "w")
+f.close()
 
 def calc_mass_loss_rate(rho, v, area):
     return np.sum(rho * np.abs(v)) * area
@@ -48,32 +52,32 @@ def get_rates(d, cutoff):
     for i, area in enumerate(areas):
         for index in indices:
             if (index == 0) and (i == 0):
-                d_i, v_i = d[0, :, :], conserved["momentum_x"][0][0, :, :] / d[0, :, :]
+                d_i, v_i = d[0, :, :], conserved["momentum_x"][0][0, :, :] / conserved["density"][0][0, :, :]
                 mask = np.logical_and(d_i >= cutoff, v_i < 0) # mask for high-density, outflowing gas
                 rates[0] = calc_mass_loss_rate(d_i[mask], v_i[mask], area)
 
             if (index == 0) and (i == 1):
-                d_i, v_i = d[:, 0, :], conserved["momentum_y"][0][:, 0, :] / d[:, 0, :]
+                d_i, v_i = d[:, 0, :], conserved["momentum_y"][0][:, 0, :] / conserved["density"][0][:, 0, :]
                 mask = np.logical_and(d_i >= cutoff, v_i < 0)
                 rates[1] = calc_mass_loss_rate(d_i[mask], v_i[mask], area)
 
             if (index == 0) and (i == 2):
-                d_i, v_i = d[:, :, 0], conserved["momentum_z"][0][:, :, 0] / d[:, :, 0]
+                d_i, v_i = d[:, :, 0], conserved["momentum_z"][0][:, :, 0] / conserved["density"][0][:, :, 0]
                 mask = np.logical_and(d_i >= cutoff, v_i < 0)
                 rates[2] = calc_mass_loss_rate(d_i[mask], v_i[mask], area)
 
             if (index == -1) and (i == 0):
-                d_i, v_i = d[-1, :, :], conserved["momentum_x"][0][-1, :, :] / d[-1, :, :]
+                d_i, v_i = d[-1, :, :], conserved["momentum_x"][0][-1, :, :] / conserved["density"][0][-1, :, :]
                 mask = np.logical_and(d_i >= cutoff, v_i > 0)
                 rates[3] = calc_mass_loss_rate(d_i[mask], v_i[mask], area)
 
             if (index == -1) and (i == 1):
-                d_i, v_i = d[:, -1, :], conserved["momentum_y"][0][:, -1, :] / d[:, -1, :]
+                d_i, v_i = d[:, -1, :], conserved["momentum_y"][0][:, -1, :] / conserved["density"][0][:, -1, :]
                 mask = np.logical_and(d_i >= cutoff, v_i > 0)
                 rates[4] = calc_mass_loss_rate(d_i[mask], v_i[mask], area)
 
             if (index == -1) and (i == 2):
-                d_i, v_i = d[:, :, -1], conserved["momentum_z"][0][:, :, -1] / d[:, :, -1]
+                d_i, v_i = d[:, :, -1], conserved["momentum_z"][0][:, :, -1] / conserved["density"][0][:, :, -1]
                 mask = np.logical_and(d_i >= cutoff, v_i > 0)
                 rates[5] = calc_mass_loss_rate(d_i[mask], v_i[mask], area)
     
@@ -122,6 +126,7 @@ for i in range(0, len(files)):
     head = data.head
     conserved = data.conserved
 
+    """
     # calculate and write rates and masses for cloud
     rates = get_rates(conserved["density"][0], cutoff)
     masses = get_masses(conserved["density"][0], cutoff)
@@ -156,4 +161,13 @@ for i in range(0, len(files)):
     with open(os.path.join(csvdir, "mass_dust.csv"), "a") as f:
         writer_obj = writer(f)
         writer_obj.writerow(masses)
+        f.close()
+"""
+
+    # calculate and write masses for dust
+    rates = get_rates(conserved["scalar0"][0], 1)
+
+    with open(os.path.join(csvdir, "rate_dust.csv"), "a") as f:
+        writer_obj = writer(f)
+        writer_obj.writerow(rates)
         f.close()

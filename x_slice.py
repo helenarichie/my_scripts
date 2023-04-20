@@ -31,19 +31,19 @@ for i in range(0, len(os.listdir(full_data))):
     d_dust = conserved["scalar0"][0]
 
     wh_zero = np.where(d_dust<1e-10)
-    d_dust[wh_zero] = 1e-10
+    d_dust[wh_zero] = 1e-11
     vlims_du = [np.log10(np.amin(d_dust.flatten())), np.log10(np.amax(d_dust.flatten()))]
 
     fig, axs = plt.subplots(nrows=1, ncols=1)
 
     # xz dust density projection
     #im = axs.imshow(np.log10(d_gas[i].T), origin="lower", vmin=vlims_gas[0], vmax=vlims_gas[1], extent=[0, nx*dx, 0, nz*dx])
-    im = axs.imshow(np.log10(d_dust[-1, :, :].T), origin="lower", cmap="plasma")
+    im = axs.imshow(np.log10(d_dust[-1, :, :].T*dx**3), origin="lower", cmap="plasma")
 
     if np.isnan(np.log10(d_dust.T).any()):
         print("there's a nan")
 
-    ylabel = r'$\mathrm{log}_{10}(\rho_{gas})$ [$\mathrm{M_\odot}\,\mathrm{kpc}^{-3}$]'
+    ylabel = r'$\mathrm{log}_{10}(M_{dust})$ [$\mathrm{M_\odot}$]'
     divider = make_axes_locatable(axs)
     cax = divider.append_axes("right", size="5%", pad=0.05)
     cbar = fig.colorbar(im, ax=axs, cax=cax)
@@ -56,7 +56,7 @@ for i in range(0, len(os.listdir(full_data))):
     #axs.set_xlabel(r"$x~$[kpc]")
     #axs.set_ylabel(r"$z~$[kpc]")
     #axs.tick_params(axis='both', which='both', direction='in', color='white', top=1, right=1, length=7)
-    axs.text(2*dx*nz, 2*dx*nz, f'{round(t[0]/1e6, 2)} Myr', color='white', fontsize=20)  
+    axs.text(10*dx*nz, 10*dx*nz, f'{round(t[0]/1e6, 2)} Myr', color='white', fontsize=15)  
     axs.set_title(r"+x boundary slice", fontsize=20)
 
     # plot and save

@@ -76,6 +76,12 @@ with open(os.path.join(csvdir, "mass_dust.csv")) as f:
         line = line.split(",")
         mass_dust[i] = np.array(line, dtype=float)
 
+rate_dust = np.zeros((n_steps, 6))  # M_sun / yr
+with open(os.path.join(csvdir, "rate_dust.csv")) as f:
+    for i, line in enumerate(f):
+        line = line.split(",")
+        rate_dust[i] = np.array(line, dtype=float)
+
 def plot_rate(rate, faces, fig_name, scale):
     fig, axs = plt.subplots(2, 3, figsize=(40,20))
     count = 0
@@ -87,7 +93,7 @@ def plot_rate(rate, faces, fig_name, scale):
                 axs[i][j].plot(t_arr/1e6, rate[:, count], linewidth="5")
             # axs[i][j].set_xlim(xlims)
             axs[i][j].set_xlabel(r"Time$~[Myr]$")
-            axs[i][j].set_ylabel(r'Outflow Rate $[M_\odot\,yr^-1]$')
+            axs[i][j].set_ylabel(r'Outflow Rate $[M_\odot\,kyr^-1]$')
             axs[i][j].set_title(face, fontsize=40, y=1.15)
             x2 = axs[i][j].twiny()
             t_cc_range = np.arange(np.amin(t_arr/(tau_cc)), np.amax(t_arr/(tau_cc)), step=4)
@@ -131,3 +137,4 @@ plot_mass(mass_cl, faces, "mass_cl", "linear")
 plot_rate(rate_gas, faces, "rate_gas", "log")
 plot_mass(mass_gas, faces, "mass_gas", "log")
 plot_mass(mass_dust, faces, "mass_dust", "log")
+plot_rate(rate_dust, faces, "rate_dust", "log")
