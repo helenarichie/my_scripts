@@ -2,7 +2,7 @@ from hconfig import *
 
 # date = input("\nDate: ")
 #################################
-date = "2023-04-06"
+date = "2023-04-24"
 cat = True
 vlims_gas = (-4.75, -3.0)
 vlims_dust = (-10, -7.25)
@@ -13,13 +13,13 @@ dust = True
 
 # directory with slices
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-proj_data = os.path.join(basedir, "hdf5/proj")
-full_data = os.path.join(basedir, "hdf5/full")
-pngdir = os.path.join(basedir, "png/proj/")
+proj_data = os.path.join(basedir, "hdf5_restart/")
+full_data = os.path.join(basedir, "hdf5_restart/")
+pngdir = os.path.join(basedir, "png/proj_restart/")
 
 if gas:
 
-    data = ReadHDF5(proj_data, nscalar=1, proj="xy", cat=cat)
+    data = ReadHDF5(proj_data, proj="xy", cat=cat)
     head = data.head
     conserved = data.conserved
 
@@ -63,7 +63,7 @@ if gas:
 
 if dust:
     for i in range(0, len(os.listdir(full_data))):
-        data = ReadHDF5(full_data, fnum=i, nscalar=1, cat=cat)
+        data = ReadHDF5(full_data, fnum=i, dust=True, cat=cat)
         head = data.head
         conserved = data.conserved
 
@@ -73,7 +73,7 @@ if dust:
 
         t = data.t_cgs() / yr_in_s
 
-        d_dust = conserved["scalar0"] * head["density_unit"]
+        d_dust = conserved["dust_density"] * head["density_unit"]
 
         wh_zero = np.where(d_dust<=0)
         d_dust[wh_zero] = 1e-40
