@@ -4,10 +4,13 @@ from labellines import labelLines
 # pip install matplotlib-label-lines
 
 #####################
-date = "2023-03-22"
+date = "2023-04-21"
 cat = True
-gas = False
-dust = True
+gas = True
+dust = False
+r_cl = 5 * 3.086e+18 # pc to cm
+chi = 100
+v_wind_i = 100e3 # cm/s
 #####################
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
@@ -21,9 +24,6 @@ if gas:
 if dust:
     d_min, d_max = 7e-29, 1e-22
 
-r_cl = 5 * 3.086e+18 # pc to cm
-chi = 100
-v_wind_i = 1000e3 # cm/s
 tau_cc = (np.sqrt(chi)*r_cl/v_wind_i)/yr_in_s # cloud crushing time
 
 if cat:
@@ -57,7 +57,7 @@ tau_sps = np.array(tau_sps)
 n_sput = np.array(n_sput)
 
 for i in range(0, len(files)):
-    data = ReadHDF5(dnamein, fnum=i, nscalar=1, cat=cat)
+    data = ReadHDF5(dnamein, fnum=i, cat=cat)
     head = data.head
     conserved = data.conserved
     dx = data.dx_cgs()[0]
@@ -67,6 +67,7 @@ for i in range(0, len(files)):
     cmap = None
     if gas:
         d = data.d_cgs()
+        d_weight = d
         cmap = "viridis"
     if dust:
         d = data.d_cgs()

@@ -5,12 +5,13 @@ import h5py
 import numpy as np
 import os
 
-date = "2023-04-24"
+########################
+date = "2023-04-26"
 ns = 0
-ne = 1
+ne = 200
 n_procs = 4 # number of processors that did the cholla calculation
-
 dust = True
+########################
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
 dnamein = os.path.join(basedir, "hdf5/raw/proj/")

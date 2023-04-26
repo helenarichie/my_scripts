@@ -5,17 +5,18 @@ import h5py
 import numpy as np
 import os
 
+###############################
+date = "2023-04-26"
 ns = 0
-ne = 100
+ne = 200
 n_procs = 4 # number of processors that did the cholla calculation
+DE = False # set to True if Dual Energy flag was used
+SCALAR = True # set to True if Scalar was used
+###############################
 
-date = "2023-04-21"
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
 dnamein = os.path.join(basedir, "hdf5/raw/slice/")
 dnameout = os.path.join(basedir, "hdf5/slice/")
-
-DE = False # set to True if Dual Energy flag was used
-SCALAR = True # set to True if Scalar was used
 
 # loop over the output times
 for n in range(ns, ne+1):
