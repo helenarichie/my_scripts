@@ -30,18 +30,13 @@ t_arr = data.t_cgs() / yr_in_s
 
 d_dust = conserved["dust_density"]
 
-wh_zero = np.where(d_dust<=0)
-d_dust[wh_zero] = 1e-40
-vlims_du = [np.log10(np.amin(d_dust.flatten())), np.log10(np.amax(d_dust.flatten()))]
-
 d_dust *= head["mass_unit"] / (head["length_unit"] ** 2)
 
 for i, d in enumerate(d_gas):
 
     fig, axs = plt.subplots(nrows=1, ncols=1, figsize=(15,5))
     
-    # xz gas density projection
-    #im = axs.imshow(np.log10(d_gas[i].T), origin="lower", vmin=vlims_gas[0], vmax=vlims_gas[1], extent=[0, nx*dx, 0, nz*dx])
+    # xy gas density projection
     im = axs.imshow(np.log10(d_gas[i].T), origin="lower", extent=[0, nx*dx, 0, nz*dx])
     ylabel = r'$\mathrm{log}_{10}(\Sigma_{gas})$ [$\mathrm{g}\,\mathrm{cm}^{-2}$]'
     divider = make_axes_locatable(axs)
@@ -64,14 +59,15 @@ for i, d in enumerate(d_gas):
 
     fig, axs = plt.subplots(nrows=1, ncols=1, figsize=(13,5))
 
-    # xz dust density projection
-    #im = axs.imshow(np.log10(d_gas[i].T), origin="lower", vmin=vlims_gas[0], vmax=vlims_gas[1], extent=[0, nx*dx, 0, nz*dx])
+    d_dust[i][d_dust[i]<=0] = 1e-40
+
+    # xy dust density projection
     im = axs.imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=vlims_dust[0], extent=[0, nx*dx, 0, nz*dx])
 
     if np.isnan(np.log10(d_dust[i].T).any()):
         print("there's a nan")
 
-    ylabel = r'$\mathrm{log}_{10}(\Sigma_{gas})$ [$\mathrm{g}\,\mathrm{cm}^{-2}$]'
+    ylabel = r'$\mathrm{log}_{10}(\Sigma_{dust})$ [$\mathrm{g}\,\mathrm{cm}^{-2}$]'
     divider = make_axes_locatable(axs)
     cax = divider.append_axes("right", size="5%", pad=0.05)
     cbar = fig.colorbar(im, ax=axs, cax=cax)
