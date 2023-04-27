@@ -86,4 +86,4 @@ for i, d in enumerate(d_gas):
         plt.savefig(pngdir + f"{i}_dust_proj.png", dpi=300)
     plt.close()
 
-    print(f"Saving dust figures {i} of {len(os.listdir(proj_data))-1}.\n")
+    print(f"Saving figures {i} of {len(os.listdir(proj_data))-1}.\n")

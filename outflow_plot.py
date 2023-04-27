@@ -1,7 +1,7 @@
 from hconfig import *
 
 ################# hard-coded, fill these in! ###################
-date = "2023-03-22"
+date = "2023-04-26"
 cat = True
 rho_cl_init = 1e-24  # g cm^-3
 r_cl_init = 5 * 3.086e+18  # cm, initial cloud radius
@@ -18,7 +18,7 @@ datadir = os.path.join(basedir, "hdf5/full/")
 csvdir = os.path.join(basedir, "csv")
 pngdir = os.path.join(basedir, "png/outflow/")
 
-data = ReadHDF5(datadir, fnum=0, nscalar=1, cat=cat)
+data = ReadHDF5(datadir, fnum=0, dust=True, cat=cat)
 head = data.head
 nx, ny, nz = head["dims"]
 dx = head["dx"] # M_sun

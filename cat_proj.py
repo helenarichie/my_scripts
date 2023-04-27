@@ -7,8 +7,8 @@ import os
 
 ########################
 date = "2023-04-26"
-ns = 0
-ne = 200
+ns = 301
+ne = 330
 n_procs = 4 # number of processors that did the cholla calculation
 dust = True
 ########################

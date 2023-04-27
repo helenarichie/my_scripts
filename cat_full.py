@@ -6,8 +6,8 @@ import numpy as np
 import os
 
 #######################
-ns = 101
-ne = 200
+ns = 301
+ne = 330
 n_proc = 4 # number of processors that did the calculations
 scalar = False
 dust = True
