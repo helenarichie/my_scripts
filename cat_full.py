@@ -3,16 +3,24 @@
 
 import h5py
 import numpy as np
+import os
 
-ns = 0
-ne = 159
+#######################
+ns = 301
+ne = 330
 n_proc = 4 # number of processors that did the calculations
+scalar = False
+dust = True
+date = "2023-04-26"
+#######################
+
+
 istart = 0*n_proc
 iend = 1*n_proc
-dnamein = '/ix/eschneider/helena/data/cloud_wind/2023-03-22/hdf5/'
-dnameout = dnamein
 
-scalar = True # set to True if scalar was used
+basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
+dnamein = os.path.join(basedir, "hdf5/raw/full/")
+dnameout = os.path.join(basedir, "hdf5/full/")
 
 # loop over outputs
 for n in range(ns, ne+1):
@@ -51,6 +59,8 @@ for n in range(ns, ne+1):
       E  = fileout.create_dataset("Energy", (nx, ny, nz), chunks=True, dtype=filein['Energy'].dtype)
       if scalar:
         scalar0 = fileout.create_dataset('scalar0', (nx, ny, nz), chunks=True, dtype=filein['scalar0'].dtype)
+      if dust:
+        dust_density = fileout.create_dataset('dust_density', (nx, ny, nz), chunks=True, dtype=filein['dust_density'].dtype)
       try:
         GE = fileout.create_dataset("GasEnergy", (nx, ny, nz), chunks=True, dtype=filein['GasEnergy'].dtype)
       except KeyError:
@@ -78,6 +88,8 @@ for n in range(ns, ne+1):
     fileout['Energy'][xs:xs+nxl,ys:ys+nyl,zs:zs+nzl]  = filein['Energy']
     if scalar:
       fileout['scalar0'][xs:xs+nxl,ys:ys+nyl,zs:zs+nzl] = filein['scalar0']
+    if dust:
+      fileout['dust_density'][xs:xs+nxl,ys:ys+nyl,zs:zs+nzl] = filein['dust_density']
     try:
       fileout['GasEnergy'][xs:xs+nxl,ys:ys+nyl,zs:zs+nzl] = filein['GasEnergy']
     except KeyError:

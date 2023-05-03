@@ -3,24 +3,27 @@ from matplotlib import colors
 from labellines import labelLines
 # pip install matplotlib-label-lines
 
-date = "2023-03-22"
+#####################
+date = "2023-04-21"
+cat = True
+gas = True
+dust = False
+r_cl = 5 * 3.086e+18 # pc to cm
+chi = 100
+v_wind_i = 100e3 # cm/s
+#####################
+
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
 dnamein = os.path.join(basedir, "hdf5/full/")
 dnameout = os.path.join(basedir, "png/phase/")
-cat = True
-gas = False
-dust = True
 
 T_min, T_max = 5e2, 5e7
 d_min, d_max = None, None
 if gas:
     d_min, d_max = 7e-29, 1e-22
 if dust:
-    d_min, d_max = 1e-34, 1.5e-24
+    d_min, d_max = 7e-29, 1e-22
 
-r_cl = 5 * 3.086e+18 # pc to cm
-chi = 100
-v_wind_i = 1000e3 # cm/s
 tau_cc = (np.sqrt(chi)*r_cl/v_wind_i)/yr_in_s # cloud crushing time
 
 if cat:
@@ -54,27 +57,30 @@ tau_sps = np.array(tau_sps)
 n_sput = np.array(n_sput)
 
 for i in range(0, len(files)):
-    data = ReadHDF5(dnamein, fnum=i, nscalar=1, cat=cat)
+    data = ReadHDF5(dnamein, fnum=i, cat=cat)
     head = data.head
     conserved = data.conserved
     dx = data.dx_cgs()[0]
 
     d = None
+    d_weight = None
     cmap = None
     if gas:
         d = data.d_cgs()
+        d_weight = d
         cmap = "viridis"
     if dust:
-        d = conserved["scalar0"] * head["density_unit"]
-        wh_zero = np.where(d<=0)
-        d[wh_zero] = 1e-40
+        d = data.d_cgs()
+        d_weight = conserved["scalar0"] * head["density_unit"]
+        wh_zero = np.where(d_weight<=0)
+        d_weight[wh_zero] = 1e-40
         cmap = "plasma"
 
     T = data.T()
     t = data.t_cgs() / yr_in_s
 
     d_sput = n_sput * (MP * 0.6)
-    weights = d.flatten() * dx**3 * 5.02785e-34 # solar masses
+    weights = d_weight.flatten() * dx**3 * 5.02785e-34 # solar masses
 
     log_d = np.log10(d.flatten())
     log_T = np.log10(T.flatten())
@@ -91,14 +97,17 @@ for i in range(0, len(files)):
 
     labelLines(plt.gca().get_lines(), zorder=2.5)
 
+    plt.xlabel(r"$\log (\rho_{gas}~[g\,cm^{-3}])$")
+
+    cbar_label = None
     if gas:
-        plt.xlabel(r"$\log (\rho_{gas}~[g\,cm^{-3}])$")
+        cbar_label = "Gas Mass $M_\odot$"
     if dust:
-        plt.xlabel(r"$\log (\rho_{dust}~[g\,cm^{-3}])$")
+        cbar_label = "Dust Mass $M_\odot$"
     plt.ylabel("$\log (T~[K])$")
     plt.title(f"Time={round(t[0]/1e6, 3)} Myr, " + r"$t/t_{cc}$=" + f"{round(t[0]/tau_cc, 3)}")
     cbar = plt.colorbar()
-    cbar.set_label("$M_\odot$", rotation=270, labelpad=30)
+    cbar.set_label(cbar_label, rotation=270, labelpad=30)
 
     if gas:
         plt.savefig(dnameout + f"{i}_gas_rhoT.png", dpi=300)

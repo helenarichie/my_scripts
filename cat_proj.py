@@ -3,12 +3,19 @@
 
 import h5py
 import numpy as np
+import os
 
-ns = 0
-ne = 150
+########################
+date = "2023-04-26"
+ns = 301
+ne = 330
 n_procs = 4 # number of processors that did the cholla calculation
-dnamein = '/ix/eschneider/helena/data/cloud_wind/2023-03-22/hdf5/'
-dnameout = dnamein
+dust = True
+########################
+
+basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
+dnamein = os.path.join(basedir, "hdf5/raw/proj/")
+dnameout = os.path.join(basedir, "hdf5/proj/")
 
 # loop over the output times
 for n in range(ns, ne+1):
@@ -59,6 +66,9 @@ for n in range(ns, ne+1):
       d_xz = np.zeros((nx,nz))
       T_xy = np.zeros((nx,ny))
       T_xz = np.zeros((nx,nz))
+      if dust:
+        dust_xy = np.zeros((nx,ny))
+        dust_xz = np.zeros((nx,nz))
 
     # write data from individual processor file to
     # correct location in concatenated file
@@ -73,6 +83,9 @@ for n in range(ns, ne+1):
     d_xz[xs:xs+nxl,zs:zs+nzl] += filein['d_xz']
     T_xy[xs:xs+nxl,ys:ys+nyl] += filein['T_xy']
     # T_xz[xs:xs+nxl,zs:zs+nzl] += filein['T_xz'] this wasn't working for some reason?
+    if dust:
+      dust_xy[xs:xs+nxl,ys:ys+nyl] += filein['d_dust_xy']
+      #dust_xz[xs:xs+nxl,zs:zs+nzl] += filein['d_dust_xz']
 
     filein.close()
 
@@ -81,5 +94,8 @@ for n in range(ns, ne+1):
   fileout.create_dataset('d_xz', data=d_xz)
   fileout.create_dataset('T_xy', data=T_xy)
   fileout.create_dataset('T_xz', data=T_xz)
+  if dust:
+    fileout.create_dataset('d_dust_xy', data=dust_xy)
+    fileout.create_dataset('d_dust_xz', data=dust_xz)
 
   fileout.close()
