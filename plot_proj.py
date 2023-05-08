@@ -2,13 +2,13 @@ from hconfig import *
 
 # date = input("\nDate: ")
 #################################
-date = "2023-04-26"
+date = "2023-05-04"
 save = True
 cat = True
 gas = True
 dust = True
-vlims_gas = (-4.75, -3.0)
-vlims_dust = (-10, -7.25)
+vlims_gas = (-8, -3)
+vlims_dust = (-10, -6)
 #################################
 
 # directory with slices
@@ -63,7 +63,7 @@ for i, d in enumerate(d_gas):
 
     # xy dust density projection
     im = axs.imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=vlims_dust[0], extent=[0, nx*dx, 0, nz*dx])
-
+    #im = axs.imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", extent=[0, nx*dx, 0, nz*dx])
     if np.isnan(np.log10(d_dust[i].T).any()):
         print("there's a nan")
 

@@ -4,10 +4,11 @@ from csv import writer
 density_conversion = 5.028e-34/(3.24e-22)**3 # g/cm^3 to M_sun/kpc^3
 
 ################# hard-coded, fill these in! ###################
-date = "2023-04-26"
-cutoff = 0.05*1e-24*density_conversion # 5% of initial density, M_sun/kpc^3
+date = "2023-05-04"
+rho_cl_i = 1e-24  # n = 1, needed to index cloud material
+cutoff = 0.05*rho_cl_i*density_conversion # 5% of initial density, M_sun/kpc^3
 cat = True
-istart = 301
+istart = 302
 ################################################################
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/" # crc
@@ -42,6 +43,14 @@ if istart == 0:
     f = open(os.path.join(csvdir, "mass_dust.csv"), "w")
     f.close()
     f = open(os.path.join(csvdir, "rate_dust.csv"), "w")
+    f.close()
+    f = open(os.path.join(csvdir, "rho_d_tot.csv"), "w")
+    f.close()
+    f = open(os.path.join(csvdir, "rho_cl_tot.csv"), "w")
+    f.close()
+    f = open(os.path.join(csvdir, "T_cl_avg.csv"), "w")
+    f.close()
+    f = open(os.path.join(csvdir, "t_arr.csv"), "w")
     f.close()
 
 def calc_mass_loss_rate(rho, v, area):
@@ -119,6 +128,44 @@ def get_masses(d, cutoff):
     
     return masses
 
+def write_csv(path, fnum=None, dust=True, cat=True):
+    data = ReadHDF5(path, fnum=fnum, dust=dust, cat=cat)
+    head = data.head
+    conserved = data.conserved
+
+    d_gas = data.d_cgs()
+    d_dust = conserved["dust_density"] * head["density_unit"]
+    T = data.T()
+    t = data.t_cgs() / yr_in_s
+
+    rho_d_tot_i = None
+    rho_cl_tot_i = None
+    T_cl_avg_i = None
+    for i, dens in enumerate(d_dust):
+        rho_d_tot_i = np.sum(d_dust[i][d_dust[i]>0])
+        rho_cl_tot_i = np.sum(d_gas[i][d_gas[i]>=1/3*rho_cl_i])
+        T_cl_avg_i = np.average(T[i][d_gas[i]>=1/3*rho_cl_i])
+
+    with open(os.path.join(csvdir, "rho_d_tot.csv"), "a") as f:
+        writer_obj = writer(f)
+        writer_obj.writerow([rho_d_tot_i])
+        f.close()
+
+    with open(os.path.join(csvdir, "rho_cl_tot.csv"), "a") as f:
+        writer_obj = writer(f)
+        writer_obj.writerow([rho_cl_tot_i])
+        f.close()
+
+    with open(os.path.join(csvdir, "T_cl_avg.csv"), "a") as f:
+        writer_obj = writer(f)
+        writer_obj.writerow([T_cl_avg_i])
+        f.close()
+
+    with open(os.path.join(csvdir, "t_arr.csv"), "a") as f:
+        writer_obj = writer(f)
+        writer_obj.writerow([t[0]])
+        f.close()
+
 # loop through hdf5 files to write out rates and masses for cloud, gas, and dust
 for i in range(istart, len(files)):
     # read in data
@@ -126,6 +173,8 @@ for i in range(istart, len(files)):
     head = data.head
     conserved = data.conserved
     dx = head["dx"][0]
+
+    write_csv(datadir, fnum=i, dust=True, cat=cat)
 
     # calculate and write rates and masses for cloud
     rates = get_rates(conserved["density"][0], cutoff)

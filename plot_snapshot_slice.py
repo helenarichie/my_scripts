@@ -10,15 +10,16 @@ if cat_in.lower() == "true":
     n_procs = int(input("\nNumber of processes: "))
 else:
     cat = False
+    n_procs = 1
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
 datadir = os.path.join(basedir, "hdf5/")
 dnameout = dnamein = datadir
 
-if cat:
-    ns = nfile
-    ne = nfile
-    DE = False # set to True if Dual Energy flag was used
+ns = nfile
+ne = nfile
+
+DE = False # set to True if Dual Energy flag was used
 SCALAR = True # set to True if Scalar was used
 
 # loop over the output times

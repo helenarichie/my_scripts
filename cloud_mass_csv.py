@@ -2,11 +2,11 @@ from hconfig import *
 from csv import writer
 
 ################# hard-coded, fill these in! ###################
-date = "2023-04-26"
+date = "2023-05-03"
 write_csv = True  # do you need to read data from HDF5 files?
 rho_cl_i = 1e-24  # n = 1, needed to index cloud material
 cat = True
-istart = 301
+istart = 0
 ################################################################
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
