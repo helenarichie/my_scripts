@@ -1,7 +1,7 @@
 from hconfig import *
 
 ################# hard-coded, fill these in! ###################
-date1 = "2023-04-26"
+date1 = "2023-05-12"
 date2 = ""
 title = "$n=10^{-2}$ Wind"
 xlim = (0, 3.0)

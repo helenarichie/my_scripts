@@ -1,37 +1,39 @@
 from hconfig import *
 
 ##################################################################
-date = "2023-05-13"
+date = "2023-03-22"
 save = True
 cat = True
-dust = True
-vlims_gas = (18.2, 20)
-vlims_dust = (12.5, 19)
+gas = True
+dust = False
+vlims_gas = (-6.0005, -2.5)
+vlims_dust = (-10.5, -4.5)
 ##################################################################
 
-##################################################################
+# directory with slices
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-projdir = os.path.join(basedir, "hdf5/proj/")
+proj_data = os.path.join(basedir, "hdf5/proj")
+full_data = os.path.join(basedir, "hdf5/full")
+full_files = sorted(os.listdir(full_data))
 pngdir = os.path.join(basedir, "png/flatiron/")
 
-data = ReadHDF5(projdir, dust=dust, proj="xy", cat=cat)
-head = data.head
-conserved = data.conserved
+if date == "2023-03-22":
+    vlims_gas = (-6.0005, -3)
+    vlims_dust = (-10.5, -4.5)
 
-nx, ny, nz = head["dims"]
-dx = head["dx"][0] * 1e3  # pc
-d_gas = conserved["density"]
-d_gas *= head["mass_unit"] / (head["length_unit"] ** 2)
+for i, d in enumerate(full_files):
 
-gamma = head["gamma"]
-t_arr = data.t_cgs() / yr_in_s  # yr
+    data = ReadHDF5(proj_data, fnum=i, proj="xy", cat=cat)
+    head = data.head
+    conserved = data.conserved
 
-d_dust = conserved["dust_density"]
+    nx, ny, nz = head["dims"]
+    dx = head["dx"][0] * 1e3  # pc
+    d_gas = conserved["density"][0]
+    d_gas *= head["mass_unit"] / (head["length_unit"] ** 2)
 
-d_dust *= head["mass_unit"] / (head["length_unit"] ** 2)
-##################################################################
-
-for i, d in enumerate(d_gas):
+    gamma = head["gamma"]
+    t_arr = data.t_cgs() / yr_in_s
 
     plt.style.use('dark_background')
 
@@ -46,15 +48,12 @@ for i, d in enumerate(d_gas):
     plt.rcParams.update({'font.size': 25})
 
     # xy gas density projection
-    n_gas = d_gas[i]/(0.6*MP) # column density
-    im = axs[0].imshow(np.log10(n_gas.T), origin="lower", vmin=vlims_gas[0], vmax=vlims_gas[1], extent=[0, nx*dx, 0, nz*dx])
-    ylabel = r'$\mathrm{log}_{10}(N_{H, gas})$ [$\mathrm{cm}^{-2}$]'
+    im = axs[0].imshow(np.log10(d_gas.T), origin="lower", vmin=vlims_gas[0], vmax=vlims_gas[1], extent=[0, nx*dx, 0, nz*dx])
+    ylabel = r'$\mathrm{log}_{10}(\Sigma_{gas})$ [$\mathrm{g}\,\mathrm{cm}^{-2}$]'
     divider = make_axes_locatable(axs[0])
     cax = divider.append_axes("right", size="5%", pad=pad)
     cbar = fig.colorbar(im, ax=axs[0], cax=cax, pad=pad)
-    cbar.ax.tick_params(length=9, width=tickwidth)
     cbar.set_label(ylabel, fontsize=fontsize, labelpad=11)
-    cbar.set_ticks(np.linspace(vlims_gas[0], vlims_gas[1], 4).round(1))
     axs[0].hlines(0.13*dx*ny, spacing, spacing+spacing, color='white')
     axs[0].text(spacing+spacing+2, 0.1*dx*ny, '20 pc', color='white', fontsize=fontsize)
     axs[0].set_xticks(np.arange(0, nx*dx, spacing))
@@ -63,22 +62,30 @@ for i, d in enumerate(d_gas):
     #axs[0].text(spacing, 0.1*dx*nz, f'{round(t_arr[i]/1e6, 2)} Myr', color='white', fontsize=fontsize)    
     #axs[0].set_title(r"Gas Density Projection")
 
-    d_dust[i][d_dust[i]<=0] = 1e-40
+    data = ReadHDF5(full_data, fnum=i, nscalar=1, cat=cat)
+    head = data.head
+    conserved = data.conserved
 
+    dx_cgs = head["dx"][0] * head["length_unit"]
+
+    d_dust = conserved["scalar0"][0] * head["density_unit"]
+    d_dust[d_dust<=0] = 1e-40
+
+    d_dust = np.sum(d_dust*dx_cgs, axis=2)
+    
     # xy dust density projection
-    n_dust = d_dust[i]/(0.6*MP) # column density
-    im = axs[1].imshow(np.log10(n_dust.T), origin="lower", cmap="plasma", vmin=vlims_dust[0], vmax=vlims_dust[1], extent=[0, nx*dx, 0, nz*dx])
-    ylabel =  r'$\mathrm{log}_{10}(N_{H, dust})$ [$\mathrm{cm}^{-2}$]'
+    im = axs[1].imshow(np.log10(d_dust.T), origin="lower", cmap="plasma", vmin=vlims_dust[0], vmax=vlims_dust[1], extent=[0, nx*dx, 0, nz*dx])
+    if np.isnan(np.log10(d_dust.T).any()):
+        print("there's a nan")
+    ylabel = r'$\mathrm{log}_{10}(\Sigma_{dust})$ [$\mathrm{g}\,\mathrm{cm}^{-2}$]'
     divider = make_axes_locatable(axs[1])
     cax = divider.append_axes("right", size="5%", pad=pad)
     cbar = fig.colorbar(im, ax=axs[1], cax=cax)
-    cbar.ax.tick_params(length=9, width=tickwidth)
-    cbar.set_label(ylabel, fontsize=fontsize, labelpad=11)
-    cbar.set_ticks(np.linspace(vlims_dust[0], vlims_dust[1], 4).round(1))
+    cbar.set_label(ylabel, fontsize=fontsize, labelpad=2)
     axs[1].set_xticks(np.arange(0, nx*dx, spacing))
     axs[1].set_yticks(np.arange(0, ny*dx, spacing))
     axs[1].tick_params(axis='both', which='both', direction='in', color='white', labelleft=0, labelbottom=0, top=1, right=1, length=9, width=tickwidth)
-    axs[1].text(spacing, 0.1*dx*nz, f'{round(t_arr[i]/1e6, 1)} Myr', color='white', fontsize=fontsize)  
+    axs[1].text(spacing, 0.1*dx*nz, f'{round(t_arr[0]/1e6, 1)} Myr', color='white', fontsize=fontsize)  
     #axs[1].set_title(r"Dust Density Projection")
 
     fig.tight_layout()
@@ -89,4 +96,4 @@ for i, d in enumerate(d_gas):
         plt.savefig(pngdir + f"{i}_proj.png", dpi=300)
     plt.close()
 
-    print(f"Saving figures {i} of {len(os.listdir(projdir))-1}.\n")
+    print(f"Saving figures {i} of {len(full_data)-1}.\n")

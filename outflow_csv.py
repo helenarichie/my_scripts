@@ -4,11 +4,12 @@ from csv import writer
 density_conversion = 5.028e-34/(3.24e-22)**3 # g/cm^3 to M_sun/kpc^3
 
 ################# hard-coded, fill these in! ###################
-date = "2023-05-04"
+date = "2023-05-12"
 rho_cl_i = 1e-24  # n = 1, needed to index cloud material
 cutoff = 0.05*rho_cl_i*density_conversion # 5% of initial density, M_sun/kpc^3
 cat = True
-istart = 302
+istart = 0
+n_hydro = 10
 ################################################################
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/" # crc
@@ -128,8 +129,7 @@ def get_masses(d, cutoff):
     
     return masses
 
-def write_csv(path, fnum=None, dust=True, cat=True):
-    data = ReadHDF5(path, fnum=fnum, dust=dust, cat=cat)
+def write_csv(data):
     head = data.head
     conserved = data.conserved
 
@@ -168,13 +168,14 @@ def write_csv(path, fnum=None, dust=True, cat=True):
 
 # loop through hdf5 files to write out rates and masses for cloud, gas, and dust
 for i in range(istart, len(files)):
+    i *= n_hydro
     # read in data
     data = ReadHDF5(datadir, fnum=i, dust=True, cat=cat)
     head = data.head
     conserved = data.conserved
     dx = head["dx"][0]
 
-    write_csv(datadir, fnum=i, dust=True, cat=cat)
+    write_csv(data)
 
     # calculate and write rates and masses for cloud
     rates = get_rates(conserved["density"][0], cutoff)

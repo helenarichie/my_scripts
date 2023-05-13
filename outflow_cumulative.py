@@ -3,12 +3,8 @@ from hconfig import *
 density_conversion = 5.028e-34/(3.24e-22)**3 # g/cm^3 to M_sun/kpc^3
 
 ################# hard-coded, fill these in! ###################
-date = "2023-05-04"
+date = "2023-05-12"
 cat = True
-rho_cl_init = 1e-24  # g cm^-3
-r_cl_init = 5 * 3.086e+18  # cm, initial cloud radius
-chi = 1e2  # background-wind density contrast
-v_b = 1e2 * 1e5  # km/s * (cm/s / km/s), background wind speed
 # xlims = (0, 1)
 pad = 0.005
 ################################################################
@@ -76,10 +72,12 @@ plt.savefig(os.path.join(pngdir, "mass_out.png"))
 mass_dust_tot = np.array(mass_dust_tot)
 mass_out = np.array(mass_out)
 
+mass_diff = mass_dust_tot[0] - mass_out
+
 fig, ax = plt.subplots(1, 1, figsize=(15,10))
-ax.semilogy(t_arr/1e6, mass_out/mass_dust_tot * 100, linewidth=4)
+ax.plot(t_arr/1e6, mass_dust_tot/mass_diff, linewidth=4)
 #ax.set_ylim(ymin, ymax)
-ax.set_title("Percentage of Total Mass")
+ax.set_title("")
 ax.set_xlabel("Time [Myr]")
 ax.set_ylabel(r"Dust Mass$~[M_\odot]$")
 plt.tight_layout()

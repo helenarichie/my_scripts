@@ -1,12 +1,12 @@
 from hconfig import *
 
 ##################################################################
-date = "2023-05-13"
+date = "2023-03-22"
 save = True
 cat = True
-dust = True
-vlims_gas = (18.2, 20)
-vlims_dust = (12.5, 19)
+dust = False
+vlims_gas = (-6.0005, -2.5)
+vlims_dust = (-10.5, -4.5)
 ##################################################################
 
 ##################################################################
@@ -46,15 +46,12 @@ for i, d in enumerate(d_gas):
     plt.rcParams.update({'font.size': 25})
 
     # xy gas density projection
-    n_gas = d_gas[i]/(0.6*MP) # column density
-    im = axs[0].imshow(np.log10(n_gas.T), origin="lower", vmin=vlims_gas[0], vmax=vlims_gas[1], extent=[0, nx*dx, 0, nz*dx])
-    ylabel = r'$\mathrm{log}_{10}(N_{H, gas})$ [$\mathrm{cm}^{-2}$]'
+    im = axs[0].imshow(np.log10(d_gas[i].T), origin="lower", vmin=vlims_gas[0], vmax=vlims_gas[1], extent=[0, nx*dx, 0, nz*dx])
+    ylabel = r'$\mathrm{log}_{10}(\Sigma_{gas})$ [$\mathrm{g}\,\mathrm{cm}^{-2}$]'
     divider = make_axes_locatable(axs[0])
     cax = divider.append_axes("right", size="5%", pad=pad)
     cbar = fig.colorbar(im, ax=axs[0], cax=cax, pad=pad)
-    cbar.ax.tick_params(length=9, width=tickwidth)
     cbar.set_label(ylabel, fontsize=fontsize, labelpad=11)
-    cbar.set_ticks(np.linspace(vlims_gas[0], vlims_gas[1], 4).round(1))
     axs[0].hlines(0.13*dx*ny, spacing, spacing+spacing, color='white')
     axs[0].text(spacing+spacing+2, 0.1*dx*ny, '20 pc', color='white', fontsize=fontsize)
     axs[0].set_xticks(np.arange(0, nx*dx, spacing))
@@ -66,15 +63,14 @@ for i, d in enumerate(d_gas):
     d_dust[i][d_dust[i]<=0] = 1e-40
 
     # xy dust density projection
-    n_dust = d_dust[i]/(0.6*MP) # column density
-    im = axs[1].imshow(np.log10(n_dust.T), origin="lower", cmap="plasma", vmin=vlims_dust[0], vmax=vlims_dust[1], extent=[0, nx*dx, 0, nz*dx])
-    ylabel =  r'$\mathrm{log}_{10}(N_{H, dust})$ [$\mathrm{cm}^{-2}$]'
+    im = axs[1].imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=vlims_dust[0], vmax=vlims_dust[1], extent=[0, nx*dx, 0, nz*dx])
+    if np.isnan(np.log10(d_dust[i].T).any()):
+        print("there's a nan")
+    ylabel = r'$\mathrm{log}_{10}(\Sigma_{dust})$ [$\mathrm{g}\,\mathrm{cm}^{-2}$]'
     divider = make_axes_locatable(axs[1])
     cax = divider.append_axes("right", size="5%", pad=pad)
     cbar = fig.colorbar(im, ax=axs[1], cax=cax)
-    cbar.ax.tick_params(length=9, width=tickwidth)
-    cbar.set_label(ylabel, fontsize=fontsize, labelpad=11)
-    cbar.set_ticks(np.linspace(vlims_dust[0], vlims_dust[1], 4).round(1))
+    cbar.set_label(ylabel, fontsize=fontsize, labelpad=2)
     axs[1].set_xticks(np.arange(0, nx*dx, spacing))
     axs[1].set_yticks(np.arange(0, ny*dx, spacing))
     axs[1].tick_params(axis='both', which='both', direction='in', color='white', labelleft=0, labelbottom=0, top=1, right=1, length=9, width=tickwidth)

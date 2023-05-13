@@ -4,8 +4,10 @@ from hconfig import *
 date = "2023-05-09"
 cat = True
 vlims_gas = (-28, -22)
-vlims_dust = (-30, -20)
-vlims_T = ()
+vlims_dust = (-30, -26)
+vlims_T = (3.5, 7.5)
+vlims_v = (-100, 200)
+vlims = True
 spacing = 40 # pc
 fontsize = 20
 unit = "pc"
@@ -15,7 +17,7 @@ plt.rcParams.update({'font.size': 20})
 
 # directory with slices
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-datadir = os.path.join(basedir, "hdf5/slice/")
+datadir = os.path.join(basedir, "hdf5/")
 pngdir = os.path.join(basedir, "png/slice/")
 
 data = ReadHDF5(datadir, nscalar=1, slice="xy", cat=cat)
@@ -39,7 +41,10 @@ for i, d in enumerate(d_gas):
     fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(25,9))
     
     # xy gas density slice
-    im = axs[0][0].imshow(np.log10(d_gas[i].T), origin="lower", extent=[0, nx*dx, 0, ny*dx])
+    if vlims:
+        im = axs[0][0].imshow(np.log10(d_gas[i].T), origin="lower", vmin=vlims_gas[0], vmax=vlims_gas[1], extent=[0, nx*dx, 0, ny*dx])
+    else:
+        im = axs[0][0].imshow(np.log10(d_gas[i].T), origin="lower", extent=[0, nx*dx, 0, ny*dx])
     ylabel = r'$\mathrm{log}_{10}(\rho_{gas})$ [$\mathrm{g}\mathrm{cm}^{-3}$]'
     divider = make_axes_locatable(axs[0][0])
     cax = divider.append_axes("right", size="5%", pad=0.05)
@@ -58,7 +63,10 @@ for i, d in enumerate(d_gas):
     wh_zero = np.where(d_dust[i]<=0)
     d_dust[i][wh_zero] = 1e-40
 
-    im = axs[1][0].imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=vlims_dust[0], extent=[0, nx*dx, 0, ny*dx])
+    if vlims:
+        im = axs[1][0].imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=vlims_dust[0], vmax=vlims_dust[1], extent=[0, nx*dx, 0, ny*dx])
+    else:
+        im = axs[1][0].imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=vlims_dust[0], extent=[0, nx*dx, 0, ny*dx])
     ylabel = r'$\mathrm{log}_{10}(\rho_{dust})$ [$\mathrm{g}\mathrm{cm}^{-3}$]'
     divider = make_axes_locatable(axs[1][0])
     cax = divider.append_axes("right", size="5%", pad=0.05)
@@ -73,7 +81,10 @@ for i, d in enumerate(d_gas):
     
 
     # xy temperature slice
-    im = axs[0][1].imshow(np.log10(T[i].T), origin="lower", cmap="inferno", extent=[0, nx*dx, 0, ny*dx])
+    if vlims:
+        im = axs[0][1].imshow(np.log10(T[i].T), origin="lower", cmap="inferno", vmin=vlims_T[0], vmax=vlims_T[1], extent=[0, nx*dx, 0, ny*dx])
+    else:
+        im = axs[0][1].imshow(np.log10(T[i].T), origin="lower", cmap="inferno", extent=[0, nx*dx, 0, ny*dx])
     ylabel = r'$\mathrm{log}_{10}(T_{gas}) [\mathrm{K}]$'
     divider = make_axes_locatable(axs[0][1])
     cax = divider.append_axes("right", size="5%", pad=0.05)
@@ -87,7 +98,10 @@ for i, d in enumerate(d_gas):
     axs[0][1].set_ylabel(r"$y~$[{}]".format(unit), fontsize=fontsize)
 
     # xy velocity slice
-    im = axs[1][1].imshow(vx[i].T*1e-5, origin="lower", extent=[0, nx*dx, 0, ny*dx])
+    if vlims:
+        im = axs[1][1].imshow(vx[i].T*1e-5, origin="lower", vmin=vlims_v[0], vmax=vlims_v[1], extent=[0, nx*dx, 0, ny*dx])
+    else:
+        im = axs[1][1].imshow(vx[i].T*1e-5, origin="lower", extent=[0, nx*dx, 0, ny*dx])
     ylabel = r'$v_x$ [km/s]'
     divider = make_axes_locatable(axs[1][1])
     cax = divider.append_axes("right", size="5%", pad=0.05)

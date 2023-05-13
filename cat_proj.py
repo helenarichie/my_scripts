@@ -6,15 +6,15 @@ import numpy as np
 import os
 
 ########################
-date = "2023-05-04"
-ns = 457
-ne = 980
+date = "2023-05-13"
+ns = 0
+ne = 1478
 n_procs = 4 # number of processors that did the cholla calculation
 dust = True
 ########################
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-dnamein = os.path.join(basedir, "hdf5/")
+dnamein = os.path.join(basedir, "hdf5/raw/")
 dnameout = os.path.join(basedir, "hdf5/proj/")
 
 # loop over the output times

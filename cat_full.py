@@ -6,33 +6,32 @@ import numpy as np
 import os
 
 #######################
-ns = 301
-ne = 301
+ns = 0
+ne = 870
+n_hydro = 1
 n_proc = 4 # number of processors that did the calculations
 scalar = False
 dust = True
-date = "2023-05-04"
+date = "2023-05-12"
 #######################
-
 
 istart = 0*n_proc
 iend = 1*n_proc
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-dnamein = os.path.join(basedir, "hdf5/sub/")
-dnameout = os.path.join(basedir, "hdf5/full/")
+dnamein = os.path.join(basedir, "hdf5/")
+dnameout = os.path.join(basedir, "hdf5/full_fine/")
 
 # loop over outputs
 for n in range(ns, ne+1):
-
+  n *= n_hydro
   # loop over files for a given output
   for i in range(istart, iend):
 
     # open the output file for writing (don't overwrite if exists)
     fileout = h5py.File(dnameout+str(n)+'.h5', 'a')
     # open the input file for reading
-    print(dnamein+"hdf5"+str(n)+'.h5.'+str(i))
-    filein = h5py.File(dnamein+"hdf5"+str(n)+'.h5.'+str(i), 'r')
+    filein = h5py.File(dnamein+str(n)+'.h5.'+str(i), 'r')
     # read in the header data from the input file
     head = filein.attrs
 
