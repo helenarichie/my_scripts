@@ -1,21 +1,19 @@
+import sys
+sys.path.insert(0, "/ix/eschneider/helena/code/github/my_scripts")
 from hconfig import *
 
 density_conversion = 5.028e-34/(3.24e-22)**3 # g/cm^3 to M_sun/kpc^3
 
 ################# hard-coded, fill these in! ###################
-date = "2023-03-22"
+date = "2023-04-26"
 cat = True
-rho_cl_init = 1e-24  # g cm^-3
-r_cl_init = 5 * 3.086e+18  # cm, initial cloud radius
-chi = 1e2  # background-wind density contrast
-v_b = 1e2 * 1e5  # km/s * (cm/s / km/s), background wind speed
 # xlims = (0, 1)
 pad = 0.005
 ################################################################
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/" # crc
 datadir = os.path.join(basedir, "hdf5/full/")
-csvdir = os.path.join(basedir, "csv")
+csvdir = os.path.join(basedir, "csv/")
 pngdir = os.path.join(basedir, "png/flatiron/")
 
 data = ReadHDF5(datadir, fnum=0, cat=cat)

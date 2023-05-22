@@ -6,21 +6,21 @@ import numpy as np
 import os
 
 #######################
-ns = 0
-ne = 870
+ns = 925
+ne = 925
 n_hydro = 1
 n_proc = 4 # number of processors that did the calculations
 scalar = False
 dust = True
-date = "2023-05-12"
+date = "2023-05-03"
 #######################
 
 istart = 0*n_proc
 iend = 1*n_proc
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-dnamein = os.path.join(basedir, "hdf5/")
-dnameout = os.path.join(basedir, "hdf5/full_fine/")
+dnamein = os.path.join(basedir, "hdf5/raw/")
+dnameout = os.path.join(basedir, "hdf5/full/")
 
 # loop over outputs
 for n in range(ns, ne+1):

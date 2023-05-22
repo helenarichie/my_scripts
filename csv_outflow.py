@@ -1,16 +1,50 @@
 from hconfig import *
 from csv import writer
+from matplotlib import colors
+from labellines import labelLines
+import seaborn as sns
 
 density_conversion = 5.028e-34/(3.24e-22)**3 # g/cm^3 to M_sun/kpc^3
 
 ################# hard-coded, fill these in! ###################
-date = "2023-05-12"
+date = "2023-04-26"
 rho_cl_i = 1e-24  # n = 1, needed to index cloud material
 cutoff = 0.05*rho_cl_i*density_conversion # 5% of initial density, M_sun/kpc^3
 cat = True
-istart = 0
-n_hydro = 10
+istart = 209
+n_hydro = 1
 ################################################################
+
+####################
+gas = False
+dust = True
+a_grain = 1
+#####################
+
+def tau_sp_n(T, tau_sp):
+    YR_IN_S = 3.154e7;
+    a1 = a_grain; # dust grain size in units of 0.1 micrometers
+    T_0 = 2e6; # K
+    omega = 2.5;
+    A = 0.17e9 * YR_IN_S; # Gyr in s
+
+    tau_sp *= yr_in_s
+
+    return A * 6e-4 * (a1/tau_sp) * ((T_0/T)**omega + 1)
+
+a = np.arange(0, 20, 2)
+a = np.array([0, 2, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18])
+tau_sp = 10**a
+T_sput_i = np.linspace(T_min, T_max, 1000)
+T_sput = []
+n_sput = []
+tau_sps = []
+for tau in tau_sp:
+    tau_sps.append(np.linspace(tau, tau, 100))
+    T_sput.append(T_sput_i)
+    n_sput.append(tau_sp_n(T_sput_i, tau))
+tau_sps = np.array(tau_sps)
+n_sput = np.array(n_sput)
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/" # crc
 datadir = os.path.join(basedir, "hdf5/full/")

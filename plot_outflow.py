@@ -10,9 +10,9 @@ pad = 0.005
 ################################################################
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/" # crc
-datadir = os.path.join(basedir, "hdf5/full/")
-csvdir = os.path.join(basedir, "csv")
-pngdir = os.path.join(basedir, "png/outflow/")
+datadir = os.path.join(basedir, "hdf5/full_fine/")
+csvdir = os.path.join(basedir, "csv_fine")
+pngdir = os.path.join(basedir, "png/outflow_fine/")
 
 data = ReadHDF5(datadir, fnum=0, cat=cat)
 head = data.head

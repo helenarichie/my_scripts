@@ -196,11 +196,11 @@ for i, d in enumerate(d_gas):
     axs[0][0].set_title(r"Gas Density Slice")
     axs[0][0].set_xlabel(r"$x~$[kpc]")
     axs[0][0].plot([], [], " ", label="${:.1e}~yr$".format(t_arr[i]))
-    axs[0][0].legend()
+    #axs[0][0].legend()
     
 
     # xy density-weighted temperature projection
-    im = axs[1][0].imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=-28, vmax=-24, extent=[0, nx*dx, 0, nz*dx])
+    im = axs[1][0].imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=-32, vmax=-24, extent=[0, nx*dx, 0, nz*dx])
     ylabel = r'$\mathrm{log}_{10}(\rho)$ [$\mathrm{g}\mathrm{cm}^{-3}$]'
     divider = make_axes_locatable(axs[1][0])
     cax = divider.append_axes("right", size="5%", pad=0.05)
@@ -213,7 +213,7 @@ for i, d in enumerate(d_gas):
     axs[1][0].set_xlabel(r"$x~$[kpc]")
     axs[1][0].set_ylabel(r"$z~$[kpc]")
     axs[1][0].plot([], [], " ", label="${:.1e}~yr$".format(t_arr[i]))
-    axs[1][0].legend()
+    #axs[1][0].legend()
     
 
     #im = axs[0][1].imshow(np.log10(T[i].T), origin="lower", cmap="inferno", vmin=0, vmax=vlims_T[1], extent=[0, nx*dx, 0, nz*dx])
@@ -234,7 +234,7 @@ for i, d in enumerate(d_gas):
     axs[0][1].set_xlabel(r"$x~$[kpc]")
     axs[0][1].set_ylabel(r"$z~$[kpc]")
     axs[0][1].plot([], [], " ", label="${:.1e}~yr$".format(t_arr[i]))
-    axs[0][1].legend()
+    #axs[0][1].legend()
 
     # xz velocity slice
     # im = axs[1][1].imshow(vx[i].T, origin="lower", vmin=-1e-3, vmax=0.011, extent=[0, nx*dx, 0, nz*dx])

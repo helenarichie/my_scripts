@@ -1,12 +1,15 @@
+import sys
+sys.path.insert(0, "/ix/eschneider/helena/code/github/my_scripts")
 from hconfig import *
 
 ##################################################################
-date = "2023-05-13"
+date = "2023-05-03"
 save = True
 cat = True
 dust = True
-vlims_gas = (18.2, 20)
-vlims_dust = (12.5, 19)
+vlims_gas = (18.2, 19.8)
+vlims_dust = (-13.6, -5)
+fnum = 0
 ##################################################################
 
 ##################################################################
@@ -31,7 +34,7 @@ d_dust = conserved["dust_density"]
 d_dust *= head["mass_unit"] / (head["length_unit"] ** 2)
 ##################################################################
 
-for i, d in enumerate(d_gas):
+for i in range(fnum, len(d_gas)):
 
     plt.style.use('dark_background')
 
@@ -66,9 +69,8 @@ for i, d in enumerate(d_gas):
     d_dust[i][d_dust[i]<=0] = 1e-40
 
     # xy dust density projection
-    n_dust = d_dust[i]/(0.6*MP) # column density
-    im = axs[1].imshow(np.log10(n_dust.T), origin="lower", cmap="plasma", vmin=vlims_dust[0], vmax=vlims_dust[1], extent=[0, nx*dx, 0, nz*dx])
-    ylabel =  r'$\mathrm{log}_{10}(N_{H, dust})$ [$\mathrm{cm}^{-2}$]'
+    im = axs[1].imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=vlims_dust[0], vmax=vlims_dust[1], extent=[0, nx*dx, 0, nz*dx])
+    ylabel = r'$\mathrm{log}_{10}(\Sigma_{dust})$ [$\mathrm{g}\,\mathrm{cm}^{-2}$]'
     divider = make_axes_locatable(axs[1])
     cax = divider.append_axes("right", size="5%", pad=pad)
     cbar = fig.colorbar(im, ax=axs[1], cax=cax)
