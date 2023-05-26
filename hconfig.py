@@ -1,6 +1,7 @@
 
 import sys
-sys.path.insert(0, "/ix/eschneider/helena/code/github/analysis_scripts")
+# sys.path.insert(0, "/ix/eschneider/helena/code/github/analysis_scripts")
+sys.path.insert(0, "/Users/helenarichie/GitHub/analysis_scripts")
 from read_hdf5 import ReadHDF5
 import os
 import glob
@@ -34,3 +35,7 @@ MP = 1.672622e-24
 # warnings.filterwarnings("ignore")
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import time
+
+plt.rcParams.update({'font.family': 'Helvetica'})
+plt.rcParams.update({'font.size': 27})
+# plt.style.use('dark_background')

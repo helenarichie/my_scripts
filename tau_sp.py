@@ -13,9 +13,11 @@ def calc_tau_sp(n, T):
     
     return tau_sp / YR_IN_S
 
-T = 10**np.linspace(1, 8, 8)
+# T = 10**np.linspace(1, 8, 8)
+T = [1e4]
+n = [1e2]
 
-n = [1e-3, 1e-2, 1e-1, 1]
+# n = [1e-3, 1e-2, 1e-1, 1]
 for n_i in n:
     print(n_i)
     for T_i in T:
