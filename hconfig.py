@@ -1,7 +1,9 @@
 
 import sys
-# sys.path.insert(0, "/ix/eschneider/helena/code/github/analysis_scripts")
-sys.path.insert(0, "/Users/helenarichie/GitHub/analysis_scripts")
+if __file__ == "/ix/eschneider/helena/code/my_scripts/hconfig.py":
+    sys.path.insert(0, "/ix/eschneider/helena/code/analysis_scripts")
+if __file__ == "/Users/helenarichie/GitHub/my_scripts/hconfig.py":
+    sys.path.insert(0, "/Users/helenarichie/GitHub/analysis_scripts/")
 from read_hdf5 import ReadHDF5
 import os
 import glob
@@ -29,7 +31,8 @@ plt.rcParams.update({'ytick.minor.width': 1.25 })
 colors = ["lightskyblue", "violet", "forestgreen", "darkviolet", "thistle", "cadetblue", 
             "palegoldenrod", "darksalmon", "indigo"]
 yr_in_s = 3.154e7 # s
-MP = 1.672622e-24
+MP = 1.672622e-24 # g
+KB = 1.3807e-16 # cm^2 g s^-2 K^-1
 
 # import warnings
 # warnings.filterwarnings("ignore")
