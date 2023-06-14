@@ -3,19 +3,20 @@ from matplotlib import colors
 from labellines import labelLines
 # pip install matplotlib-label-lines
 
-#####################
-date = "2023-05-03"
+##########################################
+date = "2023-05-09"
 cat = True
 gas = True
 dust = False
 r_cl = 5 * 3.086e+18 # pc to cm
 chi = 100
-v_wind_i = 1000e3 # cm/s
-#####################
+v_wind_i = 100e3 # cm/s
+a_grain = 0.1 # grain radius in 0.1 microns
+##########################################
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-dnamein = os.path.join(basedir, "hdf5/full/")
-dnameout = os.path.join(basedir, "png/phase/")
+dnamein = os.path.join(basedir, "hdf5_cloudy/full_fine/")
+dnameout = os.path.join(basedir, "png/phase_cloudy/")
 
 d_min, d_max = None, None
 vmin, vmax = None, None
@@ -33,6 +34,13 @@ if date == "2023-05-03":
         vmin, vmax = 5e-5, 5e2
     if dust:
         vmin, vmax = 5e-9, 0.05
+if date == "2023-05-09":
+    d_min, d_max = 8e-28, 1e-22
+    T_min, T_max = 1e3, 1e8
+    if gas:
+        vmin, vmax = 5e-5, 5e2
+    if dust:
+        vmin, vmax = 5e-9, 0.05
 
 tau_cc = (np.sqrt(chi)*r_cl/v_wind_i)/yr_in_s # cloud crushing time
 
@@ -43,7 +51,7 @@ else:
 
 def tau_sp_n(T, tau_sp):
     YR_IN_S = 3.154e7;
-    a1 = 0.1; # dust grain size in units of 0.1 micrometers
+    a1 = a_grain; # dust grain size in units of 0.1 micrometers
     T_0 = 2e6; # K
     omega = 2.5;
     A = 0.17e9 * YR_IN_S; # Gyr in s
@@ -65,6 +73,13 @@ for tau in tau_sp:
     n_sput.append(tau_sp_n(T_sput_i, tau))
 tau_sps = np.array(tau_sps)
 n_sput = np.array(n_sput)
+
+def ideal_gas(n, P):
+    return P / (n * KB)
+
+P_init = (10**5.5)*KB
+n_ideal = np.linspace(d_min, d_max, 100) / (0.6 * MP)
+T_ideal = ideal_gas(n_ideal, (10**5.5)*KB)
 
 for i in range(0, len(files)):
     data = ReadHDF5(dnamein, fnum=i, dust=True, cat=cat)
@@ -106,6 +121,9 @@ for i in range(0, len(files)):
                  linewidth=3, color="grey", label=r'$10^{{{:d}}}$ yr'.format(a[j]))
 
     labelLines(plt.gca().get_lines(), zorder=2.5)
+
+    p_handle = plt.plot(np.log10(n_ideal * (MP * 0.6)), np.log10(T_ideal), c="k", linewidth=3, zorder=3, label="$\log_{10}(P/k_B)" + f"={round(np.log10(P_init/KB), 2)}$")
+    plt.legend(handles=p_handle)
 
     plt.xlabel(r"$\log (\rho_{gas}~[g\,cm^{-3}])$")
 
