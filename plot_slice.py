@@ -1,16 +1,16 @@
 from hconfig import *
 
 #################################
-date = "2023-05-09"
+date = "2023-05-13"
 cat = True
 dust = False
 pressure = True
 vlims = True
 vlims_gas = (-26, -21) # g/cm^3
 vlims_dust = (-30, -26) # g/cm^3
-vlims_p = (4, 5.7) # P/k_b (K/cm^3)
+vlims_p = (2, 7) # P/k_b (K/cm^3)
 vlims_T = (2, 8) # K
-vlims_v = (-200, 250)
+vlims_v = (-200, 1050)
 spacing = 40 # spacing of tick marks, pc
 fontsize = 20
 unit = "pc"
@@ -20,8 +20,8 @@ plt.rcParams.update({'font.size': 20})
 
 # directory with slices
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-datadir = os.path.join(basedir, "hdf5_cloudy/slice/")
-pngdir = os.path.join(basedir, "png/slice_cloudy/")
+datadir = os.path.join(basedir, "hdf5/slice/")
+pngdir = os.path.join(basedir, "png/slices/")
 
 data = ReadHDF5(datadir, nscalar=1, slice="xy", cat=cat)
 head = data.head
