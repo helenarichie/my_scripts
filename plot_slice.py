@@ -1,19 +1,21 @@
 from hconfig import *
 
 #################################
-date = "2023-05-13"
+date = "2023-07-25"
 cat = True
-dust = False
-pressure = True
+dust = True
+pressure = False
 vlims = True
 vlims_gas = (-26, -21) # g/cm^3
-vlims_dust = (-30, -26) # g/cm^3
+vlims_dust = (-30, -25.5) # g/cm^3
 vlims_p = (2, 7) # P/k_b (K/cm^3)
 vlims_T = (2, 8) # K
 vlims_v = (-200, 1050)
-spacing = 40 # spacing of tick marks, pc
+# vlims_v = (-50, 150)
+spacing = 640*1e-3 # spacing of tick marks in units
 fontsize = 20
-unit = "pc"
+unit = "kpc" # sets axes labels and units of dx
+fnum = None
 plt.rcParams.update({'font.family': 'Helvetica'})
 plt.rcParams.update({'font.size': 20})
 #################################
@@ -21,9 +23,9 @@ plt.rcParams.update({'font.size': 20})
 # directory with slices
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
 datadir = os.path.join(basedir, "hdf5/slice/")
-pngdir = os.path.join(basedir, "png/slices/")
+pngdir = os.path.join(basedir, "png/slice/")
 
-data = ReadHDF5(datadir, nscalar=1, slice="xy", cat=cat)
+data = ReadHDF5(datadir, nscalar=1, fnum=fnum, slice="xy", cat=cat)
 head = data.head
 conserved = data.conserved
 
@@ -149,4 +151,4 @@ for i, d in enumerate(d_gas):
         plt.savefig(pngdir + f"{i}_slice.png", dpi=300)
     plt.close()
 
-    print(f"Saving figure {i+1} of {len(d_gas)}.\n")
+    print(f"Saving figure {i} of {len(d_gas)}.\n")

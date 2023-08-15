@@ -3,18 +3,19 @@ from hconfig import *
 density_conversion = 5.028e-34/(3.24e-22)**3 # g/cm^3 to M_sun/kpc^3
 
 ################# hard-coded, fill these in! ###################
-date = "2023-05-12"
+date = "2023-07-24"
 cat = True
 # xlims = (0, 1)
 pad = 0.005
+fnum = None
 ################################################################
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/" # crc
-datadir = os.path.join(basedir, "hdf5/full_fine/")
-csvdir = os.path.join(basedir, "csv_fine")
-pngdir = os.path.join(basedir, "png/outflow_fine/")
+datadir = os.path.join(basedir, "hdf5/full/")
+csvdir = os.path.join(basedir, "csv")
+pngdir = os.path.join(basedir, "png/outflow/")
 
-data = ReadHDF5(datadir, fnum=0, cat=cat)
+data = ReadHDF5(datadir, fnum=fnum, cat=cat)
 head = data.head
 nx, ny, nz = head["dims"]
 dx = head["dx"][0] # M_sun

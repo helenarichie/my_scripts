@@ -6,16 +6,16 @@ import numpy as np
 import os
 
 ###############################
-date = "2023-05-13"
-ns = 462
-ne = 1484
+date = "2023-07-25"
+ns = 0
+ne = 400
 n_procs = 4 # number of processors that did the cholla calculation
 DE = False # set to True if Dual Energy flag was used
 SCALAR = True # set to True if Scalar was used
 ###############################
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-dnamein = os.path.join(basedir, "hdf5/raw/slice/")
+dnamein = os.path.join(basedir, "hdf5/raw/")
 dnameout = os.path.join(basedir, "hdf5/slice/")
 
 # loop over the output times

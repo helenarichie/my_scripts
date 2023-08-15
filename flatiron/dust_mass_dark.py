@@ -1,20 +1,20 @@
 import sys
-sys.path.insert(0, "/ix/eschneider/helena/code/github/my_scripts")
+sys.path.insert(0, "/ix/eschneider/helena/code/my_scripts")
 from hconfig import *
 
 density_conversion = 5.028e-34/(3.24e-22)**3 # g/cm^3 to M_sun/kpc^3
 
 ################# hard-coded, fill these in! ###################
-date = "2023-04-26"
+date = "2023-07-26"
 cat = True
 # xlims = (0, 1)
-pad = 0.005
+pad = 100
 ################################################################
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/" # crc
 datadir = os.path.join(basedir, "hdf5/full/")
 csvdir = os.path.join(basedir, "csv/")
-pngdir = os.path.join(basedir, "png/flatiron/")
+pngdir = os.path.join(basedir, "png/outflow/")
 
 data = ReadHDF5(datadir, fnum=0, cat=cat)
 head = data.head

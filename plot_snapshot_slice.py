@@ -13,7 +13,7 @@ else:
     n_procs = 1
 
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-datadir = os.path.join(basedir, "hdf5/")
+datadir = os.path.join(basedir, "hdf5/raw/")
 dnameout = dnamein = datadir
 
 ns = nfile
@@ -200,7 +200,7 @@ for i, d in enumerate(d_gas):
     
 
     # xy density-weighted temperature projection
-    im = axs[1][0].imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=-32, vmax=-24, extent=[0, nx*dx, 0, nz*dx])
+    im = axs[1][0].imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=-30, extent=[0, nx*dx, 0, nz*dx])
     ylabel = r'$\mathrm{log}_{10}(\rho)$ [$\mathrm{g}\mathrm{cm}^{-3}$]'
     divider = make_axes_locatable(axs[1][0])
     cax = divider.append_axes("right", size="5%", pad=0.05)
