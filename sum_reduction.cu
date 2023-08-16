@@ -46,8 +46,11 @@ __inline__ __device__ void grid_reduce_sum(float val, float* out)
 {
   // Reduce the entire block in parallel
   val = block_reduce_sum(val);
+  if (threadIdx.x == 0) {
+    printf("Block values: %f\n", val);
+  }
 
-  // Write block level reduced value to the output scalar atomically
+  // Write block level reduced value to the output scalar automically
   if (threadIdx.x == 0) {
     atomic_add_bits(out, val);
   }
@@ -56,28 +59,31 @@ __inline__ __device__ void grid_reduce_sum(float val, float* out)
 __global__ void kernel_reduce_sum(float* in, float* out, size_t N);
 
 __global__ void kernel_reduce_sum(float* in, float* out, size_t N) {
-  float __shared__ sum_stride[128]; // should be the size of a block
 
-  printf("%d, %d, %d, %d\n", threadIdx.x, blockIdx.x, blockDim.x, gridDim.x);
-  // Grid stride loop to perform as much of the reduction as possible
-  float local_sum = 0.0;
+    __shared__ float sum_stride[128];  // array shared between each block
+
+  // printf("%d, %d, %d, %d\n", threadIdx.x, blockIdx.x, blockDim.x, gridDim.x);
+  // Grid stride loop to read global array into shared block-wide array
   for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < N; i += blockDim.x * gridDim.x) {
-    local_sum += in[i];
+    sum_stride[threadIdx.x] += in[i];  // should total to 
   }
 
-  sum_stride[threadIdx.x] = local_sum;
+  __syncthreads();
 
-  __syncthreads;
+  grid_reduce_sum(sum_stride[threadIdx.x], out);
 
-  grid_reduce_sum(, out);
-  printf("value kernel %d: %f\n", blockIdx.x * blockDim.x + threadIdx.x, sum_val);
+  __syncthreads();
+
+  if ((blockIdx.x * blockDim.x + threadIdx.x) == 0) {
+    printf("Out value: %f\n", *out);  // Can be anywhere from 1*128 -- 3*128
+  }
 
 }
 
 
 int main()
 {
-  const size_t N = pow(8, 2);
+  const size_t N = 512;
   size_t size = N * sizeof(float);
 
   printf("Checkpoint 1\n");
@@ -106,7 +112,7 @@ int main()
   
   // Copy vectors from host memory to device memory
   cudaMemcpy(dev_in, host_in, size, cudaMemcpyHostToDevice);
-  cudaMemcpy(dev_out, host_out, 1, cudaMemcpyHostToDevice);
+  cudaMemcpy(dev_out, host_out, 1*sizeof(float), cudaMemcpyHostToDevice);
 
   printf("Checkpoint 5\n");
 
@@ -117,11 +123,16 @@ int main()
 
   printf("Checkpoint 6\n");
 
-  cudaMemcpy(host_out, dev_out, 1, cudaMemcpyDeviceToHost);
+  cudaMemcpy(host_out, dev_out, 1*sizeof(float), cudaMemcpyDeviceToHost);
 
   printf("Checkpoint 7\n");
 
-  printf("value: %f\n", dev_out);
+  printf("value: %f\n", host_out);
+
+  free(host_in);
+  free(host_out);
+  cudaFree(dev_in);
+  cudaFree(dev_out);
   
   return 0;
 }
