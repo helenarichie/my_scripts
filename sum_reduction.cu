@@ -46,9 +46,6 @@ __inline__ __device__ void grid_reduce_sum(float val, float* out)
 {
   // Reduce the entire block in parallel
   val = block_reduce_sum(val);
-  if (threadIdx.x == 0) {
-    printf("Block values: %f\n", val);
-  }
 
   // Write block level reduced value to the output scalar automically
   if (threadIdx.x == 0) {
@@ -62,7 +59,6 @@ __global__ void kernel_reduce_sum(float* in, float* out, size_t N) {
 
     __shared__ float sum_stride[128];  // array shared between each block
 
-  // printf("%d, %d, %d, %d\n", threadIdx.x, blockIdx.x, blockDim.x, gridDim.x);
   // Grid stride loop to read global array into shared block-wide array
   for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < N; i += blockDim.x * gridDim.x) {
     sum_stride[threadIdx.x] += in[i];  // should total to 
@@ -72,12 +68,6 @@ __global__ void kernel_reduce_sum(float* in, float* out, size_t N) {
 
   grid_reduce_sum(sum_stride[threadIdx.x], out);
 
-  __syncthreads();
-
-  if ((blockIdx.x * blockDim.x + threadIdx.x) == 0) {
-    printf("Out value: %f\n", *out);  // Can be anywhere from 1*128 -- 3*128
-  }
-
 }
 
 
@@ -85,49 +75,37 @@ int main()
 {
   const size_t N = 512;
   size_t size = N * sizeof(float);
-
-  printf("Checkpoint 1\n");
+  size_t fsize = 1 * sizeof(float);
 
   // Allocate input vectors h_A and h_B in host memory
   float* host_in = (float*)malloc(size);
   float* host_out = (float*)malloc(1);
 
-  printf("Checkpoint 2\n");
-
   // Initialize input vectors
-  host_out = 0;
+  *host_out = 0;
   for (int i = 0; i < N; i ++) {
     host_in[i] = 1.0;
   }
 
-  printf("Checkpoint 3\n");
-
   // Allocate vectors in device memory
   float* dev_in;
-  cudaMalloc(&dev_in, size);
+  cudaMalloc((void**)&dev_in, size);
   float* dev_out;
-  cudaMalloc(&dev_out, 1);
-
-  printf("Checkpoint 4\n");
+  cudaMalloc((void**)&dev_out, 1*sizeof(float));
   
   // Copy vectors from host memory to device memory
   cudaMemcpy(dev_in, host_in, size, cudaMemcpyHostToDevice);
-  cudaMemcpy(dev_out, host_out, 1*sizeof(float), cudaMemcpyHostToDevice);
 
-  printf("Checkpoint 5\n");
+  cudaMemcpy(dev_out, host_out, fsize, cudaMemcpyHostToDevice);
 
   size_t threadsPerBlock = 128;
   size_t blocksPerGrid = (N + threadsPerBlock - 1) / threadsPerBlock;
   kernel_reduce_sum<<<blocksPerGrid, threadsPerBlock>>>(dev_in, dev_out, N);
   cudaDeviceSynchronize();
 
-  printf("Checkpoint 6\n");
-
   cudaMemcpy(host_out, dev_out, 1*sizeof(float), cudaMemcpyDeviceToHost);
 
-  printf("Checkpoint 7\n");
-
-  printf("value: %f\n", host_out);
+  printf("Result: %f\n", *host_out);
 
   free(host_in);
   free(host_out);
@@ -136,3 +114,10 @@ int main()
   
   return 0;
 }
+
+
+// cudaError_t err = cudaGetLastError();
+// if (err != cudaSuccess) {
+//     printf("CUDA error: %s\n", cudaGetErrorString(err));
+//     exit(-1);
+// }
