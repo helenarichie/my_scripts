@@ -14,8 +14,11 @@ def calc_tau_sp(n, T):
     return tau_sp / YR_IN_S
 
 # T = 10**np.linspace(1, 8, 8)
-T = [1e4]
-n = [1e2]
+T_mixed_base = np.sqrt(10**3.75*10**7.375)
+n_mixed_base = np.sqrt(2e1*2e-2)
+
+T = [3e7]
+n = [1e-2]
 
 # n = [1e-3, 1e-2, 1e-1, 1]
 for n_i in n:

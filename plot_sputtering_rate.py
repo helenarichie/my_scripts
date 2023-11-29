@@ -14,14 +14,6 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import seaborn as sns
 
 ############ hard-coded ###########
-r_cl = 1 * 3.086e+18 # pc to cm
-d_cl_init = 1e-24 # n = 1
-r_grain = 0.1 # micron
-gamma = 5/2
-T_cool = 1e4
-chi = 1000
-v_wind_i = 1000e3 # cm/s
-tau_cc = (np.sqrt(chi)*r_cl/v_wind_i)/yr_in_s # cloud crushing time
 colors = sns.color_palette("cubehelix", 7)
 mu = 0.6
 ##################################
@@ -43,19 +35,20 @@ def calc_tau_sp(n, T):
 def calc_dd_dt(d_dust, tau_sp):
     return -d_dust / (tau_sp/3)
 
-
-T_range = np.array(range(2, 9)) # log K
-T_range = 10**T_range # K
+a = np.array(range(2, 9)) # log K
+T_range = 10**a # K
 
 pairs = []
 
 tmax = 1e9 # yr
 h = 1e2 # yr
-n_gas = 0.1 # cm^-3
+n_gas = 0.01808641 # cm^-3
 d_dust_init = 0.01*n_gas*mu*MP # g cm^-3
 t_arr = np.arange(0, tmax, h)
 
 fig = plt.figure(figsize=(11,8))
+plt.style.use('dark_background')
+plt.rcParams.update({'font.family': 'Helvetica'})
 
 plt.axvline(x=1e6, color='lightgrey', linestyle="--", zorder=0, linewidth=4, label="1 Myr")
 
@@ -83,15 +76,23 @@ for j, T in enumerate(T_range):
     d_dust_solution = np.array(d_dust_solution)
     # d_dust_solution /= MP * mu
 
-    plt.semilogx(t_arr, d_dust_solution, lw=10, color='k')
-    plt.semilogx(t_arr, d_dust_solution, c=colors[j], linewidth=5, label=r"$T=$"+f"{T:.0e} K")
-    plt.title(r"$\rho_{gas}=$" + f"{n_gas*mu*MP:.1e}" + r"$~[g\,cm^{-3}]$")
+    wh_knee = (np.abs(t_arr - tau_sp)).argmin()
+
+    plt.semilogx(t_arr, d_dust_solution/d_dust_init, lw=10, color='k')
+    plt.semilogx(t_arr, d_dust_solution/d_dust_init, c=colors[j], linewidth=5, label=r'$10^{{{:d}}}$ K'.format(a[j]))
+    #if wh_knee != np.argmax(t_arr):
+    #    plt.scatter(t_arr[wh_knee], d_dust_solution[wh_knee], marker="x", color=colors[j], s=100, zorder=150, linewidths=5)
+    #    plt.title(r"$\rho_{gas}=$" + f"{n_gas*mu*MP:.1e}" + r"$~[g\,cm^{-3}]$")
 
 # plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%.1e'))
+#plt.scatter(-10, -10, marker="x", s=150, label=r"$t_{sp}$", linewidths=5, c="k")
+#plt.xlim(np.amin(t_arr)+0.01, np.amax(t_arr))
+#plt.ylim(0 - d_dust_init/10, d_dust_init + d_dust_init/100)
 plt.legend(fontsize=18, loc="lower left")
 plt.xlabel("Time [yr]")
-plt.ylabel(r"$\rho_{dust}~[g\,cm^{-3}]$")
-plt.savefig("figs/sputtering_curves.png")
+plt.ylabel(r"$\rho_{dust}/\rho_{dust,i}$")
+plt.title("Dust sputtering in \rho=")
+plt.savefig("/Users/helenarichie/Desktop/sputtering_curves.png")
 
 
 
