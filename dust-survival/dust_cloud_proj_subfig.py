@@ -10,8 +10,8 @@ density_conversion = 5.028e-34/(3.24e-22)**3 # g/cm^3 to M_sun/kpc^3
 
 ###################################################################################
 cat = True
-vlims_gas_small = (18.2, 19.6)
-vlims_gas_large = (19.3, 21.8)
+vlims_gas_small = (-10, -6)
+vlims_gas_large = (-11, -3.5)
 fnums_small = [0, 715, 1051]
 fnums_large = [0, 196, 304]
 pad = 0.1
@@ -23,14 +23,16 @@ tickwidth = 2
 tmax_small = 2.1e6
 tmax_large = 30.4e6
 plt.rcParams.update({'font.family': 'Helvetica'})
-projdir_small = csvdir_small = "/Users/helenarichie/Desktop/0426/0426"
-projdir_large = csvdir_large = "/Users/helenarichie/Desktop/0426/0726"
-pngdir = os.path.join("/Users/helenarichie/Desktop/0426/")
-cmap = sns.color_palette("mako", as_cmap=True)
+projdir_small = csvdir_small = "/Users/helenarichie/Desktop/cloud_survival/0426"
+projdir_large = csvdir_large = "/Users/helenarichie/Desktop/cloud_survival/0726"
+pngdir = os.path.join("/Users/helenarichie/Desktop/")
+cmap = sns.color_palette("rocket", as_cmap=True)
+# cmap = "viridis"
 ###################################################################################
 
 plt.rcParams.update({'font.family': 'Helvetica'})
 plt.rcParams.update({'font.size': fontsize})
+# plt.style.use('dark_background')
 
 fig, axs = plt.subplots(constrained_layout=True, figsize=(30,10))
 (subfig_small, subfig_large) = fig.subfigures(nrows=2, ncols=1)
@@ -44,7 +46,7 @@ axes_large_proj = subfigsnest_large[0].subplots(1, 3, gridspec_kw={'width_ratios
 axes_large_mass = subfigsnest_large[1].subplots(1, 1)
 
 def plot_panel(projdir, csvdir, vlims, fnums, subfig, tmax, axes_proj, axes_mass, spacing, id):
-    data = ReadHDF5(projdir, proj="xy", cat=cat, fnum=fnums[0])
+    data = ReadHDF5(projdir, proj="xy", dust=True, cat=cat, fnum=fnums[0])
     head = data.head
     conserved = data.conserved
     dx = head["dx"][0]
@@ -69,13 +71,13 @@ def plot_panel(projdir, csvdir, vlims, fnums, subfig, tmax, axes_proj, axes_mass
     dt = (t_arr[1] - t_arr[0])/1e3
 
     rate_cl = np.zeros((n_steps, 6))  # M_sun / yr
-    with open(os.path.join(csvdir, "rate_cl.csv")) as f:
+    with open(os.path.join(csvdir, "rate_dust.csv")) as f:
         for i, line in enumerate(f):
             line = line.split(",")
             rate_cl[i] = np.array(line, dtype=float)
 
     mass_cl = []
-    with open(os.path.join(csvdir, "rho_cl_tot.csv")) as f:
+    with open(os.path.join(csvdir, "rho_d_tot.csv")) as f:
         for line in f:
             line = line.split(",")
             density = float(line[0]) * density_conversion
@@ -92,15 +94,17 @@ def plot_panel(projdir, csvdir, vlims, fnums, subfig, tmax, axes_proj, axes_mass
     mass_out = np.array(mass_out)
 
     for i, axes in enumerate(axes_proj):
-        data = ReadHDF5(projdir, proj="xy", cat=cat, fnum=fnums[i])
+        data = ReadHDF5(projdir, proj="xy", dust=True, cat=cat, fnum=fnums[i])
         head = data.head
         conserved = data.conserved
         dx = head["dx"][0] * 1e3  # pc
-        d_gas = conserved["density"]
-        d_gas *= head["mass_unit"] / (head["length_unit"] ** 2)
-        n_gas = d_gas[0]/(0.6*MP) # column density
+        d_dust = conserved["dust_density"][0]
+        d_dust *= head["mass_unit"] / (head["length_unit"] ** 2)
         t = data.t_cgs() / yr_in_s  # yr
-        im = axes.imshow(np.log10(n_gas[indices[i][0]:indices[i][1],:].T), origin="lower", vmin=vlims[0], vmax=vlims[1], extent=[0, xlen[i]*dx, 0, nz*dx], cmap=cmap)
+        d_dust[indices[i][0]:indices[i][1],:][d_dust[indices[i][0]:indices[i][1],:]<=0] = 1e-40
+        print(np.amax(d_dust[indices[i][0]:indices[i][1],:]))
+        im = axes.imshow(np.log10(d_dust[indices[i][0]:indices[i][1],:].T), origin="lower", vmin=vlims[0], vmax=vlims[1], extent=[0, xlen[i]*dx, 0, nz*dx], cmap=cmap)
+        #im = axes.imshow(np.log10(d_dust[indices[i][0]:indices[i][1],:].T), origin="lower", extent=[0, xlen[i]*dx, 0, nz*dx], cmap=cmap)
 
         if i == 0:
             axes.hlines(0.12*dx*ny, spacing, spacing+spacing, color='white')
@@ -115,7 +119,7 @@ def plot_panel(projdir, csvdir, vlims, fnums, subfig, tmax, axes_proj, axes_mass
         axes.tick_params(axis='both', which='both', direction='in', color='white', labelleft=0, labelbottom=0, top=1, right=1, length=9, width=tickwidth)
 
     cbar = subfig[0].colorbar(im, ax=axes_proj, location='right', pad=0.009, shrink=0.955, aspect=10)
-    cbar.set_label(r'$\mathrm{log}_{10}(N_{H, gas})$ [$\mathrm{cm}^{-2}$]', rotation=270, labelpad=40, fontsize=fontsize)
+    cbar.set_label(r'$\mathrm{log}_{10}(\Sigma_{dust})$ [$g\,\mathrm{cm}^{-2}$]', rotation=270, labelpad=20, fontsize=fontsize)
     cbar.ax.tick_params(length=9, width=tickwidth, color="white", labelsize="medium")
     cbar.set_ticks(np.linspace(vlims[0], vlims[1], 4).round(1))
 
@@ -138,5 +142,5 @@ def plot_panel(projdir, csvdir, vlims, fnums, subfig, tmax, axes_proj, axes_mass
 plot_panel(projdir_small, csvdir_small, vlims_gas_small, fnums_small, subfigsnest_small, tmax_small, axes_small_proj, axes_small_mass, spacing_small, 0)
 plot_panel(projdir_large, csvdir_large, vlims_gas_large, fnums_large, subfigsnest_large, tmax_large, axes_large_proj, axes_large_mass, spacing_large, 1)
 
-plt.savefig(pngdir + f"cloud_survival.png", dpi=300)
+plt.savefig(pngdir + f"dust_survival.png", dpi=300)
 plt.close()
