@@ -7,12 +7,12 @@ import os
 
 #######################
 ns = 0
-ne = 526
+ne = 600
 n_hydro = 1
 n_proc = 4 # number of processors that did the calculations
 scalar = False
 dust = True
-date = "2023-07-26"
+date = "2023-11-07"
 #######################
 
 istart = 0*n_proc

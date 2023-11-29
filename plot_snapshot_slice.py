@@ -21,6 +21,9 @@ ne = nfile
 
 DE = False # set to True if Dual Energy flag was used
 SCALAR = True # set to True if Scalar was used
+nscalar = 0
+if SCALAR:
+  nscalar = 1
 
 # loop over the output times
 for n in range(ns, ne+1):
@@ -153,7 +156,7 @@ for n in range(ns, ne+1):
 
   fileout.close()
 
-data = ReadHDF5(datadir, nscalar=1, slice="xy", fnum=nfile, cat=cat)
+data = ReadHDF5(datadir, nscalar=nscalar, slice="xy", fnum=nfile, cat=cat)
 head = data.head
 conserved = data.conserved
 
@@ -162,18 +165,24 @@ nx = head["dims"][0]
 nz = head["dims"][-1]
 dx = head["dx"][0]
 d_gas = data.d_cgs()
-d_dust = conserved["scalar0"] * head["density_unit"]
+if SCALAR:
+  d_dust = conserved["scalar0"] * head["density_unit"]
 vx = data.vx_cgs()
 gamma = head["gamma"]
 t_arr = data.t_cgs() / yr_in_s
 T = data.T()
 ######################################################
 
-wh_zero = np.where(d_dust<=0)
-d_dust[wh_zero] = 1e-40
-vlims_du = [np.log10(np.amin(d_dust.flatten())), np.log10(np.amax(d_dust.flatten()))]
+if SCALAR:
+  wh_zero = np.where(d_dust==0)
+  d_dust[wh_zero] = 1e-40
+  wh_neg = np.where(d_dust<0)
+  #print("min: ", np.amin(d_dust[wh_neg]))
+  #print("max: ", np.amax(d_dust[wh_neg]))
+  d_dust[wh_neg] = np.nan
+  vlims_du = [np.log10(np.amin(d_dust.flatten())), np.log10(np.amax(d_dust.flatten()))]
 
-wh_zero = np.where(T<=0)
+wh_zero = np.where(T==0)
 T[wh_zero] = 1e-40
 #vlims_T = [np.log10(np.amin(T.flatten())), np.log10(np.amax(T.flatten()))]
 vlims_T = [2, 6]
@@ -200,7 +209,8 @@ for i, d in enumerate(d_gas):
     
 
     # xy density-weighted temperature projection
-    im = axs[1][0].imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=-30, extent=[0, nx*dx, 0, nz*dx])
+    if SCALAR:
+      im = axs[1][0].imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=-30, extent=[0, nx*dx, 0, nz*dx])
     ylabel = r'$\mathrm{log}_{10}(\rho)$ [$\mathrm{g}\mathrm{cm}^{-3}$]'
     divider = make_axes_locatable(axs[1][0])
     cax = divider.append_axes("right", size="5%", pad=0.05)
@@ -263,4 +273,4 @@ for i, d in enumerate(d_gas):
         plt.savefig(basedir + "snapshot.png", dpi=300)
     plt.close()
 
-    print(f"Saving figure {i+1} of {len(d_dust)}.\n")
+    print(f"Saving figure {i+1} of {len(d_gas)}.\n")

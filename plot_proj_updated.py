@@ -4,17 +4,18 @@ from hconfig import *
 from csv import writer
 
 ##################################################################
-date = "2023-07-26"
+date = "2023-10-15"
 save = True
 cat = True
 dust = True
-vlims = True
-vlims_gas = (19.5, 23.5) # g/cm^3
+vlims = False
+vlims_gas = (19.5, 25.5) # g/cm^3
 vlims_dust = (-25, 1) # g/cm^3
 fnum = 0 # file to start plotting at
-spacing = 640*1e-3 # spacing of tick marks in units
+# spacing = 640*1e-3 # spacing of tick marks in units
+spacing = 20
 fontsize = 28
-unit = "kpc" # sets axes labels and units of dx
+unit = "pc" # sets axes labels and units of dx (kpc or pc)
 plt.rcParams.update({'font.family': 'Helvetica'})
 plt.rcParams.update({'font.size': fontsize})
 pad = 0.1

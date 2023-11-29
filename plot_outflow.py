@@ -3,7 +3,7 @@ from hconfig import *
 density_conversion = 5.028e-34/(3.24e-22)**3 # g/cm^3 to M_sun/kpc^3
 
 ################# hard-coded, fill these in! ###################
-date = "2023-07-24"
+date = "2023-11-03"
 cat = True
 # xlims = (0, 1)
 pad = 0.005

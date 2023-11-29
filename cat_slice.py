@@ -6,9 +6,9 @@ import numpy as np
 import os
 
 ###############################
-date = "2023-07-25"
+date = "2023-11-07"
 ns = 0
-ne = 400
+ne = 600
 n_procs = 4 # number of processors that did the cholla calculation
 DE = False # set to True if Dual Energy flag was used
 SCALAR = True # set to True if Scalar was used
