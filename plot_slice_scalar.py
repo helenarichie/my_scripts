@@ -1,26 +1,27 @@
 from hconfig import *
 
 #################################
-date = "2023-11-07"
+date = "2023-10-06"
 cat = True
-dust = True
+scalar = True
+dust = False
 pressure = False
-vlims = False
+vlims = True
 fstart = 0
-vlims_gas = (-27 , -21.5) # g/cm^3
-vlims_dust = (-32, -23.5) # g/cm^3
+vlims_gas = (-27  , -23.5) # g/cm^3
+vlims_dust = (-32, -25.5) # g/cm^3
 vlims_p = (2, 7) # P/k_b (K/cm^3)
 vlims_T = (2, 8) # K
 vlims_v = (-250, 1050)
-spacing = 640*1e-3 # spacing of tick marks in units
-# spacing = 40
+# spacing = 640*1e-3 # spacing of tick marks in units
+spacing = 40
 fontsize = 20
-unit = "kpc" # sets axes labels and units of dx (kpc or pc)
+unit = "pc" # sets axes labels and units of dx (kpc or pc)
 fnum = None
 plt.rcParams.update({'font.family': 'Helvetica'})
 plt.rcParams.update({'font.size': 20})
-cloud_wind = True
-debugging = False
+cloud_wind = False
+debugging = True
 #################################
 
 # directory with slices
@@ -34,12 +35,13 @@ else:
     datadir = os.path.join(basedir, "hdf5/raw/")
 pngdir = os.path.join(basedir, "png/slice/")
 
-if dust:
+if scalar:
     data = ReadHDF5(datadir, nscalar=1, fnum=fnum, slice="xy", cat=cat)
 else:
     data = ReadHDF5(datadir, fnum=fnum, slice="xy", cat=cat)
 head = data.head
 conserved = data.conserved
+print(conserved.keys())
 
 nx = head["dims"][0]
 ny = head["dims"][-1]
@@ -47,10 +49,10 @@ dx = head["dx"][0]
 if unit == "pc":
     dx *= 1e3
 d_gas = data.d_cgs()
-d_dust = None
+scalar_arr = None
 p_gas = None
-if dust:
-    d_dust = conserved["scalar0"] * head["density_unit"]
+if scalar:
+    scalar_arr = conserved["scalar0"]
 if pressure:
     p_gas = (data.energy_cgs() - 0.5*d_gas*((data.vx_cgs())**2 + (data.vy_cgs())**2 + (data.vz_cgs())**2)) * (head["gamma"] - 1.0) 
 vx = data.vx_cgs()
@@ -60,19 +62,6 @@ T = data.T()
 for i in range(fstart, len(d_gas)):
 
     fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(25,9))
-    
-    # xy gas density slice
-    if debugging:
-        if dust:
-            wh_neg = conserved["scalar0"][i][conserved["scalar0"][i]<0]
-            print(wh_neg)
-            if len(wh_neg) >= 1:
-                print("max: ", np.amax(wh_neg))
-                print("min: ", np.amin(wh_neg))
-                print("\n")
-            else:
-                print("none\n")
-
 
     if vlims:
         im = axs[0][0].imshow(np.log10(d_gas[i].T), origin="lower", vmin=vlims_gas[0], vmax=vlims_gas[1], extent=[0, nx*dx, 0, ny*dx])
@@ -93,27 +82,35 @@ for i in range(fstart, len(d_gas)):
     
 
     # xy dust density
-    if dust:
-        wh_zero = np.where(d_dust[i]==0)
-        d_dust[i][wh_zero] = 1e-40
-        wh_neg = np.where(d_dust[i]<0)
-        d_dust[i][wh_neg] = np.nan
-
-        if vlims:
-            im = axs[1][0].imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=vlims_dust[0], vmax=vlims_dust[1], extent=[0, nx*dx, 0, ny*dx])
+    # xy gas density slice
+    if debugging:
+        wh_neg = conserved["scalar0"][i][conserved["scalar0"][i]<0]
+        wh_zero = np.where(scalar_arr[i]==0)
+        scalar_arr[i][wh_zero] = 1e-40
+        if len(wh_neg) >= 1:
+            print("max: ", np.amax(wh_neg))
+            print("min: ", np.amin(wh_neg))
+            print("\n")
         else:
-            im = axs[1][0].imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=vlims_dust[0], extent=[0, nx*dx, 0, ny*dx])
-        ylabel = r'$\mathrm{log}_{10}(\rho_{dust})$ [$\mathrm{g}\mathrm{cm}^{-3}$]'
-        divider = make_axes_locatable(axs[1][0])
-        cax = divider.append_axes("right", size="5%", pad=0.05)
-        cbar = fig.colorbar(im, ax=axs[1][0], cax=cax)
-        cbar.set_label(ylabel, fontsize=fontsize)
-        axs[1][0].set_xticks(np.arange(0, nx*dx, spacing))
-        axs[1][0].set_yticks(np.arange(0, ny*dx, spacing))
-        axs[1][0].tick_params(axis='both', which='both', direction='in', color='black', top=1, right=1, length=8)
-        axs[1][0].set_title(r"Dust Density Slice", fontsize=fontsize)
-        axs[1][0].set_xlabel(r"$x~$[{}]".format(unit), fontsize=fontsize)
-        axs[1][0].set_ylabel(r"$y~$[{}]".format(unit), fontsize=fontsize)
+            print("none\n")
+        wh_neg = np.where(scalar_arr[i]<0)
+        scalar_arr[i][wh_neg] = np.nan
+
+    if vlims:
+        im = axs[1][0].imshow(scalar_arr[i].T, origin="lower", cmap="plasma", vmin=0.01, extent=[0, nx*dx, 0, ny*dx])
+    else:
+        im = axs[1][0].imshow(scalar_arr[i].T, origin="lower", cmap="plasma", vmin=0.01, extent=[0, nx*dx, 0, ny*dx])
+    ylabel = r'Scalar'
+    divider = make_axes_locatable(axs[1][0])
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    cbar = fig.colorbar(im, ax=axs[1][0], cax=cax)
+    cbar.set_label(ylabel, fontsize=fontsize)
+    axs[1][0].set_xticks(np.arange(0, nx*dx, spacing))
+    axs[1][0].set_yticks(np.arange(0, ny*dx, spacing))
+    axs[1][0].tick_params(axis='both', which='both', direction='in', color='black', top=1, right=1, length=8)
+    axs[1][0].set_title(r"Scalar Slice", fontsize=fontsize)
+    axs[1][0].set_xlabel(r"$x~$[{}]".format(unit), fontsize=fontsize)
+    axs[1][0].set_ylabel(r"$y~$[{}]".format(unit), fontsize=fontsize)
 
     # xy pressure
     if pressure:

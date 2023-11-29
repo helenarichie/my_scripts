@@ -1,21 +1,23 @@
 import sys
-sys.path.insert(0, "/ix/eschneider/helena/code/github/my_scripts")
+sys.path.insert(0, "/ix/eschneider/helena/code/my_scripts")
 from hconfig import *
 
 ##################################################################
-date = "2023-05-03"
+date = "2023-04-26"
 save = True
 cat = True
 dust = True
+# vlims_gas = (19.3, 22.5)
+# vlims_dust = (-13.6, -3.2)
 vlims_gas = (18.2, 19.8)
-vlims_dust = (-13.6, -5)
+vlims_dust = (-13.6, -5.0)
 fnum = 0
 ##################################################################
 
 ##################################################################
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
 projdir = os.path.join(basedir, "hdf5/proj/")
-pngdir = os.path.join(basedir, "png/flatiron/")
+pngdir = os.path.join(basedir, "png/proj/")
 
 data = ReadHDF5(projdir, dust=dust, proj="xy", cat=cat)
 head = data.head
@@ -40,7 +42,8 @@ for i in range(fnum, len(d_gas)):
 
     fig, axs = plt.subplots(nrows=2, ncols=1, figsize=(20, 10))
 
-    spacing = 20  # pc, spacing of tick marks
+    # spacing = 320  # pc, spacing of tick marks
+    spacing = 20
     fontsize = 28
     pad = 0.1
     labelpad = 12
@@ -60,6 +63,7 @@ for i in range(fnum, len(d_gas)):
     cbar.set_ticks(np.linspace(vlims_gas[0], vlims_gas[1], 4).round(1))
     axs[0].hlines(0.13*dx*ny, spacing, spacing+spacing, color='white')
     axs[0].text(spacing+spacing+2, 0.1*dx*ny, '20 pc', color='white', fontsize=fontsize)
+    # axs[0].text(spacing+spacing+30, 0.1*dx*ny, '320 pc', color='white', fontsize=fontsize)
     axs[0].set_xticks(np.arange(0, nx*dx, spacing))
     axs[0].set_yticks(np.arange(0, ny*dx, spacing))
     axs[0].tick_params(axis='both', which='both', direction='in', color='white', labelleft=0, labelbottom=0, top=1, right=1, length=9, width=tickwidth)
@@ -80,7 +84,7 @@ for i in range(fnum, len(d_gas)):
     axs[1].set_xticks(np.arange(0, nx*dx, spacing))
     axs[1].set_yticks(np.arange(0, ny*dx, spacing))
     axs[1].tick_params(axis='both', which='both', direction='in', color='white', labelleft=0, labelbottom=0, top=1, right=1, length=9, width=tickwidth)
-    axs[1].text(spacing, 0.1*dx*nz, f'{round(t_arr[i]/1e6, 1)} Myr', color='white', fontsize=fontsize)  
+    axs[1].text(spacing, 0.8*dx*nz, f'{round(t_arr[i]/1e6, 1)} Myr', color='white', fontsize=fontsize)  
     #axs[1].set_title(r"Dust Density Projection")
 
     fig.tight_layout()

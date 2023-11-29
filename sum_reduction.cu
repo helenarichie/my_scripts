@@ -57,16 +57,19 @@ __global__ void kernel_reduce_sum(float* in, float* out, size_t N);
 
 __global__ void kernel_reduce_sum(float* in, float* out, size_t N) {
 
-    __shared__ float sum_stride[128];  // array shared between each block
+  // __shared__ float sum_stride[128];  // array shared between each block
 
   // Grid stride loop to read global array into shared block-wide array
+  float sum_stride = 0;
   for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < N; i += blockDim.x * gridDim.x) {
-    sum_stride[threadIdx.x] += in[i];  // should total to 
+    // sum_stride[threadIdx.x] += in[i];
+    sum_stride += in[i];
   }
 
   __syncthreads();
 
-  grid_reduce_sum(sum_stride[threadIdx.x], out);
+  // grid_reduce_sum(sum_stride[threadIdx.x], out);
+  grid_reduce_sum(sum_stride, out);
 
 }
 
@@ -95,7 +98,6 @@ int main()
   
   // Copy vectors from host memory to device memory
   cudaMemcpy(dev_in, host_in, size, cudaMemcpyHostToDevice);
-
   cudaMemcpy(dev_out, host_out, fsize, cudaMemcpyHostToDevice);
 
   size_t threadsPerBlock = 128;
