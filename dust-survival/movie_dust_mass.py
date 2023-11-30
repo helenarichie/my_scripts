@@ -24,7 +24,7 @@ tmax = tmax_0426
 
 ##################################################################
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-projdir = os.path.join(basedir, "hdf5/full/")
+projdir = os.path.join(basedir, "hdf5/proj/")
 pngdir = os.path.join(basedir, "png/dust_mass/")
 csvdir = os.path.join(basedir, "csv/")
 ##################################################################

@@ -1,4 +1,4 @@
-uuimport sys
+import sys
 sys.path.insert(0, "/Users/helenarichie/GitHub/my_scripts/")
 from hconfig import *
 import os
@@ -92,7 +92,7 @@ for i, dir in enumerate(csvdir):
 
     ax[i].plot(t_arr[t_arr<=tmax[i]]/1e6, mass_cl[t_arr<=tmax[i]], linewidth=4, c="#49b4ab", label="in box")
     ax[i].plot(t_arr[t_arr<=tmax[i]]/1e6, mass_out[t_arr<=tmax[i]], linewidth=4, linestyle="--", c="#49b4ab", label="exited box")
-    ax[i].scatter(t_arr[indices]/1e6, mass_cl[indices], marker="o", c="#49b4ab", zorder=1, s=50, linewidths=4)
+    ax[i].scatter(t_arr[indices]/1e6, mass_cl[indices], marker="o", c="#49b4ab", zorder=11, s=50, linewidths=1.5, edgecolors="k")
 
     ax[i].set_xlabel("Time [Myr]")
     ax[i].set_ylabel(r"Cloud Mass [$M_\odot$]")
@@ -101,7 +101,8 @@ for i, dir in enumerate(csvdir):
     ax[i].tick_params(axis='both', which='both', direction='in', color='black', top=1, right=1, length=9, width=2, reset=True, labelsize="medium", zorder=10)
     ax[i].ticklabel_format(axis='y', style='sci', scilimits=(0,0))
 
-    ax[i].legend(fontsize=fontsize-2, loc="center left")
+    if i == 0:
+        ax[i].legend(fontsize=fontsize-5, loc="upper right")
 
 plt.tight_layout()
 plt.savefig(pngdir + f"cloud_mass.png", dpi=300)
