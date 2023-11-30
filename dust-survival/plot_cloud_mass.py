@@ -1,4 +1,4 @@
-import sys
+uuimport sys
 sys.path.insert(0, "/Users/helenarichie/GitHub/my_scripts/")
 from hconfig import *
 import os
@@ -84,7 +84,10 @@ for i, dir in enumerate(csvdir):
     ymax = np.amax([np.amax(mass_cl), np.amax(mass_out)]) + pad
     xmin = np.amin(t_arr[t_arr<=tmax[i]]) - pad
     xmax = np.amax(t_arr[t_arr<=tmax[i]]) + pad
-    
+
+    mass_cl_init = mass_cl[0]
+    print(f"initial mass: {mass_cl_init:e}")
+        
     if i == 0:
         indices = [np.argmin(t_arr), np.argmin(np.abs(t_arr-snapshot_times[0][0])), np.argmin(np.abs(t_arr-snapshot_times[0][1]))]
     if i == 1:
