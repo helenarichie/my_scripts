@@ -1,4 +1,4 @@
-uuimport sys
+import sys
 sys.path.insert(0, "/Users/helenarichie/GitHub/my_scripts/")
 from hconfig import *
 import os
@@ -31,7 +31,7 @@ fnums = [[0, 715, 1051], [0, 196, 304]]
 snapshot_times = [[1.4e6, 2.1e6], [19.6e6, 30.3e6]]
 ##################################################################
 
-fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(6.5, 12.5))
+fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(6.5, 12))
 
 for i, dir in enumerate(csvdir):
     # get value of dx to convert from density to mass
@@ -93,12 +93,12 @@ for i, dir in enumerate(csvdir):
     if i == 1:
         indices = [np.argmin(t_arr), np.argmin(np.abs(t_arr-snapshot_times[1][0])), np.argmin(np.abs(t_arr-snapshot_times[1][1]))]
 
-    ax[i].plot(t_arr[t_arr<=tmax[i]]/1e6, mass_cl[t_arr<=tmax[i]], linewidth=4, c="#49b4ab", label="in box")
-    ax[i].plot(t_arr[t_arr<=tmax[i]]/1e6, mass_out[t_arr<=tmax[i]], linewidth=4, linestyle="--", c="#49b4ab", label="exited box")
-    ax[i].scatter(t_arr[indices]/1e6, mass_cl[indices], marker="o", c="#49b4ab", zorder=11, s=50, linewidths=1.5, edgecolors="k")
+    ax[i].plot(t_arr[t_arr<=tmax[i]]/1e6, mass_cl[t_arr<=tmax[i]]/mass_cl_init, linewidth=4, c="#49b4ab", label="in box")
+    ax[i].plot(t_arr[t_arr<=tmax[i]]/1e6, mass_out[t_arr<=tmax[i]]/mass_cl_init, linewidth=4, linestyle="--", c="#49b4ab", label="exited box")
+    ax[i].scatter(t_arr[indices]/1e6, mass_cl[indices]/mass_cl_init, marker="o", c="#49b4ab", zorder=11, s=50, linewidths=1.5, edgecolors="k")
 
     ax[i].set_xlabel("Time [Myr]")
-    ax[i].set_ylabel(r"Cloud Mass [$M_\odot$]")
+    ax[i].set_ylabel(r"$m_{cl}/m_{cl,i}$")
 
     ax[i].set_xlim(xmin/1e6, xmax/1e6)
     ax[i].tick_params(axis='both', which='both', direction='in', color='black', top=1, right=1, length=9, width=2, reset=True, labelsize="medium", zorder=10)
