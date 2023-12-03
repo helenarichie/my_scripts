@@ -1,4 +1,4 @@
-uuimport sys
+import sys
 sys.path.insert(0, "/Users/helenarichie/GitHub/my_scripts/")
 from hconfig import *
 import os
