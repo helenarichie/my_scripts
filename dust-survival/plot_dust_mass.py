@@ -111,7 +111,7 @@ ax.plot(t_arr[t_arr<=tmax]/1e6, mass_destroyed[t_arr<=tmax]/mass_dust_init, line
 ax.scatter(t_arr[indices]/1e6, mass_dust_tot[indices]/mass_dust_init, marker="o", c="#d43a4f", zorder=11, s=50, linewidths=1.5, edgecolors="k")
 
 ax.set_xlabel("Time [Myr]", fontsize=fontsize)
-ax.set_ylabel(r"Dust Mass$~[M_\odot]$", fontsize=fontsize)
+ax.set_ylabel(r"$m_{dust}/m_{dust,i}$", fontsize=fontsize+2)
 
 ax.set_xlim(xmin/1e6, xmax/1e6)
 ax.tick_params(axis='both', which='both', direction='in', color='black', top=1, right=1, length=9, width=2, reset=True)
