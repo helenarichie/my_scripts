@@ -5,14 +5,16 @@ from hconfig import *
 density_conversion = 5.028e-34/(3.24e-22)**3 # g/cm^3 to M_sun/kpc^3
 
 ##################################################################
-date = "2023-11-07"
+date = "2023-11-08"
 cat = True
 tmax_1105 = 52.1e6
 tmax_1103 = 52.1e6
 tmax_1106 = 58.9e6
 tmax_1107 = 58.9e6
+tmax_1108 = 72.2e6
 tmax_0426 = 2.4e6
-tmax = tmax_1106
+tmax_0503 = 2.4e6
+tmax = tmax_1108
 ##################################################################
 
 ##################################################################
@@ -73,6 +75,7 @@ for i, mass in enumerate(mass_dust_tot):
         mass_dest_cum += (mass - mass_dust_tot[i+1] - mass_lost[i+1])
         mass_destroyed[i+1] = mass_dest_cum
 
-
-print(mass_destroyed[t_arr<=tmax][-1]/mass_dust_tot[0])
-print(tmax/1e6)
+print(f"Inital mass: {mass_dust_tot[0]} M_sun")
+print(f"Fraction sputtered: {mass_destroyed[t_arr<=tmax][-1]/mass_dust_tot[0]}")
+print(f"Out + sputtered fraction: {mass_destroyed[t_arr<=tmax][-1]/mass_dust_tot[0] + mass_out[t_arr<=tmax][-1]/mass_dust_tot[0]}")
+print(f"t_max: {tmax/1e6} Myr")

@@ -8,8 +8,8 @@ plt.rcParams.update({'font.family': 'Helvetica'})
 plt.rcParams.update({'font.size': 20})
 
 ##################################################################
-date = "2023-11-05"
-datestr = "1105"
+date = "2023-11-08"
+datestr = "1108"
 cat = True
 pad = 0.1
 fontsize = 20
@@ -17,11 +17,14 @@ labelpad = 12
 tickwidth = 1
 tmax_1105 = 52.1e6
 tmax_1103 = 52.1e6
+tmax_1108 = 72.2e6
 tmax_0426 = 2.4e6
+tmax_0503 = 2.4e6
 snapshot_times = [[1.4e6, 2.1e6], [19.6e6, 30.4e6]]
+snapshot_markers = False
 ##################################################################
 
-tmax = tmax_1105
+tmax = tmax_1108
 
 ##################################################################
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
@@ -90,6 +93,10 @@ if datestr == "1103":
     indices = [np.argmin(t_arr), np.argmin(np.abs(t_arr-snapshot_times[1][0])), np.argmin(np.abs(t_arr-snapshot_times[1][1]))]
 if datestr == "1105":
     indices = [np.argmin(t_arr), np.argmin(np.abs(t_arr-snapshot_times[1][0])), np.argmin(np.abs(t_arr-snapshot_times[1][1]))]
+if datestr == "1106":
+    indices = [np.argmin(t_arr), np.argmin(np.abs(t_arr-snapshot_times[1][0])), np.argmin(np.abs(t_arr-snapshot_times[1][1]))]
+if datestr == "1203":
+    indices = [np.argmin(t_arr), np.argmin(np.abs(t_arr-snapshot_times[1][0])), np.argmin(np.abs(t_arr-snapshot_times[1][1]))]
 
 fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(7, 6.5))
 
@@ -108,7 +115,8 @@ print(f"initial mass: {mass_dust_init:e}")
 ax.plot(t_arr[t_arr<=tmax]/1e6, mass_dust_tot[t_arr<=tmax]/mass_dust_init, linewidth=4, c="#d43a4f", label="in box")
 ax.plot(t_arr[t_arr<=tmax]/1e6, mass_out[t_arr<=tmax]/mass_dust_init, linewidth=4, linestyle="--", c="#d43a4f", label="exited box")
 ax.plot(t_arr[t_arr<=tmax]/1e6, mass_destroyed[t_arr<=tmax]/mass_dust_init, linewidth=4, c="k", zorder=10, label="sputtered")
-ax.scatter(t_arr[indices]/1e6, mass_dust_tot[indices]/mass_dust_init, marker="o", c="#d43a4f", zorder=11, s=50, linewidths=1.5, edgecolors="k")
+if snapshot_markers:
+    ax.scatter(t_arr[indices]/1e6, mass_dust_tot[indices]/mass_dust_init, marker="o", c="#d43a4f", zorder=11, s=50, linewidths=1.5, edgecolors="k")
 
 ax.set_xlabel("Time [Myr]", fontsize=fontsize)
 ax.set_ylabel(r"$m_{dust}/m_{dust,i}$", fontsize=fontsize+2)
