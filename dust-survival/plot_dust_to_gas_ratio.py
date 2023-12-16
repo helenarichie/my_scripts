@@ -26,7 +26,7 @@ fulldir = os.path.join(basedir, "hdf5/full/")
 pngdir = os.path.join(basedir, "png/")
 ##################################################################
 
-for fnum in range(0, fmax):
+for fnum in range(fnum, fnum+1):
     data = ReadHDF5(fulldir, cat=cat, fnum=fnum, dust=True)
     head = data.head
     conserved = data.conserved

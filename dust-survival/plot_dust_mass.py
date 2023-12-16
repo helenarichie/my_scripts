@@ -8,8 +8,8 @@ plt.rcParams.update({'font.family': 'Helvetica'})
 plt.rcParams.update({'font.size': 20})
 
 ##################################################################
-date = "2023-11-08"
-datestr = "1108"
+date = "2023-12-08"
+datestr = "1208"
 cat = True
 pad = 0.1
 fontsize = 20
@@ -18,13 +18,15 @@ tickwidth = 1
 tmax_1105 = 52.1e6
 tmax_1103 = 52.1e6
 tmax_1108 = 72.2e6
-tmax_0426 = 2.4e6
+tmax_0426 = tmax_1208 = 2.4e6
 tmax_0503 = 2.4e6
+tmax_1206 = 52.1e6
+tmax_1107 = tmax_1106 = 58.9e6
 snapshot_times = [[1.4e6, 2.1e6], [19.6e6, 30.4e6]]
 snapshot_markers = False
 ##################################################################
 
-tmax = tmax_1108
+tmax = tmax_1208
 
 ##################################################################
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
