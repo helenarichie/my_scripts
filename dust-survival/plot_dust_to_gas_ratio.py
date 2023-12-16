@@ -55,8 +55,9 @@ for fnum in range(fnum, fnum+1):
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(7, 7))
 
     ax.plot(x_arr, dust_to_gas, linewidth=4, c="#f16948", label="in box")
-    ax.set_xlabel(r"Distance$~[kpc]$", fontsize=fontsize)
+    ax.set_xlabel(r"r$~[kpc]$", fontsize=fontsize)
     ax.set_ylabel(r"Dust-to-gas ratio", fontsize=fontsize)
+    ax.set_xlim(np.amin(x_arr), np.amax(x_arr))
     #ax.tick_params(axis='both', which='both', direction='in', color='black', top=1, right=1, length=9, width=2, reset=True)
     #ax.set_xlim(xmin/1e6, xmax/1e6)
     #ax.set_xticks(np.linspace(0, np.amax(t_arr[t_arr<=tmax]/1e6), 5).round(1))
