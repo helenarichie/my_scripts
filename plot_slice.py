@@ -2,11 +2,14 @@ from hconfig import *
 
 #################################
 date = "2024-01-17"
+ns = 0
+ne = 583
 cat = True
+
+########### plotting #############
 dust = False
 pressure = True
 vlims = False
-fstart = 140
 vlims_gas = (-23.0459 , -22.301) # g/cm^3
 vlims_dust = (-32, -23.5) # g/cm^3
 vlims_p = (2, 7) # P/k_b (K/cm^3)
@@ -17,56 +20,70 @@ spacing = 40
 fontsize = 20
 # unit = "kpc" # sets axes labels and units of dx (kpc or pc)
 unit = "pc"
-fnum = None
 plt.rcParams.update({'font.family': 'Helvetica'})
 plt.rcParams.update({'font.size': 20})
-cloud_wind = True
+#################################
+
+########### location ############
+crc = False
+frontier = True
+#################################
+
+########## data type ############
 debugging = False
+cloud_wind = False
 testing = False
 #################################
 
-# directory with slices
-if debugging:
-    basedir = f"/ix/eschneider/helena/data/debugging/{date}/"
-if cloud_wind:
-    basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-if testing:
-    basedir = f"/ix/eschneider/helena/data/testing/{date}/"
+########## specify slice and png directories ############
+if crc:
+    if debugging:
+        basedir = f"/ix/eschneider/helena/data/debugging/{date}/"
+    if cloud_wind:
+        basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
+    if testing:
+        basedir = f"/ix/eschneider/helena/data/testing/{date}/"
+
+if frontier:
+    basedir = f"/lustre/orion/ast181/scratch/helenarichie/{date}/"
+
 if cat:
     datadir = os.path.join(basedir, "hdf5/slice/")
 else:
     datadir = os.path.join(basedir, "hdf5/raw/")
+
 pngdir = os.path.join(basedir, "png/slice/")
+#########################################################
 
-if dust:
-    data = ReadHDF5(datadir, nscalar=1, fnum=fnum, slice="xy", cat=cat)
-else:
-    data = ReadHDF5(datadir, fnum=fnum, slice="xy", cat=cat)
-head = data.head
-conserved = data.conserved
+for i in range(ns, ne):
 
-nx = head["dims"][0]
-ny = head["dims"][-1]
-dx = head["dx"][0]
-if unit == "pc":
-    dx *= 1e3
-d_gas = data.d_cgs()
-d_dust = None
-p_gas = None
-if dust:
-    d_dust = conserved["scalar0"] * head["density_unit"]
-if pressure:
-    p_gas = (data.energy_cgs() - 0.5*d_gas*((data.vx_cgs())**2 + (data.vy_cgs())**2 + (data.vz_cgs())**2)) * (head["gamma"] - 1.0) 
-vx = data.vx_cgs()
-vy = data.vy_cgs()
-t_arr = data.t_cgs() / yr_in_s
-T = data.T()
+    # read in data
+    if dust:
+        data = ReadHDF5(datadir, nscalar=1, fnum=ns, slice="xy", cat=cat)
+    else:
+        data = ReadHDF5(datadir, fnum=ns, slice="xy", cat=cat)
 
-for i in range(fstart, len(d_gas)):
+    head = data.head
+    conserved = data.conserved
 
-    fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(25,9))
+    nx, ny = head["dims"][0], head["dims"][-1]
+    dx = head["dx"][0]
+    if unit == "pc":
+        dx *= 1e3
+
+    d_dust, p_gas = None, None
+    if dust:
+        d_dust = conserved["scalar0"] * head["density_unit"]
+    if pressure:
+        p_gas = (data.energy_cgs() - 0.5*d_gas*((data.vx_cgs())**2 + (data.vy_cgs())**2 + (data.vz_cgs())**2)) * (head["gamma"] - 1.0)
+
+    d_gas = data.d_cgs()
+    vx = data.vx_cgs()
+    T = data.T()
     
-    # xy gas density slice
+    t_arr = data.t_cgs() / yr_in_s
+
+    # check for large negative scalars
     if debugging:
         if dust:
             wh_neg = conserved["scalar0"][i][conserved["scalar0"][i]<0]
@@ -78,6 +95,8 @@ for i in range(fstart, len(d_gas)):
             else:
                 print("none\n")
 
+    # plot
+    fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(25,9))
 
     if vlims:
         im = axs[0][0].imshow(np.log10(d_gas[i].T), origin="lower", vmin=vlims_gas[0], vmax=vlims_gas[1], extent=[0, nx*dx, 0, ny*dx])
@@ -96,7 +115,6 @@ for i in range(fstart, len(d_gas)):
     axs[0][0].set_ylabel(r"$y~$[{}]".format(unit), fontsize=fontsize)
     axs[0][0].text(spacing, 0.1*dx*ny, f'{round(t_arr[i]/1e6, 2)} Myr', color='white', fontsize=fontsize)
     
-
     # xy dust density
     if dust:
         wh_zero = np.where(d_dust[i]==0)
@@ -177,9 +195,7 @@ for i in range(fstart, len(d_gas)):
     fig.tight_layout()
     
     # plot and save
-    save = True
-    if save:
-        plt.savefig(pngdir + f"{i}_slice.png", dpi=300)
+    plt.savefig(pngdir + f"{i}_slice.png", dpi=300)
     plt.close()
 
     print(f"Saving figure {i} of {len(d_gas)-1}.\n")
