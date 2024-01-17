@@ -1,26 +1,28 @@
 from hconfig import *
 
 #################################
-date = "2023-11-08"
+date = "2024-01-17"
 cat = True
-dust = True
-pressure = False
+dust = False
+pressure = True
 vlims = False
-fstart = 0
-vlims_gas = (-27 , -21.5) # g/cm^3
+fstart = 140
+vlims_gas = (-23.0459 , -22.301) # g/cm^3
 vlims_dust = (-32, -23.5) # g/cm^3
 vlims_p = (2, 7) # P/k_b (K/cm^3)
 vlims_T = (2, 8) # K
 vlims_v = (-250, 1050)
-spacing = 640*1e-3 # spacing of tick marks in units
-# spacing = 40
+# spacing = 640*1e-3 # spacing of tick marks in units
+spacing = 40
 fontsize = 20
-unit = "kpc" # sets axes labels and units of dx (kpc or pc)
+# unit = "kpc" # sets axes labels and units of dx (kpc or pc)
+unit = "pc"
 fnum = None
 plt.rcParams.update({'font.family': 'Helvetica'})
 plt.rcParams.update({'font.size': 20})
 cloud_wind = True
 debugging = False
+testing = False
 #################################
 
 # directory with slices
@@ -28,6 +30,8 @@ if debugging:
     basedir = f"/ix/eschneider/helena/data/debugging/{date}/"
 if cloud_wind:
     basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
+if testing:
+    basedir = f"/ix/eschneider/helena/data/testing/{date}/"
 if cat:
     datadir = os.path.join(basedir, "hdf5/slice/")
 else:
@@ -54,6 +58,7 @@ if dust:
 if pressure:
     p_gas = (data.energy_cgs() - 0.5*d_gas*((data.vx_cgs())**2 + (data.vy_cgs())**2 + (data.vz_cgs())**2)) * (head["gamma"] - 1.0) 
 vx = data.vx_cgs()
+vy = data.vy_cgs()
 t_arr = data.t_cgs() / yr_in_s
 T = data.T()
 
@@ -102,7 +107,7 @@ for i in range(fstart, len(d_gas)):
         if vlims:
             im = axs[1][0].imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=vlims_dust[0], vmax=vlims_dust[1], extent=[0, nx*dx, 0, ny*dx])
         else:
-            im = axs[1][0].imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=vlims_dust[0], extent=[0, nx*dx, 0, ny*dx])
+            im = axs[1][0].imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", extent=[0, nx*dx, 0, ny*dx])
         ylabel = r'$\mathrm{log}_{10}(\rho_{dust})$ [$\mathrm{g}\mathrm{cm}^{-3}$]'
         divider = make_axes_locatable(axs[1][0])
         cax = divider.append_axes("right", size="5%", pad=0.05)

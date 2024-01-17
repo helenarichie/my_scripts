@@ -6,13 +6,13 @@ import numpy as np
 import os
 
 #######################
-ns = 601
-ne = 753
+ns = 0
+ne = 1104
 n_hydro = 1
-n_proc = 4 # number of processors that did the calculations
+n_proc = 8 # number of processors that did the calculations
 scalar = False
 dust = True
-date = "2023-11-08"
+date = "2024-01-12"
 #######################
 
 istart = 0*n_proc
