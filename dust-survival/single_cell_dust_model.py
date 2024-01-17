@@ -11,19 +11,21 @@ v_wind = 1000 * 1e5  # cm/s
 rho_d_init = 1e-28  # g/cm^3
 tmax = 1e8 * yr_in_s  # yr to s
 h = 5e2 * yr_in_s  # yr to s
-x0 = 0.320 * kpc_in_cm # kpc to cm
+# x0 = 0.32 * kpc_in_cm # kpc to cm
+x0 = 0 * kpc_in_cm # kpc to cm
 csvdir = "/Users/helenarichie/Desktop/"
 new = True
 ##################################
 
-bins, r_av, n_av, n_med, n_lo, n_hi, v_av, v_med, v_lo, v_hi, T_av, T_med, T_lo, T_hi, p_av, p_med, p_lo, p_hi, c_av, c_med, c_lo, c_hi, cs_av, cs_med, cs_lo, cs_hi, K_av, K_med, K_lo, K_hi, M_av, M_med, M_lo, M_hi = np.loadtxt('/Users/helenarichie/Documents/Grad School/research/data/CGOLS profiles/2048_central_35_hot_dweight.txt', unpack=True)
-
+# bins, r_av, n_av, n_med, n_lo, n_hi, v_av, v_med, v_lo, v_hi, T_av, T_med, T_lo, T_hi, p_av, p_med, p_lo, p_hi, c_av, c_med, c_lo, c_hi, cs_av, cs_med, cs_lo, cs_hi, K_av, K_med, K_lo, K_hi, M_av, M_med, M_lo, M_hi = np.loadtxt('/Users/helenarichie/Documents/Grad School/research/data/CGOLS profiles/2048_central_35_hot_dweight.txt', unpack=True)
+bins, r_av, n_av, n_med, n_lo, n_hi, v_av, v_med, v_lo, v_hi, T_av, T_med, T_lo, T_hi, p_av, p_med, p_lo, p_hi, c_av, c_med, c_lo, c_hi, cs_av, cs_med, cs_lo, cs_hi, K_av, K_med, K_lo, K_hi, M_av, M_med, M_lo, M_hi = np.loadtxt('/Users/helenarichie/Documents/Grad School/research/data/CGOLS profiles/2048_central_35_cool_dweight.txt', unpack=True)
 r_av = np.array(r_av)
 
-# arg3 = np.argmin(abs(r_av-1))
-# print(r_av[arg3])
-# print(n_med[arg3])
-# print(T_med[arg3])
+
+arg3 = np.argmin(abs(r_av-0.2))
+print(r_av[arg3])
+print(n_med[arg3])
+print(T_med[arg3])
 
 def n(r):
     return 0.00877555*r**(-0.05 * r -1.08)
@@ -64,9 +66,12 @@ for i, t in enumerate(t_arr):
     x_distance_i += v_wind * dt
     x_distance.append(x_distance_i)
 
-    #print(x_distance_i/kpc_in_cm)
-    n_i = n(x_distance_i/kpc_in_cm)
-    T_i = T(x_distance_i/kpc_in_cm)
+    if x_distance_i <= 0.317*kpc_in_cm:
+        n_i, T_i = 0.02042275, 18328670.0
+    else:
+        #print(x_distance_i/kpc_in_cm)
+        n_i = n(x_distance_i/kpc_in_cm)
+        T_i = T(x_distance_i/kpc_in_cm)
 
     #print(n_i, T_i)
     #n_i, T_i = n_med[np.argmin(abs(r_av*kpc_in_cm-x_distance_i))], T_med[np.argmin(abs(r_av*kpc_in_cm-x_distance_i))]
@@ -107,18 +112,4 @@ for i, dust in enumerate(d_dust_solution):
         writer_obj = writer(f)
         writer_obj.writerow([t_arr[i], x_distance[i], d_dust_solution[i]])
         f.close()
-
-plt.rcParams.update({'font.size': 16})
-
-fig = plt.figure()
-plt.semilogx(t_arr, d_dust_solution, linewidth=2)
-plt.xlabel("Time [yr]")
-plt.ylabel(r"$\rho_{dust}~[g\,cm^{-3}]$")
-plt.savefig("/Users/helenarichie/Desktop/single_cell_wind_t.png")
-
-fig = plt.figure()
-plt.plot(x_distance, d_dust_solution, linewidth=2)
-plt.xlabel("Distance [kpc]")
-plt.ylabel(r"$\rho_{dust}~[g\,cm^{-3}]$")
-plt.savefig("/Users/helenarichie/Desktop/single_cell_wind_r.png")
 
