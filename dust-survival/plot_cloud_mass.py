@@ -9,7 +9,7 @@ import seaborn as sns
 density_conversion = 5.028e-34/(3.24e-22)**3 # g/cm^3 to M_sun/kpc^3
 
 plt.rcParams.update({'font.family': 'Helvetica'})
-plt.rcParams.update({'font.size': 20})
+plt.rcParams.update({'font.size': 18})
 
 ##################################################################
 cat = True
@@ -20,19 +20,21 @@ tickwidth = 1
 ##################################################################
 
 ##################################################################
-projdir = ["/Users/helenarichie/Desktop/dust-survival-snapshots/0426/proj", "/Users/helenarichie/Desktop/dust-survival-snapshots/0726/proj"]
-csvdir = ["/Users/helenarichie/Desktop/dust-survival-snapshots/0426/csv", "/Users/helenarichie/Desktop/dust-survival-snapshots/0726/csv"]
+projdir = ["/Users/helenarichie/Desktop/dust-survival-snapshots/0426/proj", "/Users/helenarichie/Desktop/dust-survival-snapshots/0726/proj", "/Users/helenarichie/Desktop/dust-survival-snapshots/1107/proj"]
+csvdir = ["/Users/helenarichie/Desktop/dust-survival-snapshots/0426/csv", "/Users/helenarichie/Desktop/dust-survival-snapshots/0726/csv", "/Users/helenarichie/Desktop/dust-survival-snapshots/1107/csv"]
 pngdir = os.path.join("/Users/helenarichie/Desktop/")
 ##################################################################
 
 ##################################################################
 #tmax = [2.1e6, 30.4e6]
-tmax = [2.4e6, 52.1e6]
-fnums = [[0, 715, 1051], [0, 196, 304]]
-snapshot_times = [[1.4e6, 2.1e6], [19.6e6, 30.3e6]]
+tmax = [2.4e6, 52.1e6, 58.8e6]
+# fnums = [[0, 715, 1051], [0, 196, 304], [0, 102, 372]]
+fnums = [[0, 482, 865], [0, 196, 304], [0, 200, 425]]
+# snapshot_times = [[1.4e6, 2.1e6], [19.6e6, 30.3e6], [10.2e6, 37.2e6]]
+snapshot_times = [[1.0e6, 1.7e6], [14.3e6, 30.0e6], [20.0e6, 42.5e6]]
 ##################################################################
 
-fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(6.5, 12))
+fig, ax = plt.subplots(nrows=3, ncols=1, figsize=(5.76, 15))
 
 for i, dir in enumerate(csvdir):
     # get value of dx to convert from density to mass
@@ -93,17 +95,21 @@ for i, dir in enumerate(csvdir):
         indices = [np.argmin(t_arr), np.argmin(np.abs(t_arr-snapshot_times[0][0])), np.argmin(np.abs(t_arr-snapshot_times[0][1]))]
     if i == 1:
         indices = [np.argmin(t_arr), np.argmin(np.abs(t_arr-snapshot_times[1][0])), np.argmin(np.abs(t_arr-snapshot_times[1][1]))]
+    if i == 2:
+        indices = [np.argmin(t_arr), np.argmin(np.abs(t_arr-snapshot_times[2][0])), np.argmin(np.abs(t_arr-snapshot_times[2][1]))]
 
     ax[i].plot(t_arr[t_arr<=tmax[i]]/1e6, mass_cl[t_arr<=tmax[i]]/mass_cl_init, linewidth=4, c="#49b4ab", label="in box")
     ax[i].plot(t_arr[t_arr<=tmax[i]]/1e6, mass_out[t_arr<=tmax[i]]/mass_cl_init, linewidth=4, linestyle="--", c="#49b4ab", label="exited box")
     ax[i].scatter(t_arr[indices]/1e6, mass_cl[indices]/mass_cl_init, marker="o", c="#49b4ab", zorder=11, s=50, linewidths=1.5, edgecolors="k")
 
     ax[i].set_xlabel("Time [Myr]")
-    ax[i].set_ylabel(r"$m_{cl}/m_{cl,i}$", fontsize=fontsize+2)
+    ax[i].set_ylabel(r"$m_{cl}/m_{cl,i}$", fontsize=fontsize)
 
     ax[i].set_xlim(xmin/1e6, xmax/1e6)
     ax[i].tick_params(axis='both', which='both', direction='in', color='black', top=1, right=1, length=9, width=2, reset=True, labelsize="medium", zorder=10)
     ax[i].ticklabel_format(axis='y', style='sci', scilimits=(0,0))
+    ax[i].set_xlim(xmin/1e6, xmax/1e6)
+    ax[i].set_xticks(np.linspace(0, np.amax(t_arr[t_arr<=tmax[i]]/1e6), 5).round(1))
 
     if i == 0:
         ax[i].legend(fontsize=fontsize-5, loc="upper right")

@@ -23,7 +23,7 @@ hist_cmap = sns.cubehelix_palette(light=1, as_cmap=True, reverse=True)
 ############ hard-coded #######################################################
 r_cl = 5 * 3.086e+18 # pc to cm
 d_cl_init = 1e-24 # n = 1
-a_grain = .1 # micron
+a_grain = 1 # micron
 gamma = 5/2
 chi = 100
 v_wind_i = 1000e3  # km/s to cm/s
@@ -145,6 +145,14 @@ log_T_cl = 4.48
 #t.set_bbox(dict(facecolor='white', edgecolor="white"))
 ################################################################################
 
+bins, r_av, n_av, n_med_hot, n_lo, n_hi, v_av, v_med, v_lo, v_hi, T_av, T_med_hot, T_lo, T_hi, p_av, p_med, p_lo, p_hi, c_av, c_med, c_lo, c_hi, cs_av, cs_med, cs_lo, cs_hi, K_av, K_med, K_lo, K_hi, M_av, M_med, M_lo, M_hi = np.loadtxt('/Users/helenarichie/Documents/Grad School/research/data/CGOLS profiles/2048_central_35_hot_dweight.txt', unpack=True)
+bins, r_av, n_av, n_med_cool, n_lo, n_hi, v_av, v_med, v_lo, v_hi, T_av, T_med_cool, T_lo, T_hi, p_av, p_med, p_lo, p_hi, c_av, c_med, c_lo, c_hi, cs_av, cs_med, cs_lo, cs_hi, K_av, K_med, K_lo, K_hi, M_av, M_med, M_lo, M_hi = np.loadtxt('/Users/helenarichie/Documents/Grad School/research/data/CGOLS profiles/2048_central_35_cool_dweight.txt', unpack=True)
+
+argbase = np.argmin(abs(r_av - 0.2))
+arg2 = np.argmin(abs(r_av - 2))
+arg5 = np.argmin(abs(r_av - 5))
+arg10 = np.argmin(abs(r_av - 10))
+
 cgols_ns = np.array([1.5e-2, 2e-2, 9e-3, 4e-3, 2.1e-3, 1.5e-3, 1e-3, 7.5e-4, 5.5e-4, 4e-4, 3e-4, 2.5e-4])
 log_cgols_Ts = np.array([7, 7.375, 7.25, 7, 6.875, 6.75, 6.7, 6.625, 6.575, 6.5, 6.4, 6.375])
 # cgols = plt.scatter(np.log10(cgols_ns*0.6*MP), log_cgols_Ts, marker="x", s=100, linewidths=3.5)
@@ -152,25 +160,25 @@ log_cgols_Ts = np.array([7, 7.375, 7.25, 7, 6.875, 6.75, 6.7, 6.625, 6.575, 6.5,
 distances = [0, 0.1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 t_sps = calc_tau_sp(cgols_ns, 10**log_cgols_Ts)
 
-cgols_base  = [cgols_ns[1], log_cgols_Ts[1]]
-cgols_2kpc  = [cgols_ns[3], log_cgols_Ts[3]]
-cgols_5kpc  = [cgols_ns[6], log_cgols_Ts[6]]
-cgols_10kpc = [cgols_ns[11], log_cgols_Ts[11]]
+cgols_base  = [n_med_hot[argbase], np.log10(T_med_hot[argbase])]
+cgols_2kpc  = [n_med_hot[arg2], np.log10(T_med_hot[arg2])]
+cgols_5kpc  = [n_med_hot[arg5], np.log10(T_med_hot[arg5])]
+cgols_10kpc = [n_med_hot[arg10], np.log10(T_med_hot[arg10])]
 
-cgols_base_cool  = [2e1, 3.75]
-cgols_2kpc_cool  = [5e-1, 3.9]
-cgols_5kpc_cool  = [1e-1, 4]
-cgols_10kpc_cool = [2e-2, 4]
+cgols_base_cool  = [n_med_cool[argbase], np.log10(T_med_cool[argbase])]
+cgols_2kpc_cool  = [n_med_cool[arg2], np.log10(T_med_cool[arg2])]
+cgols_5kpc_cool  = [n_med_cool[arg5], np.log10(T_med_cool[arg5])]
+cgols_10kpc_cool = [n_med_cool[arg10], np.log10(T_med_cool[arg10])]
 
 ##################################### hot ####################################
 cgols = ax.scatter(np.log10((cgols_base[0])*0.6*MP), cgols_base[1], marker="x", c="coral", s=150, linewidths=4.5, zorder=10)
-t = ax.text(-25.95, 7.1, "0.1 kpc", fontsize=25, zorder=10)
+t = ax.text(-25.95, 7.1, "0.2 kpc", fontsize=25, zorder=10)
 #t.set_bbox(dict(facecolor='white', edgecolor="white"))
 ax.scatter(np.log10((cgols_2kpc[0])*0.6*MP), cgols_2kpc[1], marker="x", c="coral", s=150, linewidths=4.5, zorder=10)
-t = ax.text(-26.65, 6.7, "2 kpc", fontsize=25, zorder=10)
+t = ax.text(-26.65, 6.75, "2 kpc", fontsize=25, zorder=10)
 t.set_bbox(dict(facecolor='white', edgecolor="white"))
 ax.scatter(np.log10((cgols_5kpc[0])*0.6*MP), cgols_5kpc[1], marker="x", c="coral", s=150, linewidths=4.5, zorder=10)
-t = ax.text(-27.25, 6.35, "5 kpc", fontsize=25, zorder=10)
+t = ax.text(-27.2, 6.4, "5 kpc", fontsize=25, zorder=10)
 t.set_bbox(dict(facecolor='white', edgecolor="white"))
 ax.scatter(np.log10((cgols_10kpc[0])*0.6*MP), cgols_10kpc[1], marker="x", c="coral", s=150, linewidths=4.5, zorder=10)
 t = ax.text(-27.9, 6.05, "10 kpc", fontsize=25, zorder=10)
@@ -189,7 +197,7 @@ cgols_cool = ax.scatter(np.log10((cgols_base_cool[0])*0.6*MP), cgols_base_cool[1
 ax.scatter(np.log10((cgols_2kpc_cool[0])*0.6*MP), cgols_2kpc_cool[1], marker="x", c="mediumslateblue", s=150, linewidths=4.5, zorder=10)
 ax.scatter(np.log10((cgols_5kpc_cool[0])*0.6*MP), cgols_5kpc_cool[1], marker="x", c="mediumslateblue", s=150, linewidths=4.5, zorder=10)
 ax.scatter(np.log10((cgols_10kpc_cool[0])*0.6*MP), cgols_10kpc_cool[1], marker="x", c="mediumslateblue", s=150, linewidths=4.5, zorder=10)
-t = ax.text(-23.1, 3.9, "0.1 kpc", fontsize=25, zorder=10)
+t = ax.text(-23.4, 3.95, "0.2 kpc", fontsize=25, zorder=10)
 t.set_bbox(dict(facecolor='white', edgecolor="white"))
 ###############################################################################
 
@@ -204,17 +212,17 @@ mixed = ax.scatter(np.log10((n_mix_base)*0.6*MP), np.log10(T_mix_base), marker="
 ax.scatter(np.log10((n_mix_2kpc)*0.6*MP), np.log10(T_mix_2kpc), marker="x", c="mediumseagreen", s=150, linewidths=4.5, zorder=10)
 ax.scatter(np.log10((n_mix_5kpc)*0.6*MP), np.log10(T_mix_5kpc), marker="x", c="mediumseagreen", s=150, linewidths=4.5, zorder=10)
 ax.scatter(np.log10((n_mix_10kpc)*0.6*MP), np.log10(T_mix_10kpc), marker="x", c="mediumseagreen", s=150, linewidths=4.5, zorder=10)
-t = ax.text(-23.1, 3.9, "0.1 kpc", fontsize=25, zorder=10)
+t = ax.text(-23.4, 3.95, "0.2 kpc", fontsize=25, zorder=10)
 t.set_bbox(dict(facecolor='white', edgecolor="white"))
-t = ax.text(-24.55, 4.05, "2 kpc", fontsize=25, zorder=10)
+t = ax.text(-24.47, 4.1, "2 kpc", fontsize=25, zorder=10)
 t.set_bbox(dict(facecolor='white', edgecolor="white"))
-t = ax.text(-25.25, 4.15, "5 kpc", fontsize=25, zorder=10)
+t = ax.text(-25.15, 4.15, "5 kpc", fontsize=25, zorder=10)
 t.set_bbox(dict(facecolor='white', edgecolor="white"))
-t = ax.text(-26.05, 4.15, "10 kpc", fontsize=25, zorder=10)
+t = ax.text(-25.97, 4.15, "10 kpc", fontsize=25, zorder=10)
 t.set_bbox(dict(facecolor='white', edgecolor="white"))
 ################################################################################
 
-ax.add_patch(Rectangle([-23, 4.01], 0.685, 0.125, zorder=3, fill=True, color="white"))
+#ax.add_patch(Rectangle([-23, 4.01], 0.685, 0.125, zorder=3, fill=True, color="white"))
 
 #ax.add_patch(Rectangle([-26.5, 7.02], 0.519, 0.385, zorder=9, fill=True, color="white"))
 #ax.add_patch(Rectangle([-26.5+0.519, 7.02], 0.509, 0.385, zorder=9, fill=True, color="lightgrey"))
