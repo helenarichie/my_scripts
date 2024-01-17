@@ -178,3 +178,22 @@ plt.ylabel(r"$t~[Myr]$")
 ax.tick_params(bottom=True, top=True, left=True, right=True)
 plt.legend()
 plt.savefig("/Users/helenarichie/Desktop/timescales_a.png")
+
+n_mix = np.sqrt(10*1e-2)
+T_mix = np.sqrt(3e4*3e7)
+a = 0.1
+
+print(f"Mixed phase drag time: {drag_timescale(a, n_mix, T_mix, G[0])} Myr")
+print(f"Mixed nonth sputtering time: {sputtering_timescale(a, n_mix, Y_Si)} Myr")
+
+n_hot = 1e-2
+T_hot = 3e7
+
+print(f"Hot phase drag time: {drag_timescale(a, n_hot, T_hot, G[0])} Myr")
+print(f"Hot nonth sputtering time: {sputtering_timescale(a, n_hot, Y_Si)} Myr")
+
+n_cool = 10
+T_cool = 3e4
+
+print(f"Cool phase drag time: {drag_timescale(a, n_cool, T_cool, G[0])} Myr")
+print(f"Cool nonth sputtering time: {sputtering_timescale(a, n_cool, Y_Si)} Myr")

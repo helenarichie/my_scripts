@@ -4,18 +4,18 @@ from hconfig import *
 from csv import writer
 
 ##################################################################
-date = "2023-10-15"
+date = "2024-01-13"
 save = True
 cat = True
 dust = True
 vlims = False
 vlims_gas = (19.5, 25.5) # g/cm^3
-vlims_dust = (-25, 1) # g/cm^3
-fnum = 0 # file to start plotting at
-# spacing = 640*1e-3 # spacing of tick marks in units
-spacing = 20
+vlims_dust = (-14, -3) # g/cm^3
+fnum = 1171 # file to start plotting at
+spacing = 640*1e-3 # spacing of tick marks in units
+# spacing = 20
 fontsize = 28
-unit = "pc" # sets axes labels and units of dx (kpc or pc)
+unit = "kpc" # sets axes labels and units of dx (kpc or pc)
 plt.rcParams.update({'font.family': 'Helvetica'})
 plt.rcParams.update({'font.size': fontsize})
 pad = 0.1
@@ -50,19 +50,19 @@ d_dust = conserved["dust_density"]
 d_dust *= head["mass_unit"] / (head["length_unit"] ** 2)
 ##################################################################
 # create files to write quantities for cloud (dense gas only), total gas, and dust
-f = open(os.path.join(csvdir, "d_dust_neg.csv"), "w")
-f.close()
+#f = open(os.path.join(csvdir, "d_dust_neg.csv"), "w")
+#f.close()
 
 for i in range(fnum, len(d_gas)):
 
-    with open(os.path.join(csvdir, "d_dust_neg.csv"), "a") as f:
+    """with open(os.path.join(csvdir, "d_dust_neg.csv"), "a") as f:
         d_dust_ch = d_dust[i] / (head["mass_unit"] / (head["length_unit"] ** 2))
         writer_obj = writer(f)
         if len(d_dust_ch[d_dust_ch<0]) > 0:
             writer_obj.writerow([np.amin(d_dust_ch[d_dust_ch<0]), np.amax(d_dust_ch[d_dust_ch<0]), len(d_dust_ch[d_dust_ch<0])])
         else:
             writer_obj.writerow(["None"])
-        f.close()
+        f.close()"""
 
 
     plt.style.use('dark_background')

@@ -4,11 +4,11 @@ from csv import writer
 density_conversion = 5.028e-34/(3.24e-22)**3 # g/cm^3 to M_sun/kpc^3
 
 ################# hard-coded, fill these in! ###################
-date = "2023-11-08"
+date = "2024-01-12"
 rho_cl_i = 1e-23  # needed to index cloud material
 cutoff = 0.05*rho_cl_i*density_conversion # 5% of initial density, M_sun/kpc^3
 cat = True
-istart = 601
+istart = 0
 n_hydro = 1
 ################################################################
 

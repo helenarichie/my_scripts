@@ -14,13 +14,14 @@ vlims_gas = (19.3, 21.8)
 vlims_dust = (-13.6, -3.2)
 fnums = [304]
 pad = 0.1
-spacing = 160  # pc, spacing of tick marks
-fontsize = 20
+spacing = 320  # pc, spacing of tick marks
+fontsize = 25
 labelpad = 12
 tickwidth = 2
 tmax = 30.4e6
 plt.rcParams.update({'font.family': 'Helvetica'})
-projdir = csvdir = "/Users/helenarichie/Desktop/cloud_survival/0726"
+projdir = "/Users/helenarichie/Desktop/dust-survival-snapshots/0726/proj/"
+csvdir = "/Users/helenarichie/Desktop/dust-survival-snapshots/0726/csv/"
 pngdir = os.path.join("/Users/helenarichie/Desktop/")
 cmap_dust = sns.color_palette("rocket", as_cmap=True)
 cmap_gas = sns.color_palette("mako", as_cmap=True)
@@ -122,9 +123,11 @@ im_gas = axs[0][1].imshow(np.log10(n_gas[indices[0]:indices[1],:].T), origin="lo
 im_dust = axs[1][1].imshow(np.log10(d_dust[indices[0]:indices[1],:].T), origin="lower", vmin=vlims_dust[0], vmax=vlims_dust[1], extent=[0, xlen*dx, 0, nz*dx], cmap=cmap_dust)
 #im = axes.imshow(np.log10(d_dust[indices[i][0]:indices[i][1],:].T), origin="lower", extent=[0, xlen[i]*dx, 0, nz*dx], cmap=cmap)
 
-axs[0][1].hlines(0.12*dx*ny, spacing, spacing+spacing, color='white')
-axs[0][1].text(spacing+spacing+50, 0.1*dx*ny, '160 pc', color='white', fontsize=fontsize)
-axs[1][1].text(spacing, 0.85*dx*nz, f'{round(t[0]/1e6, 1)} Myr', color='white', fontsize=fontsize) 
+#axs[0][1].hlines(0.12*dx*ny, spacing, spacing+spacing, color='white')
+#axs[0][1].text(spacing+spacing+50, 0.1*dx*ny, '320 pc', color='white', fontsize=fontsize)
+#axs[1][1].text(spacing, 0.1*dx*ny, f'{round(t[0]/1e6, 1)} Myr', color='white', fontsize=fontsize) 
+#axs[1][1].text(spacing, 0.8*dx*nz, 'gas', color='white', fontsize=fontsize) 
+#axs[0][1].text(spacing, 0.8*dx*nz, 'dust', color='white', fontsize=fontsize)
 
 axs[0][1].set_xticks(np.arange(0, xlen*dx, spacing))
 axs[0][1].set_yticks(np.arange(0, ny*dx, spacing))
@@ -136,15 +139,15 @@ axs[1][1].tick_params(axis='both', which='both', direction='in', color='white', 
 divider = make_axes_locatable(axs[0][1])
 cax = divider.append_axes("right", size="5%", pad=0.09)
 cbar_gas = fig.colorbar(im_gas, ax=axs[0][1], cax=cax)
-cbar_gas.set_label(r'$\mathrm{log}_{10}(N_{H, gas})$ [$\mathrm{cm}^{-2}$]', rotation=270, labelpad=30, fontsize=fontsize)
-cbar_gas.ax.tick_params(length=9, width=tickwidth, color="white", labelsize="medium")
+cbar_gas.set_label(r'$\mathrm{log}_{10}(N_{H, gas})$ [$\mathrm{cm}^{-2}$]', rotation=270, labelpad=35, fontsize=fontsize)
+cbar_gas.ax.tick_params(length=9, width=tickwidth, color="white", labelsize="small")
 cbar_gas.set_ticks(np.linspace(vlims_gas[0], vlims_gas[1], 4).round(1))
 
 divider = make_axes_locatable(axs[1][1])
 cax = divider.append_axes("right", size="5%", pad=0.09)
 cbar_dust = fig.colorbar(im_dust, ax=axs[1][1], cax=cax)
-cbar_dust.set_label(r'$\mathrm{log}_{10}(\Sigma_{dust})$ [$\mathrm{g}\,\mathrm{cm}^{-2}$]', rotation=270, labelpad=25, fontsize=fontsize)
-cbar_dust.ax.tick_params(length=9, width=tickwidth, color="white", labelsize="medium")
+cbar_dust.set_label(r'$\mathrm{log}_{10}(\Sigma_{dust})$ [$\mathrm{g}\,\mathrm{cm}^{-2}$]', rotation=270, labelpad=30, fontsize=fontsize)
+cbar_dust.ax.tick_params(length=9, width=tickwidth, color="white", labelsize="small")
 cbar_dust.set_ticks(np.linspace(vlims_dust[0], vlims_dust[1], 4).round(1))
 
 ymin = np.amin([np.amin(mass_cl), np.amin(mass_out_cl)]) - pad
@@ -157,8 +160,8 @@ axs[0][0].plot(t_arr[t_arr<=tmax]/1e6, mass_out_cl[t_arr<=tmax]/mass_cl[0], line
 axs[0][0].set_xlim(xmin/1e6, xmax/1e6)
 axs[0][0].set_xlabel("Time [Myr]")
 axs[0][0].set_ylabel(r"$m_{cloud}/m_{cloud,i}$")
-axs[0][0].tick_params(axis='both', which='both', direction='in', color='black', top=1, right=1, length=9, width=2, reset=True, labelsize="medium")
-axs[0][0].legend(fontsize=fontsize-2, loc="center")
+axs[0][0].tick_params(axis='both', which='both', direction='in', color='black', top=1, right=1, length=9, width=2, reset=True, labelsize="small")
+#axs[0][0].legend(fontsize=fontsize-2, loc="center")
 axs[0][0].ticklabel_format(axis='y', style='sci', useOffset=True)
 
 ymin = np.amin([np.amin(mass_dust), np.amin(mass_out_dust)]) - pad
@@ -172,8 +175,8 @@ axs[1][0].plot(t_arr[t_arr<=tmax]/1e6, mass_destroyed[t_arr<=tmax]/mass_dust[0],
 axs[1][0].set_xlim(xmin/1e6, xmax/1e6)
 axs[1][0].set_xlabel("Time [Myr]")
 axs[1][0].set_ylabel(r"$m_{dust}/m_{dust,i}$")
-axs[1][0].tick_params(axis='both', which='both', direction='in', color='black', top=1, right=1, length=9, width=2, reset=True, labelsize="medium")
-axs[1][0].legend(fontsize=fontsize-2, loc="center")
+axs[1][0].tick_params(axis='both', which='both', direction='in', color='black', top=1, right=1, length=9, width=2, reset=True, labelsize="small")
+axs[1][0].legend(fontsize=fontsize-10, loc="center left")
 axs[1][0].ticklabel_format(axis='y', style='sci', useOffset=True)
 
 print(mass_cl[0])

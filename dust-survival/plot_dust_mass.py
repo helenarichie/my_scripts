@@ -8,8 +8,8 @@ plt.rcParams.update({'font.family': 'Helvetica'})
 plt.rcParams.update({'font.size': 20})
 
 ##################################################################
-date = "2023-11-08"
-datestr = "1108"
+date = "2024-01-11"
+datestr = "0111"
 cat = True
 pad = 0.1
 fontsize = 20
@@ -18,13 +18,18 @@ tickwidth = 1
 tmax_1105 = 52.1e6
 tmax_1103 = 52.1e6
 tmax_1108 = 72.2e6
-tmax_0426 = 2.4e6
+tmax_0426 = tmax_1208 = 2.4e6
 tmax_0503 = 2.4e6
-snapshot_times = [[1.4e6, 2.1e6], [19.6e6, 30.4e6]]
+tmax_1206 = 52.1e6
+tmax_1107 = tmax_1106 = 58.9e6
+tmax_1212 = 75e6
+tmax_1217 = 47e6
+tmax_0111 = 55.1e6
+snapshot_times = [[1.4e6, 2.1e6], [19.6e6, 30.4e6], [10.2e6, 37.2e6]]
 snapshot_markers = False
 ##################################################################
 
-tmax = tmax_1108
+tmax = tmax_0111
 
 ##################################################################
 basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
@@ -96,6 +101,8 @@ if datestr == "1105":
 if datestr == "1106":
     indices = [np.argmin(t_arr), np.argmin(np.abs(t_arr-snapshot_times[1][0])), np.argmin(np.abs(t_arr-snapshot_times[1][1]))]
 if datestr == "1203":
+    indices = [np.argmin(t_arr), np.argmin(np.abs(t_arr-snapshot_times[1][0])), np.argmin(np.abs(t_arr-snapshot_times[1][1]))]
+if datestr == "1107":
     indices = [np.argmin(t_arr), np.argmin(np.abs(t_arr-snapshot_times[1][0])), np.argmin(np.abs(t_arr-snapshot_times[1][1]))]
 
 fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(7, 6.5))

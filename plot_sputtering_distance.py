@@ -31,7 +31,7 @@ plt.style.use('dark_background')
 plt.rcParams.update({'font.family': 'Helvetica'})
 ##################################
 
-bins, r_av, n_av, n_med, n_lo, n_hi, v_av, v_med, v_lo, v_hi, T_av, T_med, T_lo, T_hi, p_av, p_med, p_lo, p_hi, c_av, c_med, c_lo, c_hi, cs_av, cs_med, cs_lo, cs_hi, K_av, K_med, K_lo, K_hi, M_av, M_med, M_lo, M_hi = np.loadtxt('/Users/helenarichie/Downloads/CGOLS profiles/2048_central_35_hot_dweight.txt', unpack=True)
+bins, r_av, n_av, n_med, n_lo, n_hi, v_av, v_med, v_lo, v_hi, T_av, T_med, T_lo, T_hi, p_av, p_med, p_lo, p_hi, c_av, c_med, c_lo, c_hi, cs_av, cs_med, cs_lo, cs_hi, K_av, K_med, K_lo, K_hi, M_av, M_med, M_lo, M_hi = np.loadtxt('/Users/helenarichie/Documents/Grad School/research/data/CGOLS profiles/2048_central_35_hot_dweight.txt', unpack=True)
 
 # McKinnon et al. (2017)
 def calc_tau_sp(n, T):
@@ -46,11 +46,15 @@ def calc_tau_sp(n, T):
 
     return tau_sp
 
-argm = np.argmax(T_med)
+"""argm = np.argmax(T_med)
 print(r_av[argm])
 print(n_med[argm])
 print(T_med[argm])
-print("tau_sp: ", calc_tau_sp(n_med[argm], T_med[argm])/yr_in_s)
+print("tau_sp: ", calc_tau_sp(n_med[argm], T_med[argm])/yr_in_s)"""
+
+for i, n in enumerate(n_med):
+    print(r_av[i])
+    print(calc_tau_sp(n_med[i], T_med[i])/yr_in_s)
 
 # McKinnon et al. (2017)
 def calc_dd_dt(d_dust, tau_sp):
