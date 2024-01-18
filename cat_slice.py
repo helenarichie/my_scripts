@@ -7,16 +7,16 @@ import os
 
 ###############################
 date = "2024-01-17"
-ns = 270
-ne = 367
-n_procs = 6
+ns = 0
+ne = 583
+n_procs = 32
 DE = False
 SCALAR = True
 ###############################
 
 ###############################
-crc = True
-frontier = False
+crc = False
+frontier = True
 ###############################
 
 if crc:

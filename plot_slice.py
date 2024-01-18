@@ -2,13 +2,13 @@ from hconfig import *
 
 #################################
 date = "2024-01-17"
-ns = 270
-ne = 366
+ns = 0
+ne = 583
 cat = True
 
 ########### location ############
-crc = True
-frontier = False
+crc = False
+frontier = True
 #################################
 
 ########## data type ############
@@ -26,14 +26,20 @@ vlims_dust = (-32, -23.5) # g/cm^3
 vlims_p = (2, 7) # P/k_b (K/cm^3)
 vlims_T = (2, 8) # K
 vlims_v = (-250, 1050)
-# spacing = 640*1e-3 # spacing of tick marks in units
-spacing = 40
+spacing, unit = 640*1e-3, "kpc" # spacing of tick marks in units and sets axes labels and units of dx (kpc or pc)
+# spacing, unit = 40, "pc"
 fontsize = 20
-# unit = "kpc" # sets axes labels and units of dx (kpc or pc)
-unit = "pc"
 plt.rcParams.update({'font.family': 'Helvetica'})
 plt.rcParams.update({'font.size': 20})
 #################################
+
+import sys
+if __file__ == "/ix/eschneider/helena/code/my_scripts/hconfig.py":
+    sys.path.insert(0, "/ix/eschneider/helena/code/analysis_scripts")
+if __file__ == "/Users/helenarichie/GitHub/my_scripts/hconfig.py":
+    sys.path.insert(0, "/Users/helenarichie/GitHub/analysis_scripts/")
+if __file__ == "/ccs/home/helenarichie/code/my_scripts/hconfig.py":
+    sys.path.insert(0, "/ccs/home/helenarichie/code/analysis_scripts")
 
 ########## specify slice and png directories ############
 if crc:
