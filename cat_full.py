@@ -1,26 +1,33 @@
-#!/usr/bin/env python3
-# Example file for concatenating 3D hdf5 datasets
-
 import h5py
 import numpy as np
 import os
 
 #######################
+date = "2024-01-12"
 ns = 0
-ne = 1104
+ne = 721
 n_hydro = 1
-n_proc = 8 # number of processors that did the calculations
+n_proc = 32
 scalar = False
 dust = True
-date = "2024-01-12"
 #######################
+
+###############################
+crc = False
+frontier = True
+###############################
 
 istart = 0*n_proc
 iend = 1*n_proc
 
-basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-dnamein = os.path.join(basedir, "hdf5/raw/")
-dnameout = os.path.join(basedir, "hdf5/full/")
+if crc:
+  basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
+  dnamein = os.path.join(basedir, "hdf5/raw/")
+  dnameout = os.path.join(basedir, "hdf5/full/")
+if frontier:
+  basedir = f"/lustre/orion/ast181/scratch/helenarichie/{date}/"
+  dnamein = os.path.join(basedir, "hdf5/raw/")
+  dnameout = os.path.join(basedir, "hdf5/full/")
 
 # loop over outputs
 for n in range(ns, ne+1):

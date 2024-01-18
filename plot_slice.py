@@ -5,10 +5,11 @@ date = "2024-01-17"
 ns = 58
 ne = 583
 cat = True
+#################################
 
 ########### location ############
-crc = False
-frontier = True
+crc = True
+frontier = False
 #################################
 
 ########## data type ############

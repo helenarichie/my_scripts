@@ -1,7 +1,4 @@
-# Example file for concatenating on-axis slice data
-# created when the -DSLICES flag is turned on
-
-import h5py
+mport h5py
 import numpy as np
 import os
 os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
@@ -16,8 +13,8 @@ SCALAR = True
 ###############################
 
 ###############################
-crc = False
-frontier = True
+crc = True
+frontier = False
 ###############################
 
 if crc:
