@@ -1,22 +1,19 @@
-# Example file for concatenating on-axis slice data
-# created when the -DSLICES flag is turned on
-
-import h5py
+mport h5py
 import numpy as np
 import os
 
 ###############################
 date = "2024-01-17"
-ns = 0
-ne = 583
-n_procs = 32
+ns = 26
+ne = 98
+n_procs = 8
 DE = False
 SCALAR = True
 ###############################
 
 ###############################
-crc = False
-frontier = True
+crc = True
+frontier = False
 ###############################
 
 if crc:
