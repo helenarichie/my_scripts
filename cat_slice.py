@@ -7,16 +7,16 @@ import os
 
 ###############################
 date = "2024-01-17"
-ns = 0
-ne = 583
-n_procs = 32
+ns = 270
+ne = 367
+n_procs = 6
 DE = False
 SCALAR = True
 ###############################
 
 ###############################
-crc = False
-frontier = True
+crc = True
+frontier = False
 ###############################
 
 if crc:
@@ -30,6 +30,8 @@ if frontier:
 
 # loop over the output times
 for n in range(ns, ne+1):
+
+  print(f"Concatenating slice {n} of {ne}.\n")
 
   # open the output file for writing
   fileout = h5py.File(dnameout+str(n)+'_slice.h5', 'w')
