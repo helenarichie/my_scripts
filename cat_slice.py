@@ -4,10 +4,11 @@
 import h5py
 import numpy as np
 import os
+os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
 
 ###############################
 date = "2024-01-17"
-ns = 0
+ns = 58
 ne = 583
 n_procs = 32
 DE = False
