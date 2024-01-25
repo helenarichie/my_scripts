@@ -2,17 +2,27 @@ import h5py
 import numpy as np
 import os
 
-########################
-date = "2024-01-13"
-ns = 1171
+###############################
+date = "2024-01-17"
+ns = 0
 ne = 1200
-n_procs = 8 # number of processors that did the cholla calculation
+n_procs = 32
 dust = True
-########################
+###############################
 
-basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-dnamein = os.path.join(basedir, "hdf5/raw/")
-dnameout = os.path.join(basedir, "hdf5/proj/")
+###############################
+crc = False
+frontier = True
+###############################
+
+if crc:
+  basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
+  dnamein = os.path.join(basedir, "hdf5/raw/")
+  dnameout = os.path.join(basedir, "hdf5/proj/")
+if frontier:
+  basedir = f"/lustre/orion/ast181/scratch/helenarichie/{date}/"
+  dnamein = os.path.join(basedir, "hdf5/raw/")
+  dnameout = os.path.join(basedir, "hdf5/proj/")
 
 # loop over the output times
 for n in range(ns, ne+1):
