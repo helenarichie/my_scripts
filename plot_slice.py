@@ -1,15 +1,15 @@
 from hconfig import *
 
 #################################
-date = "2024-01-17"
-ns = 58
-ne = 583
+date = "2024-01-22"
+ns = 713
+ne = 1200
 cat = True
 #################################
 
 ########### location ############
-crc = True
-frontier = False
+crc = False
+frontier = True
 #################################
 
 ########## data type ############

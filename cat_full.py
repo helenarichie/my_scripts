@@ -3,9 +3,9 @@ import numpy as np
 import os
 
 #######################
-date = "2024-01-12"
-ns = 0
-ne = 721
+date = "2024-01-22"
+ns = 383
+ne = 1200
 n_hydro = 1
 n_proc = 32
 scalar = False

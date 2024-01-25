@@ -1,20 +1,20 @@
-mport h5py
+import h5py
 import numpy as np
 import os
 os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
 
 ###############################
-date = "2024-01-17"
-ns = 58
-ne = 583
+date = "2024-01-22"
+ns = 713
+ne = 1200
 n_procs = 32
 DE = False
 SCALAR = True
 ###############################
 
 ###############################
-crc = True
-frontier = False
+crc = False
+frontier = True
 ###############################
 
 if crc:
