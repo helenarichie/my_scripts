@@ -1,89 +1,160 @@
+import sys
+sys.path.insert(0, "/ix/eschneider/helena/code/my_scripts")
 from hconfig import *
+from csv import writer
 
-# date = input("\nDate: ")
 #################################
-date = "2023-11-08"
-save = True
-cat = True
-gas = True
+date = "2024-01-12"
+ns = 0
+ne = 1200
+n_procs = 32
+#################################
+
+########### plotting ############
 dust = True
-vlims_gas = (-8, -3)
-vlims_dust = (-10, -6)
+cat = True
+vlims = False
+unit = "kpc"  # kpc or pc
+spacing = 640*1e-3  # in kpc or pc
+# spacing = 20
+fontsize = 28
+vlims_gas = (19.5, 25.5)  # g/cm^3
+vlims_dust = (-14, -3)  # g/cm^3
+pad = 0.1
+labelpad = 12
+tickwidth = 2
+ticklen = 9
+plt.rcParams.update({'font.family': 'Helvetica'})
+plt.rcParams.update({'font.size': fontsize})
 #################################
 
-# directory with slices
-basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
-proj_data = os.path.join(basedir, "hdf5/proj/")
-pngdir = os.path.join(basedir, "png/proj/")
+########### location ############
+crc = False
+frontier = True
+#################################
 
-data = ReadHDF5(proj_data, dust=dust, proj="xy", cat=cat)
+########## data type ############
+debugging = False
+cloud_wind = False
+testing = False
+#################################
+
+########## specify slice and png directories ############
+if crc:
+    if debugging:
+        basedir = f"/ix/eschneider/helena/data/debugging/{date}/"
+    if cloud_wind:
+        basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
+    if testing:
+        basedir = f"/ix/eschneider/helena/data/testing/{date}/"
+
+if frontier:
+    basedir = f"/lustre/orion/ast181/scratch/helenarichie/{date}/"
+
+if cat:
+    projdir = os.path.join(basedir, "hdf5/proj/")
+else:
+    projdir = os.path.join(basedir, "hdf5/raw/")
+
+csvdir = os.path.join(basedir, "csv/")
+pngdir = os.path.join(basedir, "png/proj/")
+#########################################################
+
+data = ReadHDF5(projdir, dust=dust, proj="xy", cat=cat)
 head = data.head
 conserved = data.conserved
 
 nx, ny, nz = head["dims"]
 dx = head["dx"][0]
-d_gas = conserved["density"]
+if unit == "pc":
+    dx *= 1e3
+
+d_gas = conserved["density"][0]
 d_gas *= head["mass_unit"] / (head["length_unit"] ** 2)
 
 gamma = head["gamma"]
-t_arr = data.t_cgs() / yr_in_s
+t_arr = data.t_cgs() / yr_in_s  # yr
 
-d_dust = conserved["dust_density"]
+d_dust = conserved["dust_density"][0]
 
 d_dust *= head["mass_unit"] / (head["length_unit"] ** 2)
+##################################################################
+# create files to write quantities for cloud (dense gas only), total gas, and dust
+#f = open(os.path.join(csvdir, "d_dust_neg.csv"), "w")
+#f.close()
 
-for i, d in enumerate(d_gas):
+for i in range(ns, ne):
 
-    fig, axs = plt.subplots(nrows=1, ncols=1, figsize=(15,5))
-    
+    # read in data
+    if dust:
+        data = ReadHDF5(projdir, fnum=i, dust=dust, proj="xy", cat=cat)
+    else:
+        data = ReadHDF5(projdir, fnum=i, proj="xy", cat=cat)
+
+    """with open(os.path.join(csvdir, "d_dust_neg.csv"), "a") as f:
+        d_dust_ch = d_dust[i] / (head["mass_unit"] / (head["length_unit"] ** 2))
+        writer_obj = writer(f)
+        if len(d_dust_ch[d_dust_ch<0]) > 0:
+            writer_obj.writerow([np.amin(d_dust_ch[d_dust_ch<0]), np.amax(d_dust_ch[d_dust_ch<0]), len(d_dust_ch[d_dust_ch<0])])
+        else:
+            writer_obj.writerow(["None"])
+        f.close()"""
+
+
+    # plt.style.use('dark_background')
+
+    fig, axs = plt.subplots(nrows=2, ncols=1, figsize=(17,10))
+
     # xy gas density projection
-    im = axs.imshow(np.log10(d_gas[i].T), origin="lower", extent=[0, nx*dx, 0, nz*dx])
-    ylabel = r'$\mathrm{log}_{10}(\Sigma_{gas})$ [$\mathrm{g}\,\mathrm{cm}^{-2}$]'
-    divider = make_axes_locatable(axs)
-    cax = divider.append_axes("right", size="5%", pad=0.05)
-    cbar = fig.colorbar(im, ax=axs, cax=cax)
-    cbar.set_label(ylabel)
-    axs.set_xticks(nx*dx*np.arange(0, 1.25, 0.25))
-    axs.set_yticks(nz*dx*np.arange(0, 1.25, 0.5))
-    axs.set_xlabel(r"$x~$[kpc]")
-    axs.set_ylabel(r"$z~$[kpc]")
-    axs.tick_params(axis='both', which='both', direction='in', color='white', top=1, right=1, length=7)
-    axs.text(0.05*dx*nx, 0.1*dx*nz, f'{round(t_arr[i]/1e6, 2)} Myr', color='white', fontsize=20)    
-    axs.set_title(r"Gas Density Projection")
+    n_gas = d_gas/(0.6*MP) # column density
+    if vlims:
+        im = axs[0].imshow(np.log10(n_gas.T), origin="lower", vmin=vlims_gas[0], vmax=vlims_gas[1], extent=[0, nx*dx, 0, nz*dx])
+    else:
+        im = axs[0].imshow(np.log10(n_gas.T), origin="lower", extent=[0, nx*dx, 0, nz*dx])
+    ylabel = r'$\mathrm{log}_{10}(N_{H, gas})$ [$\mathrm{cm}^{-2}$]'
+    divider = make_axes_locatable(axs[0])
+    cax = divider.append_axes("right", size="5%", pad=pad)
+    cbar = fig.colorbar(im, ax=axs[0], cax=cax, pad=pad)
+    cbar.ax.tick_params(length=9, width=tickwidth)
+    cbar.set_label(ylabel, fontsize=fontsize, labelpad=11)
+    cbar.set_ticks(np.linspace(vlims_gas[0], vlims_gas[1], 4).round(1))
+    axs[0].set_xticks(np.arange(0, nx*dx, spacing))
+    axs[0].set_yticks(np.arange(0, ny*dx, spacing))
+    axs[0].tick_params(axis='both', which='both', direction='in', color='white', top=1, right=1, length=ticklen, width=tickwidth)
+    # axs[0].set_title(r"Gas Density Projection", fontsize=fontsize)
+    axs[0].set_xlabel(r"$x~$[{}]".format(unit), fontsize=fontsize)
+    axs[0].set_ylabel(r"$y~$[{}]".format(unit), fontsize=fontsize)
+    axs[0].text(spacing, 0.1*dx*ny, f'{round(t_arr[i]/1e6, 2)} Myr', color='white', fontsize=fontsize)
 
-    # plot and save
-    save = True
-    if save:
-        plt.savefig(pngdir + f"{i}_gas_proj.png", dpi=300)
-    plt.close()
+    negative = d_dust[i][d_dust[i]<0]
+    # d_dust[i][d_dust<0] = 1e-40
+    # d_dust[i][d_dust==0] = 1e-40
 
-    fig, axs = plt.subplots(nrows=1, ncols=1, figsize=(13,5))
-
-    d_dust[i][d_dust[i]<=0] = 1e-40
+    if len(negative) > 0:
+        print(len(negative))
+        print("Max: ", np.amax(negative))
+        print("Min: ", np.amin(negative))
 
     # xy dust density projection
-    im = axs.imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", vmin=vlims_dust[0], extent=[0, nx*dx, 0, nz*dx])
-    #im = axs.imshow(np.log10(d_dust[i].T), origin="lower", cmap="plasma", extent=[0, nx*dx, 0, nz*dx])
-    if np.isnan(np.log10(d_dust[i].T).any()):
-        print("there's a nan")
-
+    im = axs[1].imshow(np.log10(d_dust.T), origin="lower", cmap="plasma", vmin=vlims_dust[0], vmax=vlims_dust[1], extent=[0, nx*dx, 0, nz*dx])
     ylabel = r'$\mathrm{log}_{10}(\Sigma_{dust})$ [$\mathrm{g}\,\mathrm{cm}^{-2}$]'
-    divider = make_axes_locatable(axs)
-    cax = divider.append_axes("right", size="5%", pad=0.05)
-    cbar = fig.colorbar(im, ax=axs, cax=cax)
-    cbar.set_label(ylabel)
-    axs.set_xticks(nx*dx*np.arange(0, 1.25, 0.25))
-    axs.set_yticks(nz*dx*np.arange(0, 1.25, 0.5))
-    axs.set_xlabel(r"$x~$[kpc]")
-    axs.set_ylabel(r"$z~$[kpc]")
-    axs.tick_params(axis='both', which='both', direction='in', color='white', top=1, right=1, length=7)
-    axs.text(0.05*dx*nx, 0.1*dx*nz, f'{round(t_arr[i]/1e6, 2)} Myr', color='white', fontsize=20)  
-    axs.set_title(r"Dust Density Projection")
+    divider = make_axes_locatable(axs[1])
+    cax = divider.append_axes("right", size="5%", pad=pad)
+    cbar = fig.colorbar(im, ax=axs[1], cax=cax)
+    cbar.ax.tick_params(length=9, width=tickwidth)
+    cbar.set_label(ylabel, fontsize=fontsize, labelpad=11)
+    cbar.set_ticks(np.linspace(vlims_dust[0], vlims_dust[1], 4).round(1))
+    axs[1].set_xticks(np.arange(0, nx*dx, spacing))
+    axs[1].set_yticks(np.arange(0, ny*dx, spacing))
+    axs[1].tick_params(axis='both', which='both', direction='in', color='white', top=1, right=1, length=ticklen, width=tickwidth)
+    # axs[1].set_title(r"Dust Density Slice", fontsize=fontsize)
+    axs[1].set_xlabel(r"$x~$[{}]".format(unit), fontsize=fontsize)
+    axs[1].set_ylabel(r"$y~$[{}]".format(unit), fontsize=fontsize)
+
+    fig.tight_layout()
 
     # plot and save
-    save = True
-    if save:
-        plt.savefig(pngdir + f"{i}_dust_proj.png", dpi=300)
+    plt.savefig(pngdir + f"{i}_proj.png", dpi=300)
     plt.close()
 
-    print(f"Saving figures {i} of {len(os.listdir(proj_data))-1}.\n")
+    print(f"Saving figures {i} of {len(os.listdir(projdir))-1}.\n")
