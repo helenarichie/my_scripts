@@ -4,6 +4,8 @@ if __file__ == "/ix/eschneider/helena/code/my_scripts/hconfig.py":
     sys.path.insert(0, "/ix/eschneider/helena/code/analysis_scripts")
 if __file__ == "/Users/helenarichie/GitHub/my_scripts/hconfig.py":
     sys.path.insert(0, "/Users/helenarichie/GitHub/analysis_scripts/")
+if __file__ == "/ccs/home/helenarichie/code/my_scripts/hconfig.py":
+    sys.path.insert(0, "/ccs/home/helenarichie/code/analysis_scripts")
 from read_hdf5 import ReadHDF5
 import os
 import glob
