@@ -17,8 +17,16 @@ crc = False
 frontier = True
 ###############################
 
+###############################
+testing = True
+cloud_wind = False
+###############################
+
 if crc:
-  basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
+  if cloud_wind:
+    basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
+  if testing:
+    basedir = f"/ix/eschneider/helena/data/testing/{date}/"
   dnamein = os.path.join(basedir, "hdf5/raw/")
   dnameout = os.path.join(basedir, "hdf5/slice/")
 if frontier:
