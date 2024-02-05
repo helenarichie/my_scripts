@@ -4,10 +4,10 @@ from hconfig import *
 from csv import writer
 
 #################################
-date = "2024-01-12"
+date = "2024-01-29"
 ns = 0
-ne = 1200
-n_procs = 32
+ne = 5
+n_procs = 2
 #################################
 
 ########### plotting ############
@@ -29,14 +29,14 @@ plt.rcParams.update({'font.size': fontsize})
 #################################
 
 ########### location ############
-crc = False
-frontier = True
+crc = True
+frontier = False
 #################################
 
 ########## data type ############
 debugging = False
 cloud_wind = False
-testing = False
+testing = True
 #################################
 
 ########## specify slice and png directories ############
@@ -134,6 +134,8 @@ for i in range(ns, ne):
         print(len(negative))
         print("Max: ", np.amax(negative))
         print("Min: ", np.amin(negative))
+    if np.any(np.isnan(d_dust[i])):
+        print(d_dust[i][np.isnan(d_dust[i])])
 
     # xy dust density projection
     im = axs[1].imshow(np.log10(d_dust.T), origin="lower", cmap="plasma", vmin=vlims_dust[0], vmax=vlims_dust[1], extent=[0, nx*dx, 0, nz*dx])

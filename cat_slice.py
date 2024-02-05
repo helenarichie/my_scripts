@@ -1,14 +1,14 @@
-mport h5py
+import h5py
 import numpy as np
 import os
 os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
 
 ###############################
-date = "2024-01-17"
-ns = 58
-ne = 583
-n_procs = 32
-DE = False
+date = "2024-01-29"
+ns = 42
+ne = 326
+n_procs = 2
+DE = True
 SCALAR = True
 ###############################
 
@@ -17,8 +17,16 @@ crc = True
 frontier = False
 ###############################
 
+###############################
+testing = True
+cloud_wind = False
+###############################
+
 if crc:
-  basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
+  if cloud_wind:
+    basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
+  if testing:
+    basedir = f"/ix/eschneider/helena/data/testing/{date}/"
   dnamein = os.path.join(basedir, "hdf5/raw/")
   dnameout = os.path.join(basedir, "hdf5/slice/")
 if frontier:
