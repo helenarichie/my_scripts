@@ -1,10 +1,11 @@
 from hconfig import *
 
 #################################
-date = "2024-01-22"
-ns = 713
-ne = 1200
+date = "2024-02-07"
+ns = 383
+ne = 985
 cat = True
+title = r"$r_{cl}$/64"
 #################################
 
 ########### location ############
@@ -22,11 +23,11 @@ testing = True
 dust = True
 pressure = False
 vlims = True
-vlims_gas = (-23.0459 , -22.301) # g/cm^3
-vlims_dust = (-32, -23.5) # g/cm^3
+vlims_gas = (-26 , -21.4) # g/cm^3
+vlims_dust = (-30, -23.5) # g/cm^3
 vlims_p = (2, 7) # P/k_b (K/cm^3)
-vlims_T = (2, 8) # K
-vlims_v = (-250, 1050)
+vlims_T = (2, 7) # K
+vlims_v = (-50, 550)
 spacing, unit = 640*1e-3, "kpc" # spacing of tick marks in units and sets axes labels and units of dx (kpc or pc)
 # spacing, unit = 40, "pc"
 fontsize = 20
@@ -103,8 +104,8 @@ for i in range(ns, ne+1):
                 print("none\n")
 
     # plot
-    fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(25,9))
-
+    fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(50,9))
+    plt.suptitle(title)
     if vlims:
         im = axs[0][0].imshow(np.log10(d_gas[0].T), origin="lower", vmin=vlims_gas[0], vmax=vlims_gas[1], extent=[0, nx*dx, 0, ny*dx])
     else:

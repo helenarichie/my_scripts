@@ -4,17 +4,17 @@ import os
 os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
 
 ###############################
-date = "2024-02-04"
-ns = 0
-ne = 326
-n_procs = 2
+date = "2024-02-10"
+ns = 300
+ne = 786
+n_procs = 176
 DE = True
 SCALAR = True
 ###############################
 
 ###############################
-crc = True
-frontier = False
+crc = False
+frontier = True
 ###############################
 
 ###############################
