@@ -3,20 +3,31 @@ import numpy as np
 import os
 
 ###############################
-date = "2024-01-17"
+date = "2024-01-29"
 ns = 0
-ne = 1200
-n_procs = 32
+ne = 5
+n_procs = 2
 dust = True
 ###############################
 
 ###############################
-crc = False
-frontier = True
+crc = True
+frontier = False
 ###############################
 
+########## data type ############
+debugging = False
+cloud_wind = False
+testing = True
+#################################
+
 if crc:
-  basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
+  if debugging:
+      basedir = f"/ix/eschneider/helena/data/debugging/{date}/"
+  if cloud_wind:
+      basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
+  if testing:
+      basedir = f"/ix/eschneider/helena/data/testing/{date}/"
   dnamein = os.path.join(basedir, "hdf5/raw/")
   dnameout = os.path.join(basedir, "hdf5/proj/")
 if frontier:

@@ -1,9 +1,9 @@
 from hconfig import *
 
 #################################
-date = "2024-01-17"
-ns = 58
-ne = 583
+date = "2024-01-29"
+ns = 42
+ne = 326
 cat = True
 #################################
 
@@ -14,14 +14,14 @@ frontier = False
 
 ########## data type ############
 debugging = False
-cloud_wind = True
-testing = False
+cloud_wind = False
+testing = True
 #################################
 
 ########### plotting #############
-dust = False
-pressure = True
-vlims = False
+dust = True
+pressure = False
+vlims = True
 vlims_gas = (-23.0459 , -22.301) # g/cm^3
 vlims_dust = (-32, -23.5) # g/cm^3
 vlims_p = (2, 7) # P/k_b (K/cm^3)
@@ -124,7 +124,7 @@ for i in range(ns, ne+1):
     
     # xy dust density
     if dust:
-        wh_zero = np.where(d_dust[0]==0)
+        wh_zero = np.where(d_dust[0]<1e-40)
         d_dust[0][wh_zero] = 1e-40
         wh_neg = np.where(d_dust[0]<0)
         d_dust[0][wh_neg] = np.nan
