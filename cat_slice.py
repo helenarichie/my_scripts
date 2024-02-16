@@ -13,8 +13,8 @@ SCALAR = True
 ###############################
 
 ###############################
-crc = True
-frontier = False
+crc = False
+frontier = True
 ###############################
 
 ###############################
@@ -31,7 +31,7 @@ if crc:
   dnameout = os.path.join(basedir, "hdf5/slice/")
 if frontier:
   basedir = f"/lustre/orion/ast181/scratch/helenarichie/{date}/"
-  dnamein = os.path.join(basedir, "hdf5/raw/")
+  dnamein = os.path.join(basedir, "hdf5/new/")
   dnameout = os.path.join(basedir, "hdf5/slice/")
 
 # loop over the output times

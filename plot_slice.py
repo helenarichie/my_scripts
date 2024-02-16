@@ -5,11 +5,12 @@ date = "2024-02-11"
 ns = 47
 ne = 1200
 cat = True
+title = r"$r_{cl}$/64"
 #################################
 
 ########### location ############
-crc = True
-frontier = False
+crc = False
+frontier = True
 #################################
 
 ########## data type ############
@@ -103,8 +104,8 @@ for i in range(ns, ne+1):
                 print("none\n")
 
     # plot
-    fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(25,9))
-
+    fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(50,9))
+    plt.suptitle(title)
     if vlims:
         im = axs[0][0].imshow(np.log10(d_gas[0].T), origin="lower", vmin=vlims_gas[0], vmax=vlims_gas[1], extent=[0, nx*dx, 0, ny*dx])
     else:

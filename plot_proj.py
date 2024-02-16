@@ -1,25 +1,25 @@
 import sys
-sys.path.insert(0, "/ix/eschneider/helena/code/my_scripts")
+sys.path.insert(0, "/ccs/ihome/helenarichie/code/analysis_scripts/")
 from hconfig import *
 from csv import writer
 
 #################################
-date = "2024-01-29"
+date = "2024-02-05"
 ns = 0
-ne = 5
-n_procs = 2
+ne = 1200
+n_procs = 24
 #################################
 
 ########### plotting ############
 dust = True
 cat = True
-vlims = False
-unit = "kpc"  # kpc or pc
-spacing = 640*1e-3  # in kpc or pc
-# spacing = 20
+vlims = True
+unit = "pc"  # kpc or pc
+# spacing = 640*1e-3  # in kpc or pc
+spacing = 20
 fontsize = 28
-vlims_gas = (19.5, 25.5)  # g/cm^3
-vlims_dust = (-14, -3)  # g/cm^3
+vlims_gas = (18.55, 20.5)  # g/cm^3
+vlims_dust = (-10.5, -5.2)  # g/cm^3
 pad = 0.1
 labelpad = 12
 tickwidth = 2
@@ -29,8 +29,8 @@ plt.rcParams.update({'font.size': fontsize})
 #################################
 
 ########### location ############
-crc = True
-frontier = False
+crc = False
+frontier = True
 #################################
 
 ########## data type ############

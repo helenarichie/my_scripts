@@ -3,16 +3,16 @@ import numpy as np
 import os
 
 ###############################
-date = "2024-01-29"
+date = "2024-02-05"
 ns = 0
-ne = 5
-n_procs = 2
+ne = 1200
+n_procs = 24
 dust = True
 ###############################
 
 ###############################
-crc = True
-frontier = False
+crc = False
+frontier = True
 ###############################
 
 ########## data type ############

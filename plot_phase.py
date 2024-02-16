@@ -1,13 +1,13 @@
 from hconfig import *
 from csv import writer
 from matplotlib import colors
-from labellines import labelLines
+# from labellines import labelLines
 import seaborn as sns
 
 density_conversion = 5.028e-34/(3.24e-22)**3 # g/cm^3 to M_sun/kpc^3
 
 ################# hard-coded, fill these in! ###################
-date = "2024-02-06"
+date = "2024-02-07"
 rho_cl_i = 1e-23  # n = 1, needed to index cloud material
 cutoff = rho_cl_i*density_conversion/3 # M_sun/kpc^3
 cat = True
@@ -18,26 +18,19 @@ mu = 0.6
 ################################################################
 
 ####################
-gas = True
-dust = False
 sputtering_contours = False
 a_grain = 1  # 0.1 micrometer
 n_hydro = 1
 tickwidth = 2
 nbins = 100
+crc = False
+frontier = True
 #####################
 
 hist_cmap = sns.cubehelix_palette(light=1, as_cmap=True, reverse=True)
 
-d_min, d_max = None, None
-vmin, vmax = None, None
-if date == "2024-02-06":
-    d_min, d_max = 5e-28, 1e-22
-    T_min, T_max = 10, 7e7
-    if gas:
-        vmin, vmax = 5e-5, 1000
-    if dust:
-        vmin, vmax = 5e-9, 0.05
+d_min, d_max = 5e-28, 1e-22
+T_min, T_max = 10, 7e7
 
 def tau_sp_n(T, tau_sp):
     YR_IN_S = 3.154e7;
@@ -64,7 +57,11 @@ for tau in tau_sp:
 tau_sps = np.array(tau_sps)
 n_sput = np.array(n_sput)
 
-basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/" # crc
+if crc:
+    basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/" # crc
+if frontier:
+    basedir = f"/lustre/orion/ast181/scratch/helenarichie/{date}/"
+
 datadir = os.path.join(basedir, "hdf5/full/")
 pngdir = os.path.join(basedir, "png/phase/")
 
@@ -80,8 +77,12 @@ for i in range(istart, iend+1):
     mu = 0.6
 
     d = np.array(f["density"]).flatten()
+    print("d")
+    temp = (mu*(gamma-1.0)*1.15831413e14)*(ge/d)
+    print("temp")
     temp = (mu*(gamma-1.0)*1.15831413e14)*(np.array(f["GasEnergy"]).flatten()/d)
     weights = d * head["density_unit"] * (dx*head["length_unit"])**3 * 5.02785e-34 # solar masses
+    print("weights")
     extent = np.log10([[d_min, d_max], [T_min, T_max]])
 
     fig, ax = plt.subplots(figsize=(10,7))
@@ -107,9 +108,7 @@ for i in range(istart, iend+1):
     cbar.ax.tick_params(length=9, width=tickwidth)
     ax.tick_params(axis='both', which='both', direction='in', color='k', top=1, right=1, length=9, width=tickwidth)
 
-    if gas:
-        plt.savefig(pngdir + f"{i}_gas_rhoT.png", dpi=300)
-    if dust:
-        plt.savefig(pngdir + f"{i}_dust_rhoT.png", dpi=300)
+    plt.tight_layout()
+    plt.savefig(pngdir + f"{i}_phase.png", dpi=300, bbox_inches="tight")
     
     plt.close()
