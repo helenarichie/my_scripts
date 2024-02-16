@@ -4,10 +4,10 @@ import os
 os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
 
 ###############################
-date = "2024-02-04"
+date = "2024-02-11"
 ns = 0
-ne = 326
-n_procs = 2
+ne = 1200
+n_procs = 6
 DE = True
 SCALAR = True
 ###############################
@@ -18,8 +18,8 @@ frontier = False
 ###############################
 
 ###############################
-testing = True
-cloud_wind = False
+testing = False
+cloud_wind = True
 ###############################
 
 if crc:
@@ -31,7 +31,7 @@ if crc:
   dnameout = os.path.join(basedir, "hdf5/edges/")
 if frontier:
   basedir = f"/lustre/orion/ast181/scratch/helenarichie/{date}/"
-  dnamein = os.path.join(basedir, "hdf5/raw/")
+  dnamein = os.path.join(basedir, "hdf5/raw")
   dnameout = os.path.join(basedir, "hdf5/edges/")
 
 # loop over the output times

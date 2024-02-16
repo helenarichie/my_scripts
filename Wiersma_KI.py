@@ -2,17 +2,24 @@ import matplotlib.pyplot as plt
 import numpy as np
 import h5py
 from pandas import *
+from hconfig import *
 
-f = h5py.File('/Users/helenarichie/Documents/Grad School/research/data/cooling/z_0.000.hdf5','r')
+# f = h5py.File('/Users/helenarichie/Documents/Grad School/research/data/cooling/z_0.000.hdf5','r')
+f = h5py.File("/ix/eschneider/helena/data/cooling/z_0.000.hdf5")
 T = np.array(f['Solar/Temperature_bins/'])
 L = np.array(f['Solar/Net_cooling/'])
 f.close()
-cloudy = read_csv("/Users/helenarichie/Documents/Grad School/research/data/cooling/cloudy_coolingcurve.txt", sep="\t")
+# cloudy = read_csv("/Users/helenarichie/Documents/Grad School/research/data/cooling/cloudy_coolingcurve.txt", sep="\t")
+cloudy = read_csv("/ix/eschneider/helena/code/cholla/src/cooling/cloudy_coolingcurve.txt", sep="\t")
+
+linewidth = 3
+plt.rcParams.update({'font.size': 20})
 
 logT_cloudy = np.array(cloudy['log T'].tolist())
 logcool_n2_cloudy = np.array(cloudy['log cool/n2'].tolist())
 
-n = 1.00
+n = -2
+T_hot = 3e6
 wh_n = np.where(cloudy["#log n"] == n)
 
 H = 10**np.arange(0, 4, 0.01)
@@ -53,16 +60,16 @@ c = Lref*np.power((10**T2/Tref), al)
 wh_cl = np.argmin(abs(T[101:]-np.sqrt(3e4*3e7)))
 print(L[101:,80][wh_cl])
 
-fig = plt.figure(figsize=(4,3), dpi=300)
+fig = plt.figure(figsize=(6,5.5), dpi=300)
 ax = fig.add_axes([0.18,0.17,0.75,0.75])
 ax.tick_params(axis='both', which='both', direction='in')
-line1, = ax.plot(T[101:], L[101:,80], color="Green")
-line2, = ax.plot(T1, cool1, color="Red")
-line3, = ax.plot(10**T2, cool, color="Blue")
-line4, = ax.plot(10**logT_cloudy[wh_n], 10**logcool_n2_cloudy[wh_n], color="black", zorder=0)
+line1, = ax.plot(T[101:], L[101:,80], color="Green", linewidth=linewidth)
+line2, = ax.plot(T1, cool1, color="Red", linewidth=linewidth)
+line3, = ax.plot(10**T2, cool, color="Blue", linewidth=linewidth)
+line4, = ax.plot(10**logT_cloudy[wh_n], 10**logcool_n2_cloudy[wh_n], color="black", zorder=0, linewidth=linewidth)
 
-print(logT_cloudy)
-print(logcool_n2_cloudy)
+wh_T_hot = np.argmin(abs(10**logT_cloudy[wh_n]-T_hot))
+print(f"Wind cooling rate, n={10**n}, T={T_hot:e}: {10**logcool_n2_cloudy[wh_n][wh_T_hot]}")
 
 #ax.plot(10**T2, c1, color="Red") 
 #ax.plot(10**T2, c2, color="Red") 

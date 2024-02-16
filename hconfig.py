@@ -29,6 +29,7 @@ plt.rcParams.update({'ytick.major.size': 10})
 plt.rcParams.update({'ytick.major.width': 2 })
 plt.rcParams.update({'ytick.minor.size': 5})
 plt.rcParams.update({'ytick.minor.width': 2 })
+plt.rcParams.update({'lines.linewidth': 4})
 
 colors = ["lightskyblue", "violet", "forestgreen", "darkviolet", "thistle", "cadetblue", 
             "palegoldenrod", "darksalmon", "indigo"]
@@ -42,5 +43,5 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import time
 
 plt.rcParams.update({'font.family': 'Helvetica'})
-plt.rcParams.update({'font.size': 27})
+plt.rcParams.update({'font.size': 20})
 # plt.style.use('dark_background')

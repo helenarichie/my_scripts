@@ -4,7 +4,8 @@ import h5py
 
 kb = 1.3807e-16
 
-f = h5py.File('/Users/helenarichie/Documents/Grad School/research/data/cooling/z_0.000.hdf5','r')
+# f = h5py.File('/Users/helenarichie/Documents/Grad School/research/data/cooling/z_0.000.hdf5','r')
+f = h5py.File("/ix/eschneider/helena/data/cooling/z_0.000.hdf5")
 T = np.array(f['Solar/Temperature_bins/'])
 L = np.array(f['Solar/Net_cooling/'])
 f.close()
@@ -46,10 +47,11 @@ c = Lref*np.power((10**T2/Tref), al)
 
 def cooling_time(argn, argT):
     wh_T = np.argmin(abs(T[101:]-argT))
-    lambd = L[101:,80][wh_T]
+    # lambd = L[101:,80][wh_T]
+    lambd = 4.102041029866097e-23
     return 3 * argn * kb * argT / (2 * lambd * argn ** 2)
 
 print(np.sqrt(10*1e-2))
 print(np.sqrt(3e3*3e6))
 
-print(f"Cooling time: {cooling_time(np.sqrt(10*1e-2), np.sqrt(3e3*3e6))/3.154e7*1e-3} kyr")
+print(f"Cooling time: {cooling_time(np.sqrt(1e-2), np.sqrt(3e6))/3.154e7*1e-3} kyr")

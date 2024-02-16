@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, "/ix/eschneider/helena/code/github/my_scripts")
+sys.path.insert(0, "/ix/eschneider/helena/code/my_scripts/")
 from hconfig import *
 from csv import writer
 from matplotlib import colors
@@ -9,17 +9,18 @@ import seaborn as sns
 density_conversion = 5.028e-34/(3.24e-22)**3 # g/cm^3 to M_sun/kpc^3
 
 ################# hard-coded, fill these in! ###################
-date = "2023-04-26"
-rho_cl_i = 1e-24  # n = 1, needed to index cloud material
-cutoff = 0.05*rho_cl_i*density_conversion # 5% of initial density, M_sun/kpc^3
+date = "2024-02-06"
+rho_cl_i = 1e-23  # n = 1, needed to index cloud material
+cutoff = rho_cl_i*density_conversion/3 # M_sun/kpc^3
 cat = True
-istart = 209
+istart = 200
+iend = 200
 n_hydro = 1
 ################################################################
 
 ####################
-gas = False
-dust = True
+gas = True
+dust = False
 a_grain = 1  # 0.1 micrometer
 n_hydro = 1
 tickwidth = 2
@@ -27,7 +28,7 @@ tickwidth = 2
 
 plt.rcParams.update({'font.family': 'Helvetica'})
 plt.rcParams.update({'font.size': 27})
-plt.style.use('dark_background')
+# plt.style.use('dark_background')
 
 hist_cmap = sns.cubehelix_palette(light=1, as_cmap=True, reverse=True)
 
@@ -68,6 +69,13 @@ if date == "2023-05-13":
         vmin, vmax = 5e-5, 5e2
     if dust:
         vmin, vmax = 5e-9, 0.05
+if date == "2024-02-06":
+    d_min, d_max = 5e-28, 1e-22
+    T_min, T_max = 10, 7e7
+    if gas:
+        vmin, vmax = 5e-5, 5e2
+    if dust:
+        vmin, vmax = 5e-9, 0.05
 
 def tau_sp_n(T, tau_sp):
     YR_IN_S = 3.154e7;
@@ -99,7 +107,7 @@ datadir = os.path.join(basedir, "hdf5/full/")
 csvdir = os.path.join(basedir, "csv/")
 pngdir = os.path.join(basedir, "png/flatiron/")
 
-data = ReadHDF5(datadir, fnum=0, dust=True, cat=cat)
+data = ReadHDF5(datadir, fnum=200, dust=True, cat=cat)
 head = data.head
 nx, ny, nz = head["dims"]
 dx = head["dx"] # kpc
@@ -250,7 +258,7 @@ def write_csv(data):
         f.close()
 
 # loop through hdf5 files to write out rates and masses for cloud, gas, and dust
-for i in range(istart, len(files)):
+for i in range(istart, iend+1):
     i *= n_hydro
     # read in data
     data = ReadHDF5(datadir, fnum=i, dust=True, cat=cat)
@@ -258,6 +266,7 @@ for i in range(istart, len(files)):
     conserved = data.conserved
     dx = head["dx"][0]
 
+    """
     write_csv(data)
 
     # calculate and write rates and masses for cloud
@@ -303,6 +312,7 @@ for i in range(istart, len(files)):
         writer_obj = writer(f)
         writer_obj.writerow(rates)
         f.close()
+    """
 
     dx = data.dx_cgs()[0]
 

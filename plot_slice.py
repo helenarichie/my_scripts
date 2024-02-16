@@ -1,9 +1,9 @@
 from hconfig import *
 
 #################################
-date = "2024-01-29"
-ns = 42
-ne = 326
+date = "2024-02-11"
+ns = 47
+ne = 1200
 cat = True
 #################################
 
@@ -14,19 +14,19 @@ frontier = False
 
 ########## data type ############
 debugging = False
-cloud_wind = False
-testing = True
+cloud_wind = True
+testing = False
 #################################
 
 ########### plotting #############
-dust = True
-pressure = False
-vlims = True
-vlims_gas = (-23.0459 , -22.301) # g/cm^3
+dust = False
+pressure = True
+vlims = False
+vlims_gas = (-20 , -21) # g/cm^3
 vlims_dust = (-32, -23.5) # g/cm^3
-vlims_p = (2, 7) # P/k_b (K/cm^3)
-vlims_T = (2, 8) # K
-vlims_v = (-250, 1050)
+vlims_p = (3, 6) # P/k_b (K/cm^3)
+vlims_T = (5, 7) # K
+vlims_v = (0, 150)
 spacing, unit = 640*1e-3, "kpc" # spacing of tick marks in units and sets axes labels and units of dx (kpc or pc)
 # spacing, unit = 40, "pc"
 fontsize = 20

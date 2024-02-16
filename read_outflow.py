@@ -7,16 +7,16 @@ def calc_mass_loss_rate(rho, v, area):
 density_conversion = 5.028e-34/(3.24e-22)**3 # g/cm^3 to M_sun/kpc^3
 
 ################################################################
-date = "2024-02-04"
-rho_cl_i = 1e-26  # needed to index cloud material
+date = "2024-02-11"
+rho_cl_i = 1e-23  # needed to index cloud material
 cutoff = rho_cl_i*density_conversion/3 # M_sun/kpc^3
 ns = 0
-ne = 326
+ne = 1200
 DE = True
 SCALAR = True
 ################################################################
 
-basedir = f"/ix/eschneider/helena/data/testing/{date}/"
+basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
 datadir = os.path.join(basedir, "hdf5/edges/")
 csvdir = os.path.join(basedir, "csv/")
 

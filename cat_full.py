@@ -3,18 +3,18 @@ import numpy as np
 import os
 
 #######################
-date = "2024-01-12"
-ns = 0
-ne = 721
+date = "2024-02-06"
+ns = 300
+ne = 300
 n_hydro = 1
-n_proc = 32
+n_proc = 6
 scalar = False
 dust = True
 #######################
 
 ###############################
-crc = False
-frontier = True
+crc = True
+frontier = False
 ###############################
 
 istart = 0*n_proc
@@ -54,6 +54,7 @@ for n in range(ns, ne+1):
       fileout.attrs['t'] = [head['t'][0]]
       fileout.attrs['dt'] = [head['dt'][0]]
       fileout.attrs['n_step'] = [head['n_step'][0]]
+      print(head['t'][0])
 
       units = ['time_unit', 'mass_unit', 'length_unit', 'energy_unit', 'velocity_unit', 'density_unit']
       for unit in units:

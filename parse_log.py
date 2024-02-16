@@ -1,11 +1,29 @@
 from hconfig import *
 from csv import writer
 
-################################################################
-date = "2024-02-04"
-################################################################
+date = "2024-02-11"
 
-basedir = f"/ix/eschneider/helena/data/testing/{date}/"
+###############################
+crc = True
+frontier = False
+###############################
+
+########## data type ############
+debugging = False
+cloud_wind = True
+testing = False
+#################################
+
+if crc:
+  if debugging:
+      basedir = f"/ix/eschneider/helena/data/debugging/{date}/"
+  if cloud_wind:
+      basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
+  if testing:
+      basedir = f"/ix/eschneider/helena/data/testing/{date}/"
+if frontier:
+  basedir = f"/lustre/orion/ast181/scratch/helenarichie/{date}/"
+
 csvdir = os.path.join(basedir, "csv/")
 
 f = open(os.path.join(csvdir, "sputter_hot.csv"), "w")

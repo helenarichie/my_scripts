@@ -4,10 +4,10 @@ import os
 os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
 
 ###############################
-date = "2024-01-29"
-ns = 42
-ne = 326
-n_procs = 2
+date = "2024-02-11"
+ns = 47
+ne = 1200
+n_procs = 6
 DE = True
 SCALAR = True
 ###############################
@@ -18,8 +18,8 @@ frontier = False
 ###############################
 
 ###############################
-testing = True
-cloud_wind = False
+testing = False
+cloud_wind = True
 ###############################
 
 if crc:
