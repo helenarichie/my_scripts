@@ -14,6 +14,7 @@ cat = True
 istart = 400
 iend = 400
 n_hydro = 1
+mu = 0.6
 ################################################################
 
 ####################
@@ -34,7 +35,7 @@ if date == "2024-02-06":
     d_min, d_max = 5e-28, 1e-22
     T_min, T_max = 10, 7e7
     if gas:
-        vmin, vmax = 5e-5, 5e2
+        vmin, vmax = 5e-5, 1000
     if dust:
         vmin, vmax = 5e-9, 0.05
 
@@ -71,44 +72,23 @@ pngdir = os.path.join(basedir, "png/phase/")
 for i in range(istart, iend+1):
     i *= n_hydro
     # read in data
-    data = ReadHDF5(datadir, fnum=i, dust=True, cat=cat)
-    head = data.head
-    conserved = data.conserved
+    f = h5py.File(os.path.join(datadir, str(i)+".h5"), "r")
+    head = f.attrs
     dx = head["dx"][0]
-    dx = data.dx_cgs()[0]
+    t = head["t"][0]
+    gamma = head["gamma"][0]
+    mu = 0.6
 
-    d = None
-    d_weight = None
-    cmap = None
-    if gas:
-        d = data.d_cgs()
-        d_weight = d
-        cmap = "viridis"
-    if dust:
-        d = data.d_cgs()
-        d_weight = conserved["dust_density"] * head["density_unit"]
-        wh_zero = np.where(d_weight<=0)
-        d_weight[wh_zero] = 1e-40
-        cmap = "plasma"
-
-    T = data.T()
-    t = data.t_cgs() / yr_in_s
-
-    d_sput = n_sput * (MP * 0.6)
-    weights = d_weight.flatten() * dx**3 * 5.02785e-34 # solar masses
-
-    log_d = np.log10(d.flatten())
-    log_T = np.log10(T.flatten())
+    d = np.array(f["density"]).flatten()
+    ge = np.array(f["GasEnergy"]).flatten()
+    temp = (mu*(gamma-1.0)*1.15831413e14)*(ge/d)
+    weights = d * head["density_unit"] * (dx*head["length_unit"])**3 * 5.02785e-34 # solar masses
     extent = np.log10([[d_min, d_max], [T_min, T_max]])
 
     fig, ax = plt.subplots(figsize=(10,7))
-    # hist = plt.hist2d(log_d, log_T, weights=weights,
-    #                   bins=150, norm=colors.LogNorm(),
-    #                   range=extent, cmap=hist_cmap, vmin=vmin, vmax=vmax)
 
-    hist = plt.hist2d(log_d, log_T, weights=weights,
-                      bins=nbins, norm=colors.LogNorm(),
-                      range=extent, cmap=hist_cmap)
+    hist = plt.hist2d(np.log10(d*head["density_unit"]), np.log10(temp), weights=weights,
+                      bins=nbins, norm=colors.LogNorm(), range=extent, cmap=hist_cmap)
     
     if sputtering_contours:
         for j, tau in enumerate(tau_sp):
@@ -119,13 +99,9 @@ for i in range(istart, iend+1):
 
     plt.xlabel(r"$\log (\rho_{gas}~[g\,cm^{-3}])$")
 
-    cbar_label = None
-    if gas:
-        cbar_label = "Gas Mass $M_\odot$"
-    if dust:
-        cbar_label = "Dust Mass $M_\odot$"
+    cbar_label = "Gas Mass $M_\odot$"
     plt.ylabel("$\log (T~[K])$")
-    plt.title(f"{round(t[0]/1e6, 1)} Myr", pad=10)
+    plt.title(f"{round(t/1e6, 1)} Myr", pad=10)
     cbar = plt.colorbar()
     cbar.set_label(cbar_label, rotation=270, labelpad=30)
 
