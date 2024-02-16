@@ -7,7 +7,7 @@ import seaborn as sns
 density_conversion = 5.028e-34/(3.24e-22)**3 # g/cm^3 to M_sun/kpc^3
 
 ################# hard-coded, fill these in! ###################
-date = "2024-02-07"
+date = "2024-02-06"
 rho_cl_i = 1e-23  # n = 1, needed to index cloud material
 cutoff = rho_cl_i*density_conversion/3 # M_sun/kpc^3
 cat = True
@@ -23,13 +23,13 @@ a_grain = 1  # 0.1 micrometer
 n_hydro = 1
 tickwidth = 2
 nbins = 100
-crc = False
-frontier = True
+crc = True
+frontier = False
 #####################
 
 hist_cmap = sns.cubehelix_palette(light=1, as_cmap=True, reverse=True)
 
-d_min, d_max = 5e-28, 1e-22
+d_min, d_max = 5e-29, 1e-22
 T_min, T_max = 10, 7e7
 
 def tau_sp_n(T, tau_sp):
@@ -78,9 +78,8 @@ for i in range(istart, iend+1):
 
     d = np.array(f["density"]).flatten()
     print("d")
-    temp = (mu*(gamma-1.0)*1.15831413e14)*(ge/d)
-    print("temp")
     temp = (mu*(gamma-1.0)*1.15831413e14)*(np.array(f["GasEnergy"]).flatten()/d)
+    print("temp")
     weights = d * head["density_unit"] * (dx*head["length_unit"])**3 * 5.02785e-34 # solar masses
     print("weights")
     extent = np.log10([[d_min, d_max], [T_min, T_max]])
