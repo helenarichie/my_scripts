@@ -80,8 +80,7 @@ for i in range(istart, iend+1):
     mu = 0.6
 
     d = np.array(f["density"]).flatten()
-    ge = np.array(f["GasEnergy"]).flatten()
-    temp = (mu*(gamma-1.0)*1.15831413e14)*(ge/d)
+    temp = (mu*(gamma-1.0)*1.15831413e14)*(np.array(f["GasEnergy"]).flatten()/d)
     weights = d * head["density_unit"] * (dx*head["length_unit"])**3 * 5.02785e-34 # solar masses
     extent = np.log10([[d_min, d_max], [T_min, T_max]])
 
