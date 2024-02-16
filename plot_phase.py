@@ -78,10 +78,9 @@ for i in range(istart, iend+1):
 
     d = np.array(f["density"]).flatten()
     print("d")
-    ge = np.array(f["GasEnergy"]).flatten()
-    print("ge")
     temp = (mu*(gamma-1.0)*1.15831413e14)*(ge/d)
     print("temp")
+    temp = (mu*(gamma-1.0)*1.15831413e14)*(np.array(f["GasEnergy"]).flatten()/d)
     weights = d * head["density_unit"] * (dx*head["length_unit"])**3 * 5.02785e-34 # solar masses
     print("weights")
     extent = np.log10([[d_min, d_max], [T_min, T_max]])
@@ -109,6 +108,7 @@ for i in range(istart, iend+1):
     cbar.ax.tick_params(length=9, width=tickwidth)
     ax.tick_params(axis='both', which='both', direction='in', color='k', top=1, right=1, length=9, width=tickwidth)
 
-    plt.savefig(pngdir + f"{i}_phase.png", dpi=300)
+    plt.tight_layout()
+    plt.savefig(pngdir + f"{i}_phase.png", dpi=300, bbox_inches="tight")
     
     plt.close()
