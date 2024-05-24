@@ -43,38 +43,38 @@ def plot_generic(datadir, pngdir, ns, ne, cat, ftype, fields, vlims, print_keys=
 
                 if field_name.startswith("d_"):
                     if units == "cgs":
-                        ftype == "slice":
+                        if ftype == "slice":
                             conversion = head["density_unit"]
                             clabel = r"$\mathrm{log}_{10}(\rho)$ [$\mathrm{g}\mathrm{cm}^{-3}$]"                           
                     if units == "cholla":
-                        ftype == "slice":
+                        if ftype == "slice":
                             clabel = r"$\mathrm{log}_{10}(\rho)$ [$\mathrm{M}_\odot\mathrm{kpc}^{-3}$]"
                 if field_name.startswith("T_"):
-                    ftype == "slice":
+                    if ftype == "slice":
                         clabel = r"$\mathrm{log}_{10}(T)$ [K]"
                 if field_name.startswith("mx_"):
                     if units == "cgs":
-                        ftype == "slice":
+                        if ftype == "slice":
                             conversion = head["mass_unit"] * head["velocity_unit"]
                             clabel = r"$\mathrm{log}_{10}(p_x)$ [$g\,cm\,s^{-1}$]"
                     if units == "cholla":
-                        ftype == "slice":
+                        if ftype == "slice":
                             clabel = r"$\mathrm{log}_{10}(p_x)$ [$M_\odot\,kpc\,kyr^{-1}$]"
                 if field_name.startswith("my_"):
                     if units == "cgs":
-                        ftype == "slice":
+                        if ftype == "slice":
                             conversion = head["mass_unit"] * head["velocity_unit"]
                             clabel = r"$\mathrm{log}_{10}(p_y)$ [$g\,cm\,s^{-1}$]"
                     if units == "cholla":
-                        ftype == "slice":
+                        if ftype == "slice":
                             clabel = r"$\mathrm{log}_{10}(p_y)$ [$M_\odot\,kpc\,kyr^{-1}$]"
                 if field_name.startswith("mz_"):
                     if units == "cgs":
-                        ftype == "slice":
+                        if ftype == "slice":
                             conversion = head["mass_unit"] * head["velocity_unit"]
                             clabel = r"$\mathrm{log}_{10}(p_z)$ [$g\,cm\,s^{-1}$]"
                     if units == "cholla":
-                        ftype == "slice":
+                        if ftype == "slice":
                             clabel = r"$\mathrm{log}_{10}(p_z)$ [$M_\odot\,kpc\,kyr^{-1}$]"
 
                 if units == "cholla":
