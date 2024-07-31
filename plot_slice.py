@@ -1,35 +1,35 @@
 from hconfig import *
 
 #################################
-date = "2024-02-11"
-ns = 47
-ne = 1200
-cat = True
-title = r"$r_{cl}$/64"
+date = "2024-03-27"
+ns = 550
+ne = 800
+cat = False
+title = r""
 #################################
 
 ########### location ############
-crc = False
-frontier = True
+crc = True
+frontier = False
 #################################
 
 ########## data type ############
 debugging = False
-cloud_wind = True
-testing = False
+cloud_wind = False
+testing = True
 #################################
 
 ########### plotting #############
 dust = False
 pressure = True
-vlims = False
-vlims_gas = (-20 , -21) # g/cm^3
+vlims = True
+vlims_gas = (-26.25, -25.75) # g/cm^3
 vlims_dust = (-32, -23.5) # g/cm^3
-vlims_p = (3, 6) # P/k_b (K/cm^3)
-vlims_T = (5, 7) # K
-vlims_v = (0, 150)
-spacing, unit = 640*1e-3, "kpc" # spacing of tick marks in units and sets axes labels and units of dx (kpc or pc)
-# spacing, unit = 40, "pc"
+vlims_p = (3, 4.5) # P/k_b (K/cm^3)
+vlims_T = (5, 6.3) # K
+vlims_v = (0, 200)
+# spacing, unit = 640*1e-3, "kpc" # spacing of tick marks in units and sets axes labels and units of dx (kpc or pc)
+spacing, unit = 1, "kpc"
 fontsize = 20
 plt.rcParams.update({'font.family': 'Helvetica'})
 plt.rcParams.update({'font.size': 20})
@@ -67,9 +67,9 @@ for i in range(ns, ne+1):
 
     # read in data
     if dust:
-        data = ReadHDF5(datadir, nscalar=1, fnum=i, slice="xy", cat=cat)
+        data = ReadHDF5(os.path.join(datadir, str(i)), nscalar=1, fnum=i, slice="xy", cat=cat)
     else:
-        data = ReadHDF5(datadir, fnum=i, slice="xy", cat=cat)
+        data = ReadHDF5(os.path.join(datadir, str(i)), fnum=i, slice="xy", cat=cat)
 
     head = data.head
     conserved = data.conserved
@@ -104,7 +104,7 @@ for i in range(ns, ne+1):
                 print("none\n")
 
     # plot
-    fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(50,9))
+    fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(25,9))
     plt.suptitle(title)
     if vlims:
         im = axs[0][0].imshow(np.log10(d_gas[0].T), origin="lower", vmin=vlims_gas[0], vmax=vlims_gas[1], extent=[0, nx*dx, 0, ny*dx])

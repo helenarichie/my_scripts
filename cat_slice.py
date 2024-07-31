@@ -4,22 +4,24 @@ import os
 os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
 
 ###############################
-date = "2024-02-11"
-ns = 47
-ne = 1200
-n_procs = 6
+date = "2024-04-05"
+ns = 19
+ne = 30
+n_procs = 16
 DE = True
-SCALAR = True
+SCALAR = False
+DUST = True
 ###############################
 
 ###############################
-crc = False
-frontier = True
+crc = True
+frontier = False
 ###############################
 
 ###############################
 testing = False
-cloud_wind = True
+cloud_wind = False
+m82 = True
 ###############################
 
 if crc:
@@ -27,6 +29,8 @@ if crc:
     basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
   if testing:
     basedir = f"/ix/eschneider/helena/data/testing/{date}/"
+  if m82:
+    basedir = f"/ix/eschneider/helena/data/m82/{date}/"
   dnamein = os.path.join(basedir, "hdf5/raw/")
   dnameout = os.path.join(basedir, "hdf5/slice/")
 if frontier:
@@ -46,7 +50,7 @@ for n in range(ns, ne+1):
   for i in range(0, n_procs):
 
     # open the input file for reading
-    filein = h5py.File(dnamein+str(n)+'_slice.h5.'+str(i), 'r')
+    filein = h5py.File(dnamein+str(n)+'/'+str(n)+'_slice.h5.'+str(i), 'r')
     # read in the header data from the input file
     head = filein.attrs
 
@@ -104,6 +108,10 @@ for n in range(ns, ne+1):
        scalar_xy = np.zeros((nx,ny))
        scalar_xz = np.zeros((nx,nz))
        scalar_yz = np.zeros((ny,nz))
+      if DUST:
+       dust_xy = np.zeros((nx,ny))
+       dust_xz = np.zeros((nx,nz))
+       dust_yz = np.zeros((ny,nz))
 
     # write data from individual processor file to
     # correct location in concatenated file
@@ -137,6 +145,10 @@ for n in range(ns, ne+1):
       scalar_xy[xs:xs+nxl,ys:ys+nyl] += filein['scalar_xy']
       scalar_xz[xs:xs+nxl,zs:zs+nzl] += filein['scalar_xz']
       scalar_yz[ys:ys+nyl,zs:zs+nzl] += filein['scalar_yz']
+    if DUST:
+      dust_xy[xs:xs+nxl,ys:ys+nyl] += filein['d_dust_xy']
+      dust_xz[xs:xs+nxl,zs:zs+nzl] += filein['d_dust_xz']
+      dust_yz[ys:ys+nyl,zs:zs+nzl] += filein['d_dust_yz']
 
     filein.close()
 
@@ -164,5 +176,10 @@ for n in range(ns, ne+1):
     fileout.create_dataset('scalar_xy', data=scalar_xy)
     fileout.create_dataset('scalar_xz', data=scalar_xz)
     fileout.create_dataset('scalar_yz', data=scalar_yz)
+  if DUST:
+    fileout.create_dataset('d_dust_xy', data=dust_xy)
+    fileout.create_dataset('d_dust_xz', data=dust_xz)
+    fileout.create_dataset('d_dust_yz', data=dust_yz)
+
 
   fileout.close()

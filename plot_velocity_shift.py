@@ -1,9 +1,12 @@
 from hconfig import *
+from csv import writer
 
-date = "2024-01-18"
+date = "frontier/2024-02-19"
+datestr = "0219"
 
-basedir = f"/ix/eschneider/helena/data/testing/{date}/"
+basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
 pngdir = os.path.join(basedir, "png/")
+csvdir = os.path.join(basedir, "csv/")
 
 cloud_velocities = []
 cloud_masses = []
@@ -27,6 +30,15 @@ with open(os.path.join(basedir, "output.log")) as f:
 cloud_velocities = np.array(cloud_velocities, dtype=float)
 cloud_masses = np.array(cloud_masses, dtype=float)
 times = np.array(times, dtype=float)
+
+velocity_cumulative = 500
+with open(os.path.join(csvdir, "cloud_velocities.csv"), "w") as f:
+    writer_obj = writer(f)
+    for i, velocity in enumerate(cloud_velocities):
+        velocity_cumulative -= velocity
+        writer_obj.writerow([times[i], cloud_masses[i], cloud_velocities[i]])
+    f.close()
+print(velocity_cumulative)
 
 t_arr = np.linspace(np.amin(times), np.amax(times), len(cloud_velocities))
 
@@ -61,4 +73,4 @@ ax.set_xticks(np.linspace(0, np.amax(t_arr)/1e3, 5).round(1))
 ax.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
 
 plt.tight_layout()
-plt.savefig(os.path.join(pngdir, f"cloud_mass_{date}.png"))
+plt.savefig(os.path.join(pngdir, f"cloud_mass_{datestr}.png"))

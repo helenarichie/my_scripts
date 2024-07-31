@@ -35,7 +35,7 @@ class ReadHDF5:
         if slice != None:
             self.head, self.conserved = self.read_hdf5_slice(DE, dust, nscalar, slice, fnum, cat)
         elif proj != None:
-            self.head, self.conserved = self.read_hdf5_proj(proj, fnum, cat)
+            self.head, self.conserved = self.read_hdf5_proj(proj, dust, fnum, cat)
         else:
             self.head, self.conserved = self.read_hdf5_file(DE, dust, nscalar, fnum, cat)
 
@@ -184,8 +184,6 @@ class ReadHDF5:
         f0 = h5py.File(files[0])
         head0 = f0.attrs
 
-        print(list(f0.keys()))
-
         (nx, ny, nz) = head0["dims"]
         dx = head0["dx"]
         gamma = head0["gamma"][0]
@@ -280,7 +278,7 @@ class ReadHDF5:
         return head, conserved
 
 
-    def read_hdf5_proj(self, proj=None, fnum=None, cat=False):
+    def read_hdf5_proj(self, proj=None, dust=False, fnum=None, cat=False):
         files_unsorted = []
         if fnum == None:
             if cat == False:
@@ -330,6 +328,9 @@ class ReadHDF5:
 
         density = np.zeros(array_dims)
         temperature = np.zeros(array_dims)
+        dust_density = 0
+        if dust:
+            dust_density = np.zeros(array_dims)
         
         for i, o_file in enumerate(files):
             start = time.time()
@@ -344,6 +345,8 @@ class ReadHDF5:
             # conserved variables
             density[i] = f[f"d_{proj}"]
             temperature[i] = f[f"T_{proj}"]
+            if dust:
+               dust_density[i] = f[f"d_dust_{proj}"]
             
             f.close()
             print(os.path.basename(o_file), f"--- {round(time.time() - start, 3)} s")
@@ -351,6 +354,7 @@ class ReadHDF5:
         conserved = {
             "density" : density,
             "temperature" : temperature,
+            "dust_density" : dust_density
         }
 
         head = {

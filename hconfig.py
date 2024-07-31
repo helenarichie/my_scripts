@@ -42,5 +42,5 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import time
 
 plt.rcParams.update({'font.family': 'Helvetica'})
-plt.rcParams.update({'font.size': 13})
+plt.rcParams.update({'font.size': 10})
 # plt.style.use('dark_background')

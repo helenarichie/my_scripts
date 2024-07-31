@@ -33,7 +33,6 @@ plt.rcParams.update({'font.family': 'Helvetica'})
 
 bins, r_av, n_av, n_med, n_lo, n_hi, v_av, v_med, v_lo, v_hi, T_av, T_med, T_lo, T_hi, p_av, p_med, p_lo, p_hi, c_av, c_med, c_lo, c_hi, cs_av, cs_med, cs_lo, cs_hi, K_av, K_med, K_lo, K_hi, M_av, M_med, M_lo, M_hi = np.loadtxt('/Users/helenarichie/Downloads/CGOLS profiles/2048_central_35_hot_dweight.txt', unpack=True)
 
-
 fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(13,15))
 
 ax[0].plot(r_av, np.log10(T_med), c="darkorange", linewidth=5)

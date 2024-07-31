@@ -7,12 +7,12 @@ import seaborn as sns
 density_conversion = 5.028e-34/(3.24e-22)**3 # g/cm^3 to M_sun/kpc^3
 
 ################# hard-coded, fill these in! ###################
-date = "2024-02-06"
+date = "2024-02-07"
 rho_cl_i = 1e-23  # n = 1, needed to index cloud material
 cutoff = rho_cl_i*density_conversion/3 # M_sun/kpc^3
 cat = True
-istart = 400
-iend = 400
+istart = 3000
+iend = 3000
 n_hydro = 1
 mu = 0.6
 ################################################################
@@ -29,8 +29,11 @@ frontier = False
 
 hist_cmap = sns.cubehelix_palette(light=1, as_cmap=True, reverse=True)
 
-d_min, d_max = 5e-29, 1e-22
-T_min, T_max = 10, 7e7
+# d_min, d_max = 5e-29, 1e-22  # survived
+# T_min, T_max = 10, 7e7       # survived
+
+d_min, d_max = 5e-28, 1e-22
+T_min, T_max = 800, 8e7
 
 def tau_sp_n(T, tau_sp):
     YR_IN_S = 3.154e7;
@@ -100,7 +103,7 @@ for i in range(istart, iend+1):
 
     cbar_label = "Gas Mass $M_\odot$"
     plt.ylabel("$\log (T~[K])$")
-    plt.title(f"{round(t/1e6, 1)} Myr", pad=10)
+    plt.title(f"{round(t/1e3, 1)} Myr", pad=10)
     cbar = plt.colorbar()
     cbar.set_label(cbar_label, rotation=270, labelpad=30)
 

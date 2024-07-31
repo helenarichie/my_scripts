@@ -1,7 +1,7 @@
 from hconfig import *
 from csv import writer
 
-date = "2024-02-11"
+date = "2024-06-13"
 
 ###############################
 crc = True
@@ -38,7 +38,7 @@ f = open(os.path.join(csvdir, "time.csv"), "w")
 f.close()
 
 sputter_hot, sputter = [], []
-total_sputter = [sputter_hot, sputter]
+total_sputter = [sputter, sputter_hot]
 strings_sputter = ["Mixed sputtered mass: ", "Hot sputtered mass: "]
 mass_cloud, mass_dust = [], []
 total_mass = [mass_cloud, mass_dust]
@@ -58,12 +58,12 @@ with open(os.path.join(basedir, "output.log")) as f:
                 entry = entry.lstrip(strings_sputter[j])
                 total_sputter[j].append(float(entry))
                 if j == 0:
-                    with open(os.path.join(csvdir, "sputter_hot.csv"), "a") as f_txt:
+                    with open(os.path.join(csvdir, "sputter.csv"), "a") as f_txt:
                         writer_obj = writer(f_txt)
                         writer_obj.writerow([total_sputter[j][i]])
                         f_txt.close()
                 if j == 1:
-                    with open(os.path.join(csvdir, "sputter.csv"), "a") as f_txt:
+                    with open(os.path.join(csvdir, "sputter_hot.csv"), "a") as f_txt:
                         writer_obj = writer(f_txt)
                         writer_obj.writerow([total_sputter[j][i]])
                         f_txt.close()

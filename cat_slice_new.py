@@ -4,28 +4,28 @@ import os
 os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
 
 ###############################
-date = "2024-03-26"
-ns = 0
-ne = 0
+date = "2024-04-05"
+ns = 29
+ne = 30
 n_procs = 16
 DE = True
-SCALAR = False
+SCALAR = True
 DUST = True
 ###############################
 
 ###############################
-crc = False
-frontier = True
+crc = True
+frontier = False
 ###############################
 
 ###############################
 testing = False
-cloud_wind = True
+m82 = True
 ###############################
 
 if crc:
-  if cloud_wind:
-    basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
+  if m82:
+    basedir = f"/ix/eschneider/helena/data/m82/{date}/"
   if testing:
     basedir = f"/ix/eschneider/helena/data/testing/{date}/"
   dnamein = os.path.join(basedir, "hdf5/raw/")

@@ -7,11 +7,11 @@ def calc_mass_loss_rate(rho, v, area):
 density_conversion = 5.028e-34/(3.24e-22)**3 # g/cm^3 to M_sun/kpc^3
 
 ################################################################
-date = "2024-02-11"
+date = "2024-06-13"
 rho_cl_i = 1e-23  # needed to index cloud material
 cutoff = rho_cl_i*density_conversion/3 # M_sun/kpc^3
 ns = 0
-ne = 1200
+ne = 700
 DE = True
 SCALAR = True
 ################################################################

@@ -18,8 +18,9 @@ plt.rcParams.update({'font.size': 20})
 logT_cloudy = np.array(cloudy['log T'].tolist())
 logcool_n2_cloudy = np.array(cloudy['log cool/n2'].tolist())
 
-n = -2
+n = 1
 T_hot = 3e6
+T_cool = 3e3
 wh_n = np.where(cloudy["#log n"] == n)
 
 H = 10**np.arange(0, 4, 0.01)
@@ -69,7 +70,9 @@ line3, = ax.plot(10**T2, cool, color="Blue", linewidth=linewidth)
 line4, = ax.plot(10**logT_cloudy[wh_n], 10**logcool_n2_cloudy[wh_n], color="black", zorder=0, linewidth=linewidth)
 
 wh_T_hot = np.argmin(abs(10**logT_cloudy[wh_n]-T_hot))
-print(f"Wind cooling rate, n={10**n}, T={T_hot:e}: {10**logcool_n2_cloudy[wh_n][wh_T_hot]}")
+wh_T_cool = np.argmin(abs(10**logT_cloudy[wh_n]-T_cool))
+print(f"Wind cooling function, n={10**n}, T={T_hot:e}: {10**logcool_n2_cloudy[wh_n][wh_T_hot]}")
+print(f"Cloud cooling function, n={10**n}, T={T_cool:e}: {10**logcool_n2_cloudy[wh_n][wh_T_cool]}")
 
 #ax.plot(10**T2, c1, color="Red") 
 #ax.plot(10**T2, c2, color="Red") 

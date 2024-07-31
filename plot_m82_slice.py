@@ -1,29 +1,29 @@
 from hconfig import *
 
 #################################
-date = "2024-03-26"
+date = "2024-04-05"
 ns = 0
-ne = 1
+ne = 30
 cat = True
 #################################
 
 ########### location ############
-crc = False
-frontier = True
+crc = True
+frontier = False
 #################################
 
 ########## data type ############
 debugging = False
-cloud_wind = True
+m82 = True
 testing = False
 #################################
 
 ########### plotting #############
 dust = True
-basic_scalar = False
-vlims = False
-vlims_gas = (-20 , -21) # g/cm^3
-vlims_dust = (-32, -23.5) # g/cm^3
+basic_scalar = True
+vlims = True
+vlims_gas = (32.7 , 38.5) # g/cm^3
+vlims_dust = (30, 36.7) # g/cm^3
 vlims_p = (3, 6) # P/k_b (K/cm^3)
 vlims_T = (5, 7) # K
 vlims_v = (0, 150)
@@ -38,8 +38,8 @@ plt.rcParams.update({'font.size': 20})
 if crc:
     if debugging:
         basedir = f"/ix/eschneider/helena/data/debugging/{date}/"
-    if cloud_wind:
-        basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
+    if m82:
+        basedir = f"/ix/eschneider/helena/data/m82/{date}/"
     if testing:
         basedir = f"/ix/eschneider/helena/data/testing/{date}/"
 
@@ -63,15 +63,15 @@ for i in range(ns, ne+1):
     t = head["t"][0]*1e3
     gamma = head["gamma"][0]
     mu = 0.6
-    print(f.keys())
 
     nx, ny, nz = head["dims"][0], head["dims"][1], head["dims"][2]
     dx = head["dx"][0]
 
     d_gas = np.array(f["d_xz"]) * head["density_unit"] * (dx*head["length_unit"])**3
-    d_dust = np.array(f["d_dust_xz"]) * head["density_unit"] * (dx*head["length_unit"])**3
-    print("Dust min: ", np.amin(d_dust))
-    print("Dust max: ", np.amax(d_dust))
+    if dust:
+        d_dust = np.array(f["d_dust_xz"]) * head["density_unit"] * (dx*head["length_unit"])**3
+        print("Dust min: ", np.amin(d_dust))
+        print("Dust max: ", np.amax(d_dust))
     if basic_scalar:
         scalar = np.array(f["basic_scalar_xz"])
         print("Scalar min: ", np.amin(scalar))
@@ -127,7 +127,7 @@ for i in range(ns, ne+1):
     
     if basic_scalar:
         if vlims:
-            im = ax[2].imshow(np.log10(scalar.T), origin="lower", cmap="jet", extent=[0, nx*dx, 0, nz*dx])
+            im = ax[2].imshow(np.log10(scalar.T), origin="lower", cmap="jet", extent=[0, nx*dx, 0, nz*dx], vmin=2, vmax=10)
         else: 
             im = ax[2].imshow(np.log10(scalar.T), origin="lower", cmap="jet", extent=[0, nx*dx, 0, nz*dx])
         ylabel = "scalar"
@@ -145,7 +145,7 @@ for i in range(ns, ne+1):
     fig.tight_layout()
     
     # plot and save
-    plt.savefig(pngdir + f"{i}_m82_slice.png", dpi=300)
+    plt.savefig(pngdir + f"{i}_m82_slice.png", dpi=300, bbox_inches="tight")
     plt.close()
 
     print(f"Saving figure {i} of {ne}.\n")

@@ -3,22 +3,23 @@ import numpy as np
 import os
 
 ###############################
-date = "2024-02-05"
+date = "2024-04-05"
 ns = 0
-ne = 1200
-n_procs = 24
+ne = 30
+n_procs = 16
 dust = True
 ###############################
 
 ###############################
-crc = False
-frontier = True
+crc = True
+frontier = False
 ###############################
 
 ########## data type ############
 debugging = False
 cloud_wind = False
-testing = True
+testing = False
+m82 = True
 #################################
 
 if crc:
@@ -28,6 +29,8 @@ if crc:
       basedir = f"/ix/eschneider/helena/data/cloud_wind/{date}/"
   if testing:
       basedir = f"/ix/eschneider/helena/data/testing/{date}/"
+  if m82:
+      basedir = f"/ix/eschneider/helena/data/m82/{date}/"
   dnamein = os.path.join(basedir, "hdf5/raw/")
   dnameout = os.path.join(basedir, "hdf5/proj/")
 if frontier:
@@ -45,7 +48,7 @@ for n in range(ns, ne+1):
   for i in range(0, n_procs):
 
     # open the input file for reading
-    filein = h5py.File(dnamein+str(n)+'_proj.h5.'+str(i), 'r')
+    filein = h5py.File(dnamein+str(n)+"/"+str(n)+'_proj.h5.'+str(i), 'r')
     # read in the header data from the input file
     head = filein.attrs
 
@@ -100,10 +103,10 @@ for n in range(ns, ne+1):
     d_xy[xs:xs+nxl,ys:ys+nyl] += filein['d_xy']
     d_xz[xs:xs+nxl,zs:zs+nzl] += filein['d_xz']
     T_xy[xs:xs+nxl,ys:ys+nyl] += filein['T_xy']
-    # T_xz[xs:xs+nxl,zs:zs+nzl] += filein['T_xz'] this wasn't working for some reason?
+    T_xz[xs:xs+nxl,zs:zs+nzl] += filein['T_xz']
     if dust:
       dust_xy[xs:xs+nxl,ys:ys+nyl] += filein['d_dust_xy']
-      #dust_xz[xs:xs+nxl,zs:zs+nzl] += filein['d_dust_xz']
+      dust_xz[xs:xs+nxl,zs:zs+nzl] += filein['d_dust_xz']
 
     filein.close()
 

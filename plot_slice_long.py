@@ -1,10 +1,10 @@
 from hconfig import *
 
 #################################
-date = "2024-01-17"
-ns = 58
-ne = 583
-cat = True
+date = "2024-02-18"
+ns = 0
+ne = 20
+cat = False
 #################################
 
 ########### location ############
@@ -14,12 +14,12 @@ frontier = False
 
 ########## data type ############
 debugging = False
-cloud_wind = True
-testing = False
+cloud_wind = False
+testing = True
 #################################
 
 ########### plotting #############
-dust = False
+dust = True
 pressure = True
 vlims = False
 vlims_gas = (-23.0459 , -22.301) # g/cm^3
