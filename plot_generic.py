@@ -4,8 +4,7 @@ import matplotlib.pyplot as plt
 import os
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-def plot_generic(datadir, pngdir, ns, ne, cat, ftype, fields, vlims, print_keys=False, floor=None, units="cholla", derive=None, n_xtick=11, n_ytick=11):
-
+def plot_generic(datadir, pngdir, ns, ne, cat, ftype, fields, vlims, print_keys=False, floor=None, units="cholla", derive=None, n_xtick=11, n_ytick=11, figsize=None):
     for i in range(ns, ne+1):
         if ftype == "slice":
             if cat:
@@ -49,6 +48,8 @@ def plot_generic(datadir, pngdir, ns, ne, cat, ftype, fields, vlims, print_keys=
                     if units == "cholla":
                         if ftype == "slice":
                             clabel = r"$\mathrm{log}_{10}(\rho)$ [$\mathrm{M}_\odot\mathrm{kpc}^{-3}$]"
+                        if ftype == "proj":
+                            clabel = r'$\mathrm{log}_{10}(\Sigma_{gas})$ [$\mathrm{M}_\odot\,\mathrm{kpc}^{-2}$]'
                 if field_name.startswith("T_"):
                     if ftype == "slice":
                         clabel = r"$\mathrm{log}_{10}(T)$ [K]"
@@ -76,6 +77,9 @@ def plot_generic(datadir, pngdir, ns, ne, cat, ftype, fields, vlims, print_keys=
                     if units == "cholla":
                         if ftype == "slice":
                             clabel = r"$\mathrm{log}_{10}(p_z)$ [$M_\odot\,kpc\,kyr^{-1}$]"
+                if field_name.startswith("scalar"):
+                    conversion = 1
+                    clabel = ""
 
                 if units == "cholla":
                     conversion = 1
@@ -86,7 +90,10 @@ def plot_generic(datadir, pngdir, ns, ne, cat, ftype, fields, vlims, print_keys=
                     field[field<=floor] = floor
 
                 def plot(vlim=False):
-                    fig, ax = plt.subplots()
+                    if figsize == None:
+                        fig, ax = plt.subplots()
+                    else:
+                        fig, ax = plt.subplots(figsize=figsize)
                     if vlim:
                         im = ax.imshow(np.log10(field.T), origin="lower", vmin=vlims[j][0], vmax=vlims[j][1], extent=[0, xlen, 0, ylen])
                     else:
@@ -102,7 +109,7 @@ def plot_generic(datadir, pngdir, ns, ne, cat, ftype, fields, vlims, print_keys=
                     except NameError:
                         print('field_name must end in "xy", "yz", or "xz".')
                     ax.tick_params(axis='both', which='both', direction='in', color='black', top=1, right=1)
-                    ax.set_title(f"{field_name}")
+                    ax.set_title(f"{field_name}, {t} kyr")
                     ax.set_xlabel(xlabel)
                     ax.set_ylabel(ylabel)
                     fig.tight_layout()
