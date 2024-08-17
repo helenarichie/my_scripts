@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import os
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-def plot_generic(datadir, pngdir, ns, ne, cat, ftype, fields, vlims, print_keys=False, floor=None, units="cholla", derive=None, n_xtick=11, n_ytick=11, figsize=None):
+def plot_generic(datadir, pngdir, ns, ne, cat, ftype, fields, vlims, print_keys=False, floor=None, units="cholla", derive=False, n_xtick=11, n_ytick=11, figsize=None):
     for i in range(ns, ne+1):
         if ftype == "slice":
             if cat:
@@ -28,7 +28,10 @@ def plot_generic(datadir, pngdir, ns, ne, cat, ftype, fields, vlims, print_keys=
         t = head["t"][0]
         gamma = head["gamma"][0]
         nx, ny, nz = head["dims"][0], head["dims"][1], head["dims"][2]
-        dx = head["dx"][0]
+        dx = head["dx"][0]        
+        mu = 0.6 # mean molecular weight
+        MP = 1.672622e-24 # proton mass, g
+        KB = 1.380658e-16 # Boltzmann constant, cm^2 g s^-2 K^-1
         for j, field_name in enumerate(fields):
 
                 if field_name[-2:] == "xy":
@@ -84,7 +87,18 @@ def plot_generic(datadir, pngdir, ns, ne, cat, ftype, fields, vlims, print_keys=
                 if units == "cholla":
                     conversion = 1
 
-                field = np.array(f[field_name]) * conversion
+                if not derive:
+                    field = np.array(f[field_name]) * conversion
+                else:
+                    if field_name.startswith("T"):
+                        if units == "cgs":
+                            density = np.array(f["d_xz"])
+                            energy = np.array(f["E_xz"])
+                            momentum_x = np.array(f["mx_xz"])
+                            momentum_y = np.array(f["my_xz"])
+                            momentum_z = np.array(f["mz_xz"])
+                            field = ((head["gamma"] - 1) / (((density * head["density_unit"]) / (mu*MP))*KB)) * ((energy * head["energy_unit"]) - (1/2 * (density * head["density_unit"]) * ((momentum_x / density * head["velocity_unit"])**2 + (momentum_y / density * head["velocity_unit"])**2 + (momentum_z / density * head["velocity_unit"])**2)))
+                
 
                 if floor != None:
                     field[field<=floor] = floor

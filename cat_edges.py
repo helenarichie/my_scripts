@@ -4,10 +4,10 @@ import os
 os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
 
 ###############################
-date = "2024-06-13"
+date = "m82"
 ns = 0
-ne = 700
-n_procs = 12
+ne = 13
+n_procs = 4
 DE = True
 SCALAR = True
 ###############################
@@ -18,8 +18,8 @@ frontier = False
 ###############################
 
 ###############################
-testing = False
-cloud_wind = True
+testing = True
+cloud_wind = False
 ###############################
 
 if crc:
@@ -46,7 +46,7 @@ for n in range(ns, ne+1):
   for i in range(0, n_procs):
 
     # open the input file for reading
-    filein = h5py.File(dnamein+str(n)+'_edges.h5.'+str(i), 'r')
+    filein = h5py.File(dnamein+str(n)+'/'+str(n)+'_edges.h5.'+str(i), 'r')
     # read in the header data from the input file
     head = filein.attrs
 
